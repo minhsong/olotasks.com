@@ -16,8 +16,8 @@ import {
 const Index = () => {
   let history = useHistory();
   useEffect(() => {
-    document.title = "Trello Clone"
-  }, [])
+    document.title = "Olo Tasks";
+  }, []);
   return (
     <>
       <IndexNav />
@@ -25,7 +25,7 @@ const Index = () => {
         <Content>
           <LeftSide>
             <LeftWrapper>
-              <Title>Trello helps teams move work forward.</Title>
+              <Title>Olo Tasks helps teams move work forward.</Title>
               <Text>
                 Collaborate, manage projects, and reach new productivity peaks.
                 From high rises to the home office, the way your team works is

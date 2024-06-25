@@ -12,39 +12,53 @@ const Boards = () => {
   const history = useHistory();
   const { pending, boardsData } = useSelector((state) => state.boards);
   const [openModal, setOpenModal] = useState(false);
-  const [searchString, setSearchString] = useState('');
+  const [searchString, setSearchString] = useState("");
   const handleModalClose = () => {
     setOpenModal(false);
   };
 
   const handleClick = (e) => {
-   history.push(`/board/${e.target.id}`)
-  }
+    history.push(`/board/${e.target.id}`);
+  };
 
   useEffect(() => {
-    getBoards(false,dispatch);
+    getBoards(false, dispatch);
   }, [dispatch]);
 
   useEffect(() => {
-    document.title = "Boards | Trello Clone"
-  }, [])
+    document.title = "Boards | Olo Tasks";
+  }, []);
 
   return (
     <>
       {pending && <LoadingScreen />}
-      <Container>        
+      <Container>
         <Navbar searchString={searchString} setSearchString={setSearchString} />
         <Wrapper>
           <Title>Your Boards</Title>
           {!pending &&
-            boardsData.length>0 &&
-            boardsData.filter(item=>searchString?item.title.toLowerCase().includes(searchString.toLowerCase()):true).map((item) => {
-              return (
-                <Board key={item._id} link={item.backgroundImageLink} isImage={item.isImage} id={item._id} onClick={(e)=>handleClick(e)}>
-                  {item.title}
-                </Board>
-              );
-            })}
+            boardsData.length > 0 &&
+            boardsData
+              .filter((item) =>
+                searchString
+                  ? item.title
+                      .toLowerCase()
+                      .includes(searchString.toLowerCase())
+                  : true
+              )
+              .map((item) => {
+                return (
+                  <Board
+                    key={item._id}
+                    link={item.backgroundImageLink}
+                    isImage={item.isImage}
+                    id={item._id}
+                    onClick={(e) => handleClick(e)}
+                  >
+                    {item.title}
+                  </Board>
+                );
+              })}
           {!pending && (
             <AddBoard onClick={() => setOpenModal(true)}>
               Create new board

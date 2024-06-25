@@ -13,7 +13,7 @@ import {
 } from "../Redux/Slices/userSlice";
 import { openAlert } from "../Redux/Slices/alertSlice";
 import setBearer from "../Utils/setBearer";
-const baseUrl = "http://localhost:3001/user/";
+const baseUrl = process.env.REACT_APP_API_URL + "/user/";
 
 export const register = async (
   { name, surname, email, password, repassword },
@@ -64,7 +64,7 @@ export const login = async ({ email, password }, dispatch) => {
     const { user, message } = res.data;
     localStorage.setItem("token", user.token);
     setBearer(user.token);
-      dispatch(loginSuccess({ user }));
+    dispatch(loginSuccess({ user }));
     dispatch(
       openAlert({
         message,
@@ -106,11 +106,11 @@ export const getUserFromEmail = async (email, dispatch) => {
         message: "Please write an email to invite",
         severity: "warning",
       })
-      );
-      dispatch(fetchingFinish());
-      return null;
-    }
-    
+    );
+    dispatch(fetchingFinish());
+    return null;
+  }
+
   try {
     const res = await axios.post(baseUrl + "get-user-with-email", { email });
     dispatch(fetchingFinish());
@@ -119,12 +119,12 @@ export const getUserFromEmail = async (email, dispatch) => {
     dispatch(
       openAlert({
         message: error?.response?.data?.errMessage
-        ? error.response.data.errMessage
-        : error.message,
+          ? error.response.data.errMessage
+          : error.message,
         severity: "error",
       })
-      );
-     dispatch(fetchingFinish());
-     return null;
+    );
+    dispatch(fetchingFinish());
+    return null;
   }
 };

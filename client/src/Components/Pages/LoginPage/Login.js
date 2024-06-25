@@ -18,7 +18,7 @@ import {
   Hr,
   Link,
 } from "./Styled";
-
+import logo from "../../../Images/trello-logo.svg";
 const Login = () => {
   let history = useHistory();
   const dispatch = useDispatch();
@@ -28,8 +28,8 @@ const Login = () => {
   });
 
   useEffect(() => {
-    document.title = "Log in to Trello Clone"
-  }, [])
+    document.title = "Log in to Olo Tasks";
+  }, []);
   const handleSubmit = (e) => {
     e.preventDefault();
     login(userInformations, dispatch);
@@ -41,7 +41,7 @@ const Login = () => {
       </BgContainer>
       <Container>
         <TrelloIconContainer onClick={() => history.push("/")}>
-          <Icon src="https://d2k1ftgv7pobq7.cloudfront.net/meta/c/p/res/images/trello-header-logos/167dc7b9900a5b241b15ba21f8037cf8/trello-logo-blue.svg" />
+          <Icon src={logo} />
         </TrelloIconContainer>
         <FormSection>
           <FormCard>

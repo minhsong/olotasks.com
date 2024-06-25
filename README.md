@@ -1,10 +1,10 @@
-# Trello Clone With MERN Stack!
+# Olo Tasks With MERN Stack!
 
 
 
 This is an app built with MERN Stack, and you can access the live demo [HERE](https://trello-clone-umurdogan.herokuapp.com) and you can CLICK the following image to watch video! 
 
-[![Trello clone video](https://i.ibb.co/6PRn1Bw/Ekran-g-r-nt-s-2021-12-23-16-21-36.png)](https://www.youtube.com/watch?v=D2Vcb_QIWmA)
+[![Olo Tasks video](https://i.ibb.co/6PRn1Bw/Ekran-g-r-nt-s-2021-12-23-16-21-36.png)](https://www.youtube.com/watch?v=D2Vcb_QIWmA)
 
 
 Click the image to watch video!
