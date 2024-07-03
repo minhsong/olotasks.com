@@ -3,6 +3,7 @@ const listModel = require("../Models/listModel");
 const boardModel = require("../Models/boardModel");
 const userModel = require("../Models/userModel");
 const helperMethods = require("./helperMethods");
+const { uniqBy } = require("lodash");
 
 const create = async (title, listId, boardId, user, callback) => {
   try {
@@ -361,6 +362,7 @@ const addMember = async (cardId, listId, boardId, user, memberId, callback) => {
       name: member.name,
       color: member.color,
     });
+    card.members = uniqBy(card.members, "user");
     await card.save();
 
     //Add to board activity
@@ -463,8 +465,13 @@ const createLabel = async (cardId, listId, boardId, user, label, callback) => {
       backcolor: label.backColor,
       selected: true,
     });
+    board.labels.unshift({
+      text: label.text,
+      color: label.color,
+      backcolor: label.backColor,
+    });
     await card.save();
-
+    await board.save();
     const labelId = card.labels[0]._id;
 
     return callback(false, { labelId: labelId });

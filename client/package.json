@@ -18,6 +18,7 @@
     "axios": "^0.24.0",
     "date-fns": "^2.0.0-beta.5",
     "eslint-plugin-react-hooks": "^4.2.1-alpha-a44a7a2a3-20211111",
+    "lodash-es": "^4.17.21",
     "moment": "^2.29.1",
     "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.0",
