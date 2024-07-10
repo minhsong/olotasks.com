@@ -29,6 +29,7 @@ const LabelsPopover = (props) => {
   const { currentPage } = props;
   const dispatch = useDispatch();
   const thisCard = useSelector((state) => state.card);
+  const thisBoard = useSelector((state) => state.board);
   const [selectedCard, setSelectedCard] = useState({
     _id: "",
     color: "",
@@ -64,13 +65,14 @@ const LabelsPopover = (props) => {
     );
   };
 
-  const handleColorBoxClick = async (labelId, selected) => {
+  const handleColorBoxClick = async (labelId, selected, label) => {
     await labelUpdateSelection(
       thisCard.cardId,
       thisCard.listId,
       thisCard.boardId,
       labelId,
       selected,
+      label,
       dispatch
     );
   };
@@ -94,7 +96,7 @@ const LabelsPopover = (props) => {
           bg={props.color}
           hbg={props.backColor}
           onClick={() => {
-            handleColorBoxClick(props._id, !props.selected);
+            handleColorBoxClick(props._id, !props.selected, props);
           }}
         >
           <ColorText>{props.text}</ColorText>
@@ -118,15 +120,17 @@ const LabelsPopover = (props) => {
     );
   };
 
+  const cardLabelIds = (thisCard.labels || []).map((label) => label._id);
   const mainPage = (
     <Container>
       <SearchArea placeholder="Search labels..." />
       <Title>Labels</Title>
-      {thisCard.labels.map((label) => {
+      {thisBoard.labels.map((label) => {
         return (
           <LabelComponent
             key={label._id}
             {...label}
+            selected={cardLabelIds.includes(label._id)}
             arrowCallback={props.arrowCallback}
             titleCallback={props.titleCallback}
           />
@@ -178,7 +182,7 @@ const LabelsPopover = (props) => {
         <ButtonContainer>
           <BlueButton
             onClick={() => {
-              if (createText && createColor && createBackColor)
+              if (createColor && createBackColor)
                 handleCreateClick(createText, createColor, createBackColor);
               else
                 dispatch(
@@ -231,7 +235,7 @@ const LabelsPopover = (props) => {
         <ButtonContainer>
           <BlueButton
             onClick={() => {
-              if (changeText && changeColor && changeBackColor)
+              if (changeColor && changeBackColor)
                 handleSaveClick(
                   selectedCard._id,
                   changeText,

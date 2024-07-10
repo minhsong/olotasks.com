@@ -94,6 +94,7 @@ export const loadUser = async (dispatch) => {
     const res = await axios.get(baseUrl + "get-user");
     dispatch(loadSuccess({ user: res.data }));
   } catch (error) {
+    localStorage.removeItem("token");
     dispatch(loadFailure());
   }
 };

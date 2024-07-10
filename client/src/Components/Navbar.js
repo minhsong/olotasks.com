@@ -4,7 +4,7 @@ import DropdownMenu from "./DropdownMenu";
 import SearchBar from "./SearchBar";
 import { xs } from "../BreakPoints";
 import ProfileBox from "./ProfileBox";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import logo_white from "../Images/olotasks_white.svg";
 
 const Container = styled.div`
@@ -71,7 +71,7 @@ const DropdownContainer = styled.div`
 `;
 
 const Navbar = (props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <Container>
@@ -79,7 +79,7 @@ const Navbar = (props) => {
         <LogoContainer>
           <TrelloLogo
             onClick={() => {
-              history.push("/boards");
+              navigate("/boards");
             }}
             src={logo_white}
           />

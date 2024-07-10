@@ -30,6 +30,8 @@ import {
   deleteAttachment,
   updateAttachment,
   updateCover,
+  updateEstimateTime,
+  updateTimeTracking,
 } from "../Redux/Slices/cardSlice";
 import {
   addAttachmentForCard,
@@ -51,7 +53,9 @@ import {
   updateLabelSelectionOfCard,
   updateMemberOfCard,
   updateStartDueDatesOfCard,
+  updateTimeTrackingOfCard,
 } from "../Redux/Slices/listSlice";
+import { updateBoardLabels } from "../Redux/Slices/boardSlice";
 
 const baseUrl = process.env.REACT_APP_API_URL + "/card";
 let submitCall = Promise.resolve();
@@ -410,6 +414,17 @@ export const labelUpdate = async (
       })
     );
 
+    dispatch(
+      updateBoardLabels({
+        listId,
+        cardId,
+        labelId: labelId,
+        text: label.text,
+        color: label.color,
+        backColor: label.backColor,
+      })
+    );
+
     submitCall = submitCall.then(() =>
       axios.put(
         baseUrl +
@@ -482,11 +497,16 @@ export const labelUpdateSelection = async (
   boardId,
   labelId,
   selected,
+  label,
   dispatch
 ) => {
   try {
-    dispatch(updateLabelSelection({ labelId: labelId, selected: selected }));
-    dispatch(updateLabelSelectionOfCard({ listId, cardId, labelId, selected }));
+    dispatch(
+      updateLabelSelection({ labelId: labelId, selected: selected, label })
+    );
+    dispatch(
+      updateLabelSelectionOfCard({ listId, cardId, labelId, selected, label })
+    );
 
     submitCall = submitCall.then(() =>
       axios.put(
@@ -1083,6 +1103,215 @@ export const coverUpdate = async (
       )
     );
     await submitCall;
+  } catch (error) {
+    dispatch(
+      openAlert({
+        message: error?.response?.data?.errMessage
+          ? error.response.data.errMessage
+          : error.message,
+        severity: "error",
+      })
+    );
+  }
+};
+
+export const estimateTimeUpdate = async (
+  cardId,
+  listId,
+  boardId,
+  time,
+  dispatch
+) => {
+  try {
+    dispatch(updateEstimateTime(time));
+    let response = "";
+    submitCall = submitCall.then(() =>
+      axios
+        .post(
+          baseUrl +
+            "/" +
+            boardId +
+            "/" +
+            listId +
+            "/" +
+            cardId +
+            "/estimate-time",
+          {
+            time,
+          }
+        )
+        .then((res) => {
+          response = res;
+        })
+    );
+    await submitCall;
+
+    dispatch(
+      updateTimeTrackingOfCard({
+        listId,
+        cardId,
+        data: response.data,
+      })
+    );
+  } catch (error) {
+    dispatch(
+      openAlert({
+        message: error?.response?.data?.errMessage
+          ? error.response.data.errMessage
+          : error.message,
+        severity: "error",
+      })
+    );
+  }
+};
+
+export const addWorkingTime = async (
+  cardId,
+  listId,
+  boardId,
+  time,
+  comment,
+  date,
+  dispatch
+) => {
+  try {
+    let response = "";
+    submitCall = submitCall.then(() =>
+      axios
+        .post(
+          baseUrl + "/" + boardId + "/" + listId + "/" + cardId + "/add-time",
+          {
+            time,
+            comment,
+            date,
+          }
+        )
+        .then((res) => {
+          response = res;
+        })
+    );
+    await submitCall;
+
+    dispatch(updateTimeTracking(response.data));
+
+    dispatch(
+      updateTimeTrackingOfCard({
+        listId,
+        cardId,
+        data: response.data,
+      })
+    );
+    return response.data;
+  } catch (error) {
+    dispatch(
+      openAlert({
+        message: error?.response?.data?.errMessage
+          ? error.response.data.errMessage
+          : error.message,
+        severity: "error",
+      })
+    );
+  }
+};
+
+export const updateWorkingTime = async (
+  cardId,
+  listId,
+  boardId,
+  timeId,
+  time,
+  comment,
+  date,
+  dispatch
+) => {
+  try {
+    let response = "";
+    submitCall = submitCall.then(() =>
+      axios
+        .put(
+          baseUrl +
+            "/" +
+            boardId +
+            "/" +
+            listId +
+            "/" +
+            cardId +
+            "/" +
+            timeId +
+            "/update-time",
+          {
+            time,
+            comment,
+            date,
+          }
+        )
+        .then((res) => {
+          response = res;
+        })
+    );
+    await submitCall;
+
+    dispatch(updateTimeTracking(response.data));
+
+    dispatch(
+      updateTimeTrackingOfCard({
+        listId,
+        cardId,
+        data: response.data,
+      })
+    );
+    return response.data;
+  } catch (error) {
+    dispatch(
+      openAlert({
+        message: error?.response?.data?.errMessage
+          ? error.response.data.errMessage
+          : error.message,
+        severity: "error",
+      })
+    );
+  }
+};
+
+export const deleteWorkingTime = async (
+  cardId,
+  listId,
+  boardId,
+  timeId,
+  dispatch
+) => {
+  try {
+    let response = "";
+    submitCall = submitCall.then(() =>
+      axios
+        .delete(
+          baseUrl +
+            "/" +
+            boardId +
+            "/" +
+            listId +
+            "/" +
+            cardId +
+            "/" +
+            timeId +
+            "/delete-time"
+        )
+        .then((res) => {
+          response = res;
+        })
+    );
+    await submitCall;
+
+    dispatch(updateTimeTracking(response.data));
+
+    dispatch(
+      updateTimeTrackingOfCard({
+        listId,
+        cardId,
+        data: response.data,
+      })
+    );
+    return response.data;
   } catch (error) {
     dispatch(
       openAlert({

@@ -28,7 +28,7 @@ const create = async (title, listId, boardId, user, callback) => {
     // Create new card
     const card = await cardModel({ title: title });
     card.owner = listId;
-    card.activities.unshift({
+    card.activities?.unshift({
       text: `added this card to ${list.title}`,
       userName: user.name,
       color: user.color,
@@ -196,7 +196,7 @@ const addComment = async (cardId, listId, boardId, user, body, callback) => {
     }
 
     //Add comment
-    card.activities.unshift({
+    card.activities?.unshift({
       text: body.text,
       userName: user.name,
       isComment: true,
@@ -252,7 +252,7 @@ const updateComment = async (
     }
 
     //Update card
-    card.activities = card.activities.map((activity) => {
+    card.activities = card.activities?.map((activity) => {
       if (activity._id.toString() === commentId.toString()) {
         if (activity.userName !== user.name) {
           return callback({
@@ -313,7 +313,7 @@ const deleteComment = async (
     }
 
     //Delete card
-    card.activities = card.activities.filter(
+    card.activities = card.activities?.filter(
       (activity) => activity._id.toString() !== commentId.toString()
     );
     await card.save();
@@ -643,12 +643,12 @@ const createChecklist = async (
     }
 
     //Add checklist
-    card.checklists.push({
+    card.checklists?.push({
       title: title,
     });
     await card.save();
 
-    const checklistId = card.checklists[card.checklists.length - 1]._id;
+    const checklistId = card.checklists[card.checklists?.length - 1]._id;
 
     //Add to board activity
     board.activity.unshift({
@@ -693,11 +693,11 @@ const deleteChecklist = async (
     if (!validate) {
       errMessage: "You dont have permission to delete this checklist";
     }
-    let cl = card.checklists.filter(
+    let cl = card.checklists?.filter(
       (l) => l._id.toString() === checklistId.toString()
     );
     //Delete checklist
-    card.checklists = card.checklists.filter(
+    card.checklists = card.checklists?.filter(
       (list) => list._id.toString() !== checklistId.toString()
     );
     await card.save();
@@ -748,7 +748,7 @@ const addChecklistItem = async (
     }
 
     //Add checklistItem
-    card.checklists = card.checklists.map((list) => {
+    card.checklists = card.checklists?.map((list) => {
       if (list._id.toString() == checklistId.toString()) {
         list.items.push({ text: text });
       }
@@ -758,7 +758,7 @@ const addChecklistItem = async (
 
     // Get to created ChecklistItem's id
     let checklistItemId = "";
-    card.checklists = card.checklists.map((list) => {
+    card.checklists = card.checklists?.map((list) => {
       if (list._id.toString() == checklistId.toString()) {
         checklistItemId = list.items[list.items.length - 1]._id;
       }
@@ -802,7 +802,7 @@ const setChecklistItemCompleted = async (
     }
     let clItem = "";
     //Update completed of checklistItem
-    card.checklists = card.checklists.map((list) => {
+    card.checklists = card.checklists?.map((list) => {
       if (list._id.toString() == checklistId.toString()) {
         list.items = list.items.map((item) => {
           if (item._id.toString() === checklistItemId) {
@@ -865,7 +865,7 @@ const setChecklistItemText = async (
     }
 
     //Update text of checklistItem
-    card.checklists = card.checklists.map((list) => {
+    card.checklists = card.checklists?.map((list) => {
       if (list._id.toString() == checklistId.toString()) {
         list.items = list.items.map((item) => {
           if (item._id.toString() === checklistItemId) {
@@ -914,7 +914,7 @@ const deleteChecklistItem = async (
     }
 
     //Delete checklistItem
-    card.checklists = card.checklists.map((list) => {
+    card.checklists = card.checklists?.map((list) => {
       if (list._id.toString() == checklistId.toString()) {
         list.items = list.items.filter(
           (item) => item._id.toString() !== checklistItemId
@@ -961,10 +961,10 @@ const updateStartDueDates = async (
     }
 
     //Update dates
-    card.date.startDate = startDate;
-    card.date.dueDate = dueDate;
-    card.date.dueTime = dueTime;
-    if (dueDate === null) card.date.completed = false;
+    card.date?.startDate = startDate;
+    card.date?.dueDate = dueDate;
+    card.date?.dueTime = dueTime;
+    if (dueDate === null) card.date?.completed = false;
     await card.save();
     return callback(false, { message: "Success!" });
   } catch (error) {
@@ -1002,7 +1002,7 @@ const updateDateCompleted = async (
     }
 
     //Update date completed event
-    card.date.completed = completed;
+    card.date?.completed = completed;
 
     await card.save();
 
@@ -1058,7 +1058,7 @@ const addAttachment = async (
       ? link
       : "http://" + link;
 
-    card.attachments.push({ link: validLink, name: name });
+    card.attachments?.push({ link: validLink, name: name });
     await card.save();
 
     //Add to board activity
@@ -1072,7 +1072,7 @@ const addAttachment = async (
 
     return callback(false, {
       attachmentId:
-        card.attachments[card.attachments.length - 1]._id.toString(),
+        card.attachments[card.attachments?.length - 1]._id.toString(),
     });
   } catch (error) {
     return callback({
@@ -1108,12 +1108,12 @@ const deleteAttachment = async (
       errMessage: "You dont have permission to delete this attachment";
     }
 
-    let attachmentObj = card.attachments.filter(
+    let attachmentObj = card.attachments?.filter(
       (attachment) => attachment._id.toString() === attachmentId.toString()
     );
 
     //Delete checklistItem
-    card.attachments = card.attachments.filter(
+    card.attachments = card.attachments?.filter(
       (attachment) => attachment._id.toString() !== attachmentId.toString()
     );
     await card.save();
@@ -1165,7 +1165,7 @@ const updateAttachment = async (
     }
 
     //Update date completed event
-    card.attachments = card.attachments.map((attachment) => {
+    card.attachments = card.attachments?.map((attachment) => {
       if (attachment._id.toString() === attachmentId.toString()) {
         attachment.link = link;
         attachment.name = name;
@@ -1211,8 +1211,8 @@ const updateCover = async (
     }
 
     //Update date cover color
-    card.cover.color = color;
-    card.cover.isSizeOne = isSizeOne;
+    card.cover?.color = color;
+    card.cover?.isSizeOne = isSizeOne;
 
     await card.save();
     return callback(false, { message: "Success!" });

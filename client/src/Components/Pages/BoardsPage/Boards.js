@@ -5,20 +5,26 @@ import { getBoards } from "../../../Services/boardsService";
 import Navbar from "../../Navbar";
 import { Container, Wrapper, Title, Board, AddBoard } from "./Styled";
 import CreateBoard from "../../Modals/CreateBoardModal/CreateBoard";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 
 const Boards = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { pending, boardsData } = useSelector((state) => state.boards);
+  const user = useSelector((state) => state.user);
   const [openModal, setOpenModal] = useState(false);
   const [searchString, setSearchString] = useState("");
   const handleModalClose = () => {
     setOpenModal(false);
   };
 
+  useEffect(() => {
+    if (!user.isAuthenticated && !user.pending)
+      navigate("/login?redirect=/boards");
+  }, [user]);
+
   const handleClick = (e) => {
-    history.push(`/board/${e.target.id}`);
+    navigate(`/board/${e.target.id}`);
   };
 
   useEffect(() => {

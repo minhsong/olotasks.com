@@ -13,20 +13,29 @@ import {
 } from "../../../Services/dragAndDropService";
 import LoadingScreen from "../../LoadingScreen";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Board = (props) => {
   /* props.match.params.id */
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  let { id } = useParams();
   const { backgroundImageLink, isImage, loading, title } = useSelector(
     (state) => state.board
   );
+  const user = useSelector((state) => state.user);
   const { allLists, loadingListService } = useSelector((state) => state.list);
   const [searchString, setSearchString] = useState("");
-  const boardId = props.match.params.id;
+  const boardId = id;
+
   useEffect(() => {
-    getBoard(props.match.params.id, dispatch);
+    if (!user.isAuthenticated && !user.pending) navigate("/");
+  });
+
+  useEffect(() => {
+    getBoard(id, dispatch);
     getLists(boardId, dispatch);
-  }, [props.match.params.id, dispatch, boardId]);
+  }, [id, dispatch, boardId]);
 
   useEffect(() => {
     document.title = title + " | Olo Tasks";

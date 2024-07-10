@@ -1,17 +1,24 @@
-import React from 'react';
-import CloseIcon from '@mui/icons-material/Close';
-import * as style from './styled';
+import React from "react";
+import CloseIcon from "@mui/icons-material/Close";
+import * as style from "./styled";
+import Button from "../../../../Modals/EditCardModal/ReUsableComponents/Button";
 
 const BottomButtonGroup = (props) => {
-	const { clickCallback, closeCallback, title } = props;
-	return (
-		<style.Row>
-			<style.AddListButton onClick={() => clickCallback()}>{title}</style.AddListButton>
-			<style.IconWrapper>
-			<CloseIcon onClick={() => closeCallback()} fontSize='medium'/>
-			</style.IconWrapper>
-		</style.Row>
-	);
+  const { clickCallback, closeCallback, title } = props;
+  return (
+    <style.Row>
+      <style.AddListButton onClick={() => clickCallback()}>
+        {title}
+      </style.AddListButton>
+
+      <Button
+        style={{ fontSize: "1em" }}
+        clickCallback={() => closeCallback()}
+        title="Close"
+      ></Button>
+      {/* <CloseIcon fontSize='medium'/> */}
+    </style.Row>
+  );
 };
 
 export default BottomButtonGroup;

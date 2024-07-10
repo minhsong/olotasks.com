@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import Background from "../../Background";
 import { register } from "../../../Services/userService";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,7 +22,7 @@ import { useEffect } from "react";
 import logo from "../../../Images/trello-logo.svg";
 
 const Register = () => {
-  let history = useHistory();
+  let nvaigate = useNavigate();
   const dispatch = useDispatch();
   const { pending } = useSelector((state) => state.user);
   const [userInformations, setUserInformations] = useState({
@@ -42,13 +42,15 @@ const Register = () => {
     await register(userInformations, dispatch);
   };
 
+  if (localStorage.getItem("token")) return <Navigate push to="/boards" />;
+
   return (
     <>
       <BgContainer>
         <Background />
       </BgContainer>
       <Container>
-        <TrelloIconContainer onClick={() => history.push("/")}>
+        <TrelloIconContainer onClick={() => nvaigate("/")}>
           <Icon src={logo} />
         </TrelloIconContainer>
         <FormSection>
@@ -124,7 +126,7 @@ const Register = () => {
                 Complete
               </Button>
               <Hr />
-              <Link fontSize="0.85rem" onClick={() => history.push("/login")}>
+              <Link fontSize="0.85rem" onClick={() => nvaigate("/login")}>
                 Already have an account? Log In
               </Link>
             </Form>
