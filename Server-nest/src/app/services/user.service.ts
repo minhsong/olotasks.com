@@ -18,14 +18,12 @@ export class UserService {
 
   async login(email, password): Promise<any> {
     try {
-      console.log(email);
       const user = await this.userModel.findOne({ email });
       if (!user) {
         return null;
       }
 
       const isMatch = await comparePasswords(password, user.password);
-      console.log(isMatch, email, password);
       if (!isMatch) {
         return null;
       }

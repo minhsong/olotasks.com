@@ -10,6 +10,7 @@ import { BoardModule } from './app/modules/board.module';
 import { CardModule } from './app/modules/card.module';
 import { UserModule } from './app/modules/user.module';
 import { ListModule } from './app/modules/list.module';
+import { WsGateway } from './app/websocket/ws.gateway';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { ListModule } from './app/modules/list.module';
     ListModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, WsGateway],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

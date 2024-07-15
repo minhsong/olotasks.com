@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { UserTokenPayload } from 'src/app/models/dto/user/user.tokenPayload';
+import { Socket } from 'socket.io';
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -8,6 +9,11 @@ export const extractTokenFromHeader = (
   request: Request,
 ): string | undefined => {
   const [type, token] = request.headers.authorization?.split(' ') ?? [];
+  return type === 'Bearer' ? token : undefined;
+};
+
+export const extractTokenFromWS = (client: Socket): string | undefined => {
+  const [type, token] = client.handshake.auth.token?.split(' ') ?? [];
   return type === 'Bearer' ? token : undefined;
 };
 
