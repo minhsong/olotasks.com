@@ -7,10 +7,10 @@ import {
   DescriptionText,
 } from "./styled";
 import DescriptionIcon from "@mui/icons-material/TextSnippetOutlined";
-import BottomButtonGroup from "../../../Pages/BoardPage/BoardComponents/BottomButtonGroup/BottomButtonGroup.js";
 import { useDispatch, useSelector } from "react-redux";
 import { descriptionUpdate } from "../../../../Services/cardService";
-import HTMLEditor from "../ReUsableComponents/HTMLEditor.js";
+import HTMLEditor from "../../../ReUsableComponents/HTMLEditor.js";
+import BottomButtonGroup from "../../../BottomButtonGroup/BottomButtonGroup.js";
 const Description = () => {
   const thisCard = useSelector((state) => state.card);
   const dispatch = useDispatch();

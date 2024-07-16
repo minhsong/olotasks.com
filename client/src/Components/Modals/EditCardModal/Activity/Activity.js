@@ -12,12 +12,12 @@ import {
 import MessageIcon from "@mui/icons-material/MessageOutlined";
 import Comment from "../Comment/Comment";
 import ActivityLog from "../ActivityLog/ActivityLog";
-import Button from "../ReUsableComponents/Button";
+import Button from "../../../ReUsableComponents/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { comment } from "../../../../Services/cardService";
 import { Avatar } from "@mui/material";
 import { CommentEditorContainer } from "../Comment/styled";
-import HTMLEditor from "../ReUsableComponents/HTMLEditor";
+import HTMLEditor from "../../../ReUsableComponents/HTMLEditor";
 
 const Activity = () => {
   const dispatch = useDispatch();

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import IndexNav from "../../IndexNav";
+import IndexNav from "../../Components/IndexNav";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
   Container,

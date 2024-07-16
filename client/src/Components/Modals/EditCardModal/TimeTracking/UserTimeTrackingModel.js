@@ -10,10 +10,10 @@ import {
   TableRow,
 } from "@mui/material";
 import { secondsToTimeString } from "../../../../Utils/estimateTimeHelper";
-import Button from "../ReUsableComponents/Button";
+import Button from "../../../ReUsableComponents/Button";
 import { Delete } from "@mui/icons-material";
 import { useState } from "react";
-import BasePopover from "../ReUsableComponents/BasePopover";
+import BasePopover from "../../../ReUsableComponents/BasePopover";
 import EstimateTimePopover from "../Popovers/EstimateTime/EstimateTimePopover";
 import { BlueButton, RedButton } from "../Popovers/Labels/styled";
 import { useDispatch, useSelector } from "react-redux";

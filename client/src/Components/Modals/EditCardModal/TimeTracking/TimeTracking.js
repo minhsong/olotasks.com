@@ -2,10 +2,10 @@ import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar } from "@mui/material";
 import { TimeRow, TimeTable, Title, TitleWrapper, Container } from "./Styled";
-import Button from "../ReUsableComponents/Button";
+import Button from "../../../ReUsableComponents/Button";
 import { Timer } from "@mui/icons-material";
-import TimeTrackingButton from "../ReUsableComponents/TimeTrackingButton";
-import BasePopover from "../ReUsableComponents/BasePopover";
+import TimeTrackingButton from "../../../ReUsableComponents/TimeTrackingButton";
+import BasePopover from "../../../ReUsableComponents/BasePopover";
 import {
   secondsToTimeString,
   timeStringToSeconds,
@@ -45,7 +45,7 @@ const TimeTracking = () => {
   };
 
   const timmerStop = (seconds) => {
-    if (time) {
+    if (time && time._id) {
       updateWorkingTime(
         thisCard.cardId,
         thisCard.listId,
@@ -56,13 +56,12 @@ const TimeTracking = () => {
         null,
         dispatch
       );
-      console.log("stop", seconds);
       setTime((state) => ({ comment: "", _id: undefined }));
     }
   };
 
   const timeSyncToServer = (seconds) => {
-    if (time) {
+    if (time && time._id) {
       updateWorkingTime(
         thisCard.cardId,
         thisCard.listId,

@@ -9,7 +9,7 @@ import {
 } from "../Labels/styled";
 import SizeTypeOne from "./SizeTypeOne";
 import SizeTypeTwo from "./SizeTypeTwo";
-import Button from "../../ReUsableComponents/Button";
+import Button from "../../../../ReUsableComponents/Button";
 import { coverUpdate } from "../../../../../Services/cardService";
 const ColorBox = styled(SmallColorBox)`
   border: 2px solid ${(props) => (props.selected ? "#0079bf" : "transparent")};

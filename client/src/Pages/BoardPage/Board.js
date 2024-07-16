@@ -1,25 +1,26 @@
-import Navbar from "../../Navbar";
+import Navbar from "../../Components/Navbar";
 import React, { useEffect, useState } from "react";
-import TopBar from "./BoardComponents/TopBar/TopBar";
+import TopBar from "../../Components/TopBar/TopBar";
 import * as style from "./Styled";
-import AddList from "./BoardComponents/AddList/AddList";
-import List from "./BoardComponents/List/List";
+import AddList from "../../Components/AddList/AddList";
+import List from "../../Components/List/List";
 import { useDispatch, useSelector } from "react-redux";
-import { getBoard } from "../../../Services/boardsService";
-import { getLists } from "../../../Services/boardService";
+import { getBoard } from "../../Services/boardsService";
+import { getLists } from "../../Services/boardService";
 import {
   updateCardOrder,
   updateListOrder,
-} from "../../../Services/dragAndDropService";
-import LoadingScreen from "../../LoadingScreen";
+} from "../../Services/dragAndDropService";
+import LoadingScreen from "../../Components/LoadingScreen";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { useNavigate, useParams } from "react-router-dom";
+import EditCard from "../../Components/Modals/EditCardModal/EditCard";
 
 const Board = (props) => {
   /* props.match.params.id */
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  let { id } = useParams();
+  let { id, cardId } = useParams();
   const { backgroundImageLink, isImage, loading, title } = useSelector(
     (state) => state.board
   );
@@ -77,6 +78,11 @@ const Board = (props) => {
     );
   };
 
+  const handleOpenClose = () => {
+    navigate(`/board/${id}`);
+    // setOpenModal((current) => !current);
+  };
+
   return (
     <>
       <Navbar searchString={searchString} setSearchString={setSearchString} />
@@ -120,6 +126,16 @@ const Board = (props) => {
           </Droppable>
         </DragDropContext>
       </style.Container>
+      {cardId && (
+        <EditCard
+          open={true}
+          callback={handleOpenClose}
+          ids={{
+            cardId: cardId,
+            boardId: id,
+          }}
+        />
+      )}
     </>
   );
 };

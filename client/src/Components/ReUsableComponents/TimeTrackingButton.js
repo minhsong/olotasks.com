@@ -5,7 +5,6 @@ import Button from "./Button";
 import { useStopwatch } from "react-timer-hook";
 
 const TimeTrackingButton = ({ onStart, onStop, timeUpdate }) => {
-  const [timeoutId, setTimeoutId] = useState(null);
   const {
     totalSeconds,
     seconds,

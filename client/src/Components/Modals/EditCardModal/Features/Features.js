@@ -13,9 +13,9 @@ import {
 } from "./styled";
 import MembersFeature from "./MembersFeature";
 import ArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import Checkbox from "../ReUsableComponents/Checkbox";
+import Checkbox from "../../../ReUsableComponents/Checkbox";
 import { useDispatch, useSelector } from "react-redux";
-import BasePopover from "../ReUsableComponents/BasePopover";
+import BasePopover from "../../../ReUsableComponents/BasePopover";
 import LabelsPopover from "../Popovers/Labels/LabelsPopover";
 import moment from "moment";
 import { dateCompletedUpdate } from "../../../../Services/cardService";

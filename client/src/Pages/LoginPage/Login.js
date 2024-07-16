@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
-import { login } from "../../../Services/userService";
-import Background from "../../Background";
+import { login } from "../../Services/userService";
+import Background from "../../Components/Background";
 import {
   BgContainer,
   Container,
@@ -18,7 +18,7 @@ import {
   Hr,
   Link,
 } from "./Styled";
-import logo from "../../../Images/trello-logo.svg";
+import logo from "../../Images/trello-logo.svg";
 const Login = () => {
   let navigate = useNavigate();
   const dispatch = useDispatch();

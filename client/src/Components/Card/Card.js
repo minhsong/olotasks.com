@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import EditCard from "../../../../Modals/EditCardModal/EditCard";
+import EditCard from "../Modals/EditCardModal/EditCard";
 import FollowIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import WatchIcon from "@mui/icons-material/AccessTimeOutlined";
 import DescriptiondIcon from "@mui/icons-material/DescriptionOutlined";
@@ -28,9 +28,11 @@ import {
 import { Draggable } from "react-beautiful-dnd";
 import moment from "moment";
 import { Avatar } from "@mui/material";
-import { secondsToTimeString } from "../../../../../Utils/estimateTimeHelper";
+import { secondsToTimeString } from "../../Utils/estimateTimeHelper";
+import { useNavigate } from "react-router-dom";
 const Card = (props) => {
   const [openModal, setOpenModal] = useState(false);
+  const navigate = useNavigate();
   const card = props.info;
   const comment = card.activities?.filter((act) => act.isComment).length;
   let checks = { c: 0, n: 0 };
@@ -43,7 +45,8 @@ const Card = (props) => {
   });
 
   const handleOpenClose = () => {
-    setOpenModal((current) => !current);
+    navigate(`/board/${props.boardId}/${props.info._id}`);
+    // setOpenModal((current) => !current);
   };
 
   const formatDate = (date) => {
@@ -233,17 +236,16 @@ const Card = (props) => {
           );
         }}
       </Draggable>
-      {openModal && (
+      {/* {openModal && (
         <EditCard
           open={openModal}
           callback={handleOpenClose}
           ids={{
             cardId: props.info._id,
-            listId: props.listId,
             boardId: props.boardId,
           }}
         />
-      )}
+      )} */}
     </>
   );
 };

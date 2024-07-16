@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import Background from "../../Background";
-import { register } from "../../../Services/userService";
+import Background from "../../Components/Background";
+import { register } from "../../Services/userService";
 import { useDispatch, useSelector } from "react-redux";
 import {
   BgContainer,
@@ -19,7 +19,7 @@ import {
   Link,
 } from "./Styled";
 import { useEffect } from "react";
-import logo from "../../../Images/trello-logo.svg";
+import logo from "../../Images/trello-logo.svg";
 
 const Register = () => {
   let nvaigate = useNavigate();

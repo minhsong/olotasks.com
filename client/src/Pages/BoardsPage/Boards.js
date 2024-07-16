@@ -1,10 +1,10 @@
-import LoadingScreen from "../../LoadingScreen";
+import LoadingScreen from "../../Components/LoadingScreen";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getBoards } from "../../../Services/boardsService";
-import Navbar from "../../Navbar";
+import { getBoards } from "../../Services/boardsService";
+import Navbar from "../../Components/Navbar";
 import { Container, Wrapper, Title, Board, AddBoard } from "./Styled";
-import CreateBoard from "../../Modals/CreateBoardModal/CreateBoard";
+import CreateBoard from "../../Components/Modals/CreateBoardModal/CreateBoard";
 import { useNavigate } from "react-router";
 
 const Boards = () => {

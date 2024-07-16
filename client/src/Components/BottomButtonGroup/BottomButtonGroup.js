@@ -1,7 +1,6 @@
 import React from "react";
-import CloseIcon from "@mui/icons-material/Close";
 import * as style from "./styled";
-import Button from "../../../../Modals/EditCardModal/ReUsableComponents/Button";
+import Button from "../ReUsableComponents/Button";
 
 const BottomButtonGroup = (props) => {
   const { clickCallback, closeCallback, title } = props;

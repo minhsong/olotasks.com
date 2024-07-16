@@ -11,7 +11,7 @@ import Title from "./Title/Title";
 import CardLoadingSvg from "../../../Images/cardLoading.svg";
 import { getCard } from "../../../Services/cardService";
 import { useSelector, useDispatch } from "react-redux";
-import IconButton from "./ReUsableComponents/IconButton";
+import IconButton from "../../ReUsableComponents/IconButton";
 import CoverIcon from "@mui/icons-material/TableChartOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -36,14 +36,14 @@ import {
 import TimeTracking from "./TimeTracking/TimeTracking";
 
 export default function EditCard(props) {
-  const { cardId, listId, boardId } = props.ids;
+  const { cardId, boardId } = props.ids;
   const dispatch = useDispatch();
   const thisCard = useSelector((state) => state.card);
   React.useEffect(() => {
     if (props.open) {
-      getCard(cardId, listId, boardId, dispatch);
+      getCard(cardId, boardId, dispatch);
     }
-  }, [boardId, cardId, dispatch, listId, props.open]);
+  }, [boardId, cardId, dispatch, props.open]);
 
   return (
     <div style={{ position: "relative" }}>

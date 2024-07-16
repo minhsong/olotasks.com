@@ -60,16 +60,14 @@ import { updateBoardLabels } from "../Redux/Slices/boardSlice";
 const baseUrl = process.env.REACT_APP_API_URL + "/card";
 let submitCall = Promise.resolve();
 
-export const getCard = async (cardId, listId, boardId, dispatch) => {
+export const getCard = async (cardId, boardId, dispatch) => {
   dispatch(setPending(true));
   try {
     let response = "";
     submitCall = submitCall.then(() =>
-      axios
-        .get(baseUrl + "/" + boardId + "/" + listId + "/" + cardId)
-        .then((res) => {
-          response = res;
-        })
+      axios.get(baseUrl + "/" + boardId + "/" + cardId).then((res) => {
+        response = res;
+      })
     );
     await submitCall;
 
@@ -95,7 +93,7 @@ export const titleUpdate = async (cardId, listId, boardId, title, dispatch) => {
     dispatch(updateTitle(title));
 
     submitCall = submitCall.then(() =>
-      axios.put(baseUrl + "/" + boardId + "/" + listId + "/" + cardId, {
+      axios.put(baseUrl + "/" + boardId + "/" + cardId, {
         title: title,
       })
     );
@@ -124,7 +122,7 @@ export const descriptionUpdate = async (
     dispatch(updateDescriptionOfCard({ listId, cardId, description }));
 
     submitCall = submitCall.then(() =>
-      axios.put(baseUrl + "/" + boardId + "/" + listId + "/" + cardId, {
+      axios.put(baseUrl + "/" + boardId + "/" + cardId, {
         description: description,
       })
     );
@@ -155,19 +153,9 @@ export const comment = async (
     let response = "";
     submitCall = submitCall.then(() =>
       axios
-        .post(
-          baseUrl +
-            "/" +
-            boardId +
-            "/" +
-            listId +
-            "/" +
-            cardId +
-            "/add-comment",
-          {
-            text: text,
-          }
-        )
+        .post(baseUrl + "/" + boardId + "/" + cardId + "/add-comment", {
+          text: text,
+        })
         .then((res) => {
           response = res;
         })
@@ -201,12 +189,9 @@ export const commentUpdate = async (
     dispatch(updateComment(commentId, text));
 
     submitCall = submitCall.then(() =>
-      axios.put(
-        baseUrl + "/" + boardId + "/" + listId + "/" + cardId + "/" + commentId,
-        {
-          text: text,
-        }
-      )
+      axios.put(baseUrl + "/" + boardId + "/" + cardId + "/" + commentId, {
+        text: text,
+      })
     );
     await submitCall;
   } catch (error) {
@@ -232,9 +217,7 @@ export const commentDelete = async (
     dispatch(deleteComment(commentId));
 
     submitCall = submitCall.then(() =>
-      axios.delete(
-        baseUrl + "/" + boardId + "/" + listId + "/" + cardId + "/" + commentId
-      )
+      axios.delete(baseUrl + "/" + boardId + "/" + cardId + "/" + commentId)
     );
     await submitCall;
   } catch (error) {
@@ -265,12 +248,9 @@ export const memberAdd = async (
     );
 
     submitCall = submitCall.then(() =>
-      axios.post(
-        baseUrl + "/" + boardId + "/" + listId + "/" + cardId + "/add-member",
-        {
-          memberId: memberId,
-        }
-      )
+      axios.post(baseUrl + "/" + boardId + "/" + cardId + "/add-member", {
+        memberId: memberId,
+      })
     );
     await submitCall;
   } catch (error) {
@@ -302,8 +282,6 @@ export const memberDelete = async (
         baseUrl +
           "/" +
           boardId +
-          "/" +
-          listId +
           "/" +
           cardId +
           "/" +
@@ -341,21 +319,11 @@ export const labelCreate = async (
     let response = "";
     submitCall = submitCall.then(() =>
       axios
-        .post(
-          baseUrl +
-            "/" +
-            boardId +
-            "/" +
-            listId +
-            "/" +
-            cardId +
-            "/create-label",
-          {
-            text,
-            color,
-            backColor,
-          }
-        )
+        .post(baseUrl + "/" + boardId + "/" + cardId + "/create-label", {
+          text,
+          color,
+          backColor,
+        })
         .then((res) => {
           response = res;
         })
@@ -431,8 +399,6 @@ export const labelUpdate = async (
           "/" +
           boardId +
           "/" +
-          listId +
-          "/" +
           cardId +
           "/" +
           labelId +
@@ -466,16 +432,7 @@ export const labelDelete = async (
 
     submitCall = submitCall.then(() =>
       axios.delete(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          listId +
-          "/" +
-          cardId +
-          "/" +
-          labelId +
-          "/delete-label"
+        baseUrl + "/" + boardId + "/" + cardId + "/" + labelId + "/delete-label"
       )
     );
     await submitCall;
@@ -514,8 +471,6 @@ export const labelUpdateSelection = async (
           "/" +
           boardId +
           "/" +
-          listId +
-          "/" +
           cardId +
           "/" +
           labelId +
@@ -549,19 +504,9 @@ export const checklistCreate = async (
     let response = "";
     submitCall = submitCall.then(() =>
       axios
-        .post(
-          baseUrl +
-            "/" +
-            boardId +
-            "/" +
-            listId +
-            "/" +
-            cardId +
-            "/create-checklist",
-          {
-            title,
-          }
-        )
+        .post(baseUrl + "/" + boardId + "/" + cardId + "/create-checklist", {
+          title,
+        })
         .then((res) => {
           response = res;
         })
@@ -604,8 +549,6 @@ export const checklistDelete = async (
         baseUrl +
           "/" +
           boardId +
-          "/" +
-          listId +
           "/" +
           cardId +
           "/" +
@@ -650,8 +593,6 @@ export const checklistItemAdd = async (
           baseUrl +
             "/" +
             boardId +
-            "/" +
-            listId +
             "/" +
             cardId +
             "/" +
@@ -727,8 +668,6 @@ export const checklistItemCompletedSet = async (
           "/" +
           boardId +
           "/" +
-          listId +
-          "/" +
           cardId +
           "/" +
           checklistId +
@@ -786,8 +725,6 @@ export const checklistItemTextSet = async (
           "/" +
           boardId +
           "/" +
-          listId +
-          "/" +
           cardId +
           "/" +
           checklistId +
@@ -842,8 +779,6 @@ export const checklistItemDelete = async (
           "/" +
           boardId +
           "/" +
-          listId +
-          "/" +
           cardId +
           "/" +
           checklistId +
@@ -881,14 +816,11 @@ export const startDueDatesUpdate = async (
     );
 
     submitCall = submitCall.then(() =>
-      axios.put(
-        baseUrl + "/" + boardId + "/" + listId + "/" + cardId + "/update-dates",
-        {
-          startDate,
-          dueDate,
-          dueTime,
-        }
-      )
+      axios.put(baseUrl + "/" + boardId + "/" + cardId + "/update-dates", {
+        startDate,
+        dueDate,
+        dueTime,
+      })
     );
     await submitCall;
   } catch (error) {
@@ -916,14 +848,7 @@ export const dateCompletedUpdate = async (
 
     submitCall = submitCall.then(() =>
       axios.put(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          listId +
-          "/" +
-          cardId +
-          "/update-date-completed",
+        baseUrl + "/" + boardId + "/" + cardId + "/update-date-completed",
         {
           completed,
         }
@@ -958,20 +883,10 @@ export const attachmentAdd = async (
     let response = "";
     submitCall = submitCall.then(() =>
       axios
-        .post(
-          baseUrl +
-            "/" +
-            boardId +
-            "/" +
-            listId +
-            "/" +
-            cardId +
-            "/add-attachment",
-          {
-            link: link,
-            name: name,
-          }
-        )
+        .post(baseUrl + "/" + boardId + "/" + cardId + "/add-attachment", {
+          link: link,
+          name: name,
+        })
         .then((res) => {
           response = res;
         })
@@ -1018,8 +933,6 @@ export const attachmentDelete = async (
           "/" +
           boardId +
           "/" +
-          listId +
-          "/" +
           cardId +
           "/" +
           attachmentId +
@@ -1059,8 +972,6 @@ export const attachmentUpdate = async (
           "/" +
           boardId +
           "/" +
-          listId +
-          "/" +
           cardId +
           "/" +
           attachmentId +
@@ -1094,13 +1005,10 @@ export const coverUpdate = async (
     dispatch(updateCoverOfCard({ listId, cardId, color, isSizeOne }));
 
     submitCall = submitCall.then(() =>
-      axios.put(
-        baseUrl + "/" + boardId + "/" + listId + "/" + cardId + "/update-cover",
-        {
-          color: color,
-          isSizeOne: isSizeOne,
-        }
-      )
+      axios.put(baseUrl + "/" + boardId + "/" + cardId + "/update-cover", {
+        color: color,
+        isSizeOne: isSizeOne,
+      })
     );
     await submitCall;
   } catch (error) {
@@ -1127,19 +1035,9 @@ export const estimateTimeUpdate = async (
     let response = "";
     submitCall = submitCall.then(() =>
       axios
-        .post(
-          baseUrl +
-            "/" +
-            boardId +
-            "/" +
-            listId +
-            "/" +
-            cardId +
-            "/estimate-time",
-          {
-            time,
-          }
-        )
+        .post(baseUrl + "/" + boardId + "/" + cardId + "/estimate-time", {
+          time,
+        })
         .then((res) => {
           response = res;
         })
@@ -1178,14 +1076,11 @@ export const addWorkingTime = async (
     let response = "";
     submitCall = submitCall.then(() =>
       axios
-        .post(
-          baseUrl + "/" + boardId + "/" + listId + "/" + cardId + "/add-time",
-          {
-            time,
-            comment,
-            date,
-          }
-        )
+        .post(baseUrl + "/" + boardId + "/" + cardId + "/add-time", {
+          time,
+          comment,
+          date,
+        })
         .then((res) => {
           response = res;
         })
@@ -1232,8 +1127,6 @@ export const updateWorkingTime = async (
           baseUrl +
             "/" +
             boardId +
-            "/" +
-            listId +
             "/" +
             cardId +
             "/" +
@@ -1285,16 +1178,7 @@ export const deleteWorkingTime = async (
     submitCall = submitCall.then(() =>
       axios
         .delete(
-          baseUrl +
-            "/" +
-            boardId +
-            "/" +
-            listId +
-            "/" +
-            cardId +
-            "/" +
-            timeId +
-            "/delete-time"
+          baseUrl + "/" + boardId + "/" + cardId + "/" + timeId + "/delete-time"
         )
         .then((res) => {
           response = res;

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import BottomButtonGroup from "../../../Pages/BoardPage/BoardComponents/BottomButtonGroup/BottomButtonGroup.js";
 
 import {
   Container,
@@ -20,8 +19,9 @@ import {
   commentUpdate,
 } from "../../../../Services/cardService.js";
 import { Avatar } from "@mui/material";
-import HTMLEditor from "../ReUsableComponents/HTMLEditor.js";
+import HTMLEditor from "../../../ReUsableComponents/HTMLEditor.js";
 import moment from "moment";
+import BottomButtonGroup from "../../../BottomButtonGroup/BottomButtonGroup.js";
 
 const Comment = (props) => {
   const [edit, setEdit] = useState(true);

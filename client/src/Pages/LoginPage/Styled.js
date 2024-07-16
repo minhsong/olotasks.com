@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { md } from "../../../BreakPoints";
+import { md } from "../../BreakPoints";
 
 export const BgContainer = styled.div`
   display: initial;

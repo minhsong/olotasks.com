@@ -9,8 +9,8 @@ import {
   SaveButton,
 } from "./styled";
 import { DateRange } from "react-date-range";
-import CheckBox from "../../ReUsableComponents/Checkbox";
-import Button from "../../ReUsableComponents/Button";
+import CheckBox from "../../../../ReUsableComponents/Checkbox";
+import Button from "../../../../ReUsableComponents/Button";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { openAlert } from "../../../../../Redux/Slices/alertSlice";

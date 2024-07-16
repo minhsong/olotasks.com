@@ -34,7 +34,7 @@ export class CardService {
       const board = await this.boardModel.findById(boardId);
 
       // Validate the ownership
-      const validate = await validateCardOwners(null, list, board, user, true);
+      const validate = await validateCardOwners(null, board, user, true);
       if (!validate) {
         throw new Error(
           'You dont have permission to add card to this list or board',
@@ -85,18 +85,17 @@ export class CardService {
 
   async deleteById(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
   ): Promise<{ message: string }> {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
+      const list = await this.listModel.findById(card.owner);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to update this card');
       }
@@ -125,22 +124,17 @@ export class CardService {
     }
   }
 
-  async getCard(
-    cardId: string,
-    listId: string,
-    boardId: string,
-    user: User,
-  ): Promise<any> {
+  async getCard(cardId: string, boardId: string, user: User): Promise<any> {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
+      const list = await this.listModel.findById(card.owner);
       const board = await this.boardModel.findById(boardId);
       const activities = await this.activityModel.find({
         card: new ObjectId(cardId),
       });
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to update this card');
       }
@@ -148,7 +142,7 @@ export class CardService {
       const returnObject = {
         ...card.toJSON(),
         listTitle: list.title,
-        listId,
+        listId: card.owner,
         boardId,
         activities,
       };
@@ -161,7 +155,6 @@ export class CardService {
 
   async update(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     updatedObj: any,
@@ -169,11 +162,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to update this card');
       }
@@ -189,7 +181,6 @@ export class CardService {
 
   async addComment(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     body: any,
@@ -197,11 +188,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to update this card');
       }
@@ -209,7 +199,7 @@ export class CardService {
       await this.activityModel.create({
         board: new ObjectId(boardId),
         card: new ObjectId(cardId),
-        list: new ObjectId(listId),
+        list: card.owner,
         user: new ObjectId(user.id),
         text: body.text,
         color: user.color,
@@ -225,7 +215,6 @@ export class CardService {
 
   async updateComment(
     cardId: string,
-    listId: string,
     boardId: string,
     commentId: string,
     user: User,
@@ -234,11 +223,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to update this card');
       }
@@ -261,7 +249,7 @@ export class CardService {
       this.activityModel.create({
         board: new ObjectId(boardId),
         card: new ObjectId(cardId),
-        list: new ObjectId(listId),
+        list: card.owner,
         user: new ObjectId(user.id),
         text: body.text,
         color: user.color,
@@ -281,7 +269,6 @@ export class CardService {
 
   async deleteComment(
     cardId: string,
-    listId: string,
     boardId: string,
     commentId: string,
     user: User,
@@ -289,11 +276,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to update this card');
       }
@@ -304,7 +290,7 @@ export class CardService {
       this.activityModel.create({
         board: new ObjectId(boardId),
         card: new ObjectId(cardId),
-        list: new ObjectId(listId),
+        list: card.owner,
         user: new ObjectId(user.id),
         text: `deleted his/her own comment from ${card.title}`,
         color: user.color,
@@ -322,7 +308,6 @@ export class CardService {
 
   async addMember(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     memberId: string,
@@ -330,12 +315,11 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
       const member = await this.userModel.findById(memberId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to add member this card');
       }
@@ -365,7 +349,6 @@ export class CardService {
 
   async deleteMember(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     memberId: string,
@@ -373,11 +356,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to add member this card');
       }
@@ -409,15 +391,14 @@ export class CardService {
     }
   }
 
-  async createLabel(cardId, listId, boardId, user, label: Label) {
+  async createLabel(cardId, boardId, user, label: Label) {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to add label this card');
       }
@@ -443,15 +424,14 @@ export class CardService {
     }
   }
 
-  async updateLabel(cardId, listId, boardId, labelId, user, label) {
+  async updateLabel(cardId, boardId, labelId, user, label) {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to update this card');
       }
@@ -480,15 +460,14 @@ export class CardService {
     }
   }
 
-  async deleteLabel(cardId, listId, boardId, labelId, user) {
+  async deleteLabel(cardId, boardId, labelId, user) {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         return { errMessage: 'You dont have permission to delete this label' };
       }
@@ -512,14 +491,13 @@ export class CardService {
     }
   }
 
-  async updateLabelSelection(cardId, listId, boardId, labelId, user, selected) {
+  async updateLabelSelection(cardId, boardId, labelId, user, selected) {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         return { errMessage: 'You dont have permission to update this card' };
       }
@@ -563,17 +541,15 @@ export class CardService {
       };
     }
   }
-  async createChecklist(cardId, listId, boardId, user, title) {
+  async createChecklist(cardId, boardId, user, title) {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
       const loggedInUser = await this.userModel.findById(user.id);
       // Validate owner
       const validate = await validateCardOwners(
         card,
-        list,
         board,
         loggedInUser,
         false,
@@ -609,15 +585,14 @@ export class CardService {
     }
   }
 
-  async deleteChecklist(cardId, listId, boardId, checklistId, user) {
+  async deleteChecklist(cardId, boardId, checklistId, user) {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         return {
           errMessage: 'You dont have permission to delete this checklist',
@@ -649,7 +624,6 @@ export class CardService {
 
   async addChecklistItem(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     checklistId: string,
@@ -658,11 +632,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         return {
           errMessage: 'You dont have permission to add item this checklist',
@@ -694,7 +667,6 @@ export class CardService {
 
   async setChecklistItemCompleted(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     checklistId: string,
@@ -704,11 +676,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         return {
           errMessage:
@@ -749,7 +720,6 @@ export class CardService {
 
   async setChecklistItemText(
     cardId,
-    listId,
     boardId,
     user,
     checklistId,
@@ -759,11 +729,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error(
           'You dont have permission to set text of this checklist item',
@@ -791,7 +760,6 @@ export class CardService {
 
   async deleteChecklistItem(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     checklistId: string,
@@ -800,17 +768,15 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error(
           'You dont have permission to delete this checklist item',
         );
       }
-      console.log(listId, boardId, cardId, checklistId, checklistItemId);
       // Delete checklistItem
       card.checklists = card.checklists?.map((list: any) => {
         if (list._id.toString() === checklistId.toString()) {
@@ -829,7 +795,6 @@ export class CardService {
 
   async updateStartDueDates(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     startDate: Date,
@@ -839,11 +804,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to update date of this card');
       }
@@ -862,7 +826,6 @@ export class CardService {
 
   async updateDateCompleted(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     completed: boolean,
@@ -870,11 +833,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error(
           "You don't have permission to update the date of this card",
@@ -905,7 +867,6 @@ export class CardService {
 
   async addAttachment(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     link: string,
@@ -914,11 +875,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to update date of this card');
       }
@@ -951,7 +911,6 @@ export class CardService {
 
   async deleteAttachment(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     attachmentId: string,
@@ -959,11 +918,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to delete this attachment');
       }
@@ -995,7 +953,6 @@ export class CardService {
 
   async updateAttachment(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     attachmentId: string,
@@ -1005,11 +962,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error(
           'You dont have permission to update attachment of this card',
@@ -1034,7 +990,6 @@ export class CardService {
 
   async updateCover(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     color: string,
@@ -1043,11 +998,10 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
 
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error(
           'You dont have permission to update attachment of this card',
@@ -1067,7 +1021,6 @@ export class CardService {
 
   async estimateTime(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     astimatedTime: number,
@@ -1075,10 +1028,9 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         return {
           errMessage: 'You dont have permission to add Checklist this card',
@@ -1095,7 +1047,7 @@ export class CardService {
       this.activityModel.create({
         board: new ObjectId(boardId),
         card: new ObjectId(cardId),
-        list: new ObjectId(listId),
+        list: card.owner,
         user: new ObjectId(user._id),
         text: `estimated time as ${secondsToTimeString(astimatedTime)} hours`,
         color: user.color,
@@ -1114,7 +1066,6 @@ export class CardService {
 
   async addTimeTracking(
     cardId: string,
-    listId: string,
     boardId: string,
     user: User,
     time: number,
@@ -1124,10 +1075,9 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         return {
           errMessage: 'You dont have permission to add Checklist this card',
@@ -1161,7 +1111,6 @@ export class CardService {
 
   async updateTimeTracking(
     cardId: string,
-    listId: string,
     boardId: string,
     timeTrackingId: string,
     user: User,
@@ -1172,10 +1121,9 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         return {
           errMessage: 'You dont have permission to add Checklist this card',
@@ -1214,7 +1162,6 @@ export class CardService {
   }
   async deleteTimeTracking(
     cardId: string,
-    listId: string,
     boardId: string,
     timeTrackingId: string,
     user: User,
@@ -1222,10 +1169,9 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const list = await this.listModel.findById(listId);
       const board = await this.boardModel.findById(boardId);
       // Validate owner
-      const validate = await validateCardOwners(card, list, board, user, false);
+      const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         return {
           errMessage: 'You dont have permission to add Checklist this card',

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { lg, sm } from "../../../BreakPoints";
+import { lg, sm } from "../../BreakPoints";
 
 export const Container = styled.div`
   background: linear-gradient(rgb(234, 230, 255), rgb(255, 255, 255)) no-repeat;

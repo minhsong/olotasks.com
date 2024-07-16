@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
 import AttachmentIcon from "@mui/icons-material/InsertLinkRounded";
-import Button from "../ReUsableComponents/Button";
+import Button from "../../../ReUsableComponents/Button";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Container,
@@ -18,7 +18,7 @@ import {
   AttachmentOperations,
 } from "./styled";
 import { attachmentDelete } from "../../../../Services/cardService";
-import BasePopover from "../ReUsableComponents/BasePopover";
+import BasePopover from "../../../ReUsableComponents/BasePopover";
 import EditAttachmentPopover from "../Popovers/Attachment/EditAttachmentPopover";
 import moment from "moment";
 import AddAttachmentPopover from "../Popovers/Attachment/AddAttachmentPopover";

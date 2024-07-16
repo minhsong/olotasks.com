@@ -1,21 +1,25 @@
 export const validateCardOwners = async (
   card = null,
-  list,
-  board,
+  board = null,
   user,
   isCreate = false,
 ) => {
-  const validate = isCreate
-    ? true
-    : list.cards.filter((item) => item.toString() === card._id.toString());
-  const validate2 = board.lists.filter(
-    (item) => item.toString() === list._id.toString(),
-  );
-  const validate3 = user.boards.filter(
-    (item) => item.toString() === board._id.toString(),
-  );
+  // check if user is member of the board
 
-  return validate && validate2 && validate3;
+  if (
+    board &&
+    !board.members.map((s) => s.user.toString()).includes(user._id.toString())
+  ) {
+    return false;
+  }
+
+  // check if the card is in the board for editing
+
+  if (card && card.board.toString() !== board._id.toString()) {
+    return false;
+  }
+
+  return true;
 };
 
 export const createRandomHexColor = () => {
