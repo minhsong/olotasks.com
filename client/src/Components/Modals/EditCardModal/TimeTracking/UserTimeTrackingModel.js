@@ -17,8 +17,13 @@ import BasePopover from "../ReUsableComponents/BasePopover";
 import EstimateTimePopover from "../Popovers/EstimateTime/EstimateTimePopover";
 import { BlueButton, RedButton } from "../Popovers/Labels/styled";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteWorkingTime } from "../../../../Services/cardService";
+import {
+  comment,
+  deleteWorkingTime,
+  updateWorkingTime,
+} from "../../../../Services/cardService";
 import Close from "@mui/icons-material/Close";
+import TaskComment from "./TaskCommen";
 
 const UserTimeTrackingModel = (props) => {
   const { open, callback } = props;
@@ -35,6 +40,19 @@ const UserTimeTrackingModel = (props) => {
       dispatch
     );
     setDeletePopover(null);
+  };
+
+  const onTimeCommentChanged = (data) => {
+    updateWorkingTime(
+      thisCard.cardId,
+      thisCard.listId,
+      thisCard.boardId,
+      data._id,
+      data.loggedTime,
+      data.comment,
+      null,
+      dispatch
+    );
   };
   return (
     <Modal open={open} onClose={callback} style={{ overflow: "auto" }}>
@@ -82,7 +100,14 @@ const UserTimeTrackingModel = (props) => {
                   </TableCell>
                   <TableCell scope="row">{row.userName}</TableCell>
 
-                  <TableCell align="left">{row.comment}</TableCell>
+                  <TableCell align="left">
+                    <TaskComment
+                      text={row.comment}
+                      onChanged={(text) =>
+                        onTimeCommentChanged({ ...row, comment: text })
+                      }
+                    />
+                  </TableCell>
                   <TableCell align="right">
                     {secondsToTimeString(row.loggedTime)}
                   </TableCell>

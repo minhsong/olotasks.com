@@ -15,9 +15,11 @@ import AddWorkingTimePopover from "../Popovers/AddWokringTime/AddWorkingTimePopo
 import { uniq, uniqBy } from "lodash-es";
 import {
   addWorkingTime,
+  comment,
   updateWorkingTime,
 } from "../../../../Services/cardService";
 import UserTimeTrackingModel from "./UserTimeTrackingModel";
+import TaskComment from "./TaskCommen";
 
 const TimeTracking = () => {
   const dispatch = useDispatch();
@@ -26,7 +28,7 @@ const TimeTracking = () => {
   const user = useSelector((state) => state.user);
   const [estimatePopover, setEstimatePopover] = useState(null);
   const [addTime, setAddime] = useState(null);
-  const [time, setTime] = useState(null);
+  const [time, setTime] = useState({});
   const [showTimeTracking, setShowTimeTracking] = useState(false);
   const timmerStart = async (seconds) => {
     addWorkingTime(
@@ -34,7 +36,7 @@ const TimeTracking = () => {
       thisCard.listId,
       thisCard.boardId,
       60,
-      "",
+      time.comment,
       new Date(),
       dispatch
     ).then((data) => {
@@ -54,6 +56,8 @@ const TimeTracking = () => {
         null,
         dispatch
       );
+      console.log("stop", seconds);
+      setTime((state) => ({ comment: "", _id: undefined }));
     }
   };
 
@@ -145,7 +149,14 @@ const TimeTracking = () => {
           </div>
         </div>
 
-        <div style={{ flexGrow: 1 }}></div>
+        <div style={{ flexGrow: 1 }}>
+          <TaskComment
+            text={time?.comment}
+            onChanged={(text) =>
+              setTime((state) => ({ ...state, comment: text }))
+            }
+          />
+        </div>
 
         <div
           style={{

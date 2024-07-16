@@ -64,3 +64,30 @@ export const ButtonContainer = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
+
+export const EditInput = styled.input`
+  width: 100%;
+  height: 2rem;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  padding-left: 0.5rem;
+  outline: none;
+  font-size: 0.875rem;
+  background-color: #fff;
+`;
+
+export const CommentContent = styled.div`
+  padding: 0.5rem;
+  margin-bottom: 0.5em;
+  text-align: right;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  svg {
+    cursor: pointer;
+    &:hover: {
+      color: #0079bf;
+    }
+  }
+`;
