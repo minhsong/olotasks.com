@@ -81,7 +81,7 @@ export const ChecklistItemSchema = SchemaFactory.createForClass(ChecklistItem);
 @Schema({ collection: 'cards' })
 export class Card extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Board', default: [] })
-  board?: Types.ObjectId;
+  board: Types.ObjectId;
 
   @Prop({ required: true })
   title: string;

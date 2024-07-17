@@ -7,12 +7,15 @@ import { Board, BoardDocument } from 'src/app/models/schemas/board.schema';
 import { CreateBoardDto } from '../models/dto/board/board.create';
 import { UserTokenPayload } from '../models/dto/user/user.tokenPayload';
 import { ObjectId } from 'mongodb';
+import { uniqBy } from 'lodash';
+import { Card, CardDocument } from '../models/schemas/card.schema';
 
 @Injectable()
 export class BoardService {
   constructor(
     @InjectModel(Board.name) private readonly boardModel: Model<BoardDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(Card.name) private readonly cardModel: Model<CardDocument>,
   ) {}
 
   async create(
@@ -212,13 +215,16 @@ export class BoardService {
           newMember.boards.push(board._id as any);
           await newMember.save();
           board.members.push({
-            user: newMember._id as any,
+            user: newMember._id,
             name: newMember.name,
             surname: newMember.surname,
             email: newMember.email,
             color: newMember.color,
             role: 'member',
           });
+
+          board.members = uniqBy(board.members, 'user');
+
           // Add to board activity
           // board.activity.push({
           //   user: user.id,

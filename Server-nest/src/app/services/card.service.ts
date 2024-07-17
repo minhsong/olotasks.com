@@ -291,7 +291,7 @@ export class CardService {
         board: new ObjectId(boardId),
         card: new ObjectId(cardId),
         list: card.owner,
-        user: new ObjectId(user.id),
+        user: user.id,
         text: `deleted his/her own comment from ${card.title}`,
         color: user.color,
         userName: user.name,
@@ -330,15 +330,22 @@ export class CardService {
         name: member.name,
         color: member.color,
       });
+      card.members = uniqBy(card.members, 'user');
       await card.save();
 
-      // Add to board activity
-      // board.activity.unshift({
-      //   user: user._id,
-      //   name: user.name,
-      //   action: `added '${member.name}' to ${card.title}`,
-      //   color: user.color,
-      // });
+      this.activityModel.create({
+        board: new ObjectId(boardId),
+        card: new ObjectId(cardId),
+        list: card.owner,
+        user: user.id,
+        text: `added '${member.name}' to ${card.title}`,
+        color: user.color,
+        userName: user.name,
+        isComment: false,
+        actionType: 'member',
+        cardTitle: card.title,
+      });
+
       await board.save();
 
       return { message: 'success' };
@@ -365,24 +372,28 @@ export class CardService {
       }
 
       // Delete member
-      card.members = card.members.filter(
-        (a) => a.user.toString() !== memberId.toString(),
+      card.members = uniqBy(
+        card.members.filter((a) => a.user.toString() !== memberId.toString()),
+        'user',
       );
       await card.save();
 
       // Get member
       const tempMember = await this.userModel.findById(memberId);
 
-      // Add to board activity
-      // board.activity.unshift({
-      //   user: user._id,
-      //   name: user.name,
-      //   action:
-      //     tempMember.name === user.name
-      //       ? `left ${card.title}`
-      //       : `removed '${tempMember.name}' from ${card.title}`,
-      //   color: user.color,
-      // });
+      this.activityModel.create({
+        board: new ObjectId(boardId),
+        card: new ObjectId(cardId),
+        list: card.owner,
+        user: user.id,
+        text: `removed '${tempMember.name}' from ${card.title}`,
+        color: user.color,
+        userName: user.name,
+        isComment: false,
+        actionType: 'member',
+        cardTitle: card.title,
+      });
+
       await board.save();
 
       return { message: 'success' };

@@ -6,6 +6,7 @@ import { LoggerModule } from './logger.module';
 import { BoardService } from '../services/board.service';
 import { UserModule } from './user.module';
 import { User, UserSchema } from '../models/schemas/user.shema';
+import { Card, CardSchema } from '../models/schemas/card.schema';
 
 @Module({
   providers: [BoardService],
@@ -15,6 +16,7 @@ import { User, UserSchema } from '../models/schemas/user.shema';
     MongooseModule.forFeature([
       { name: Board.name, schema: BoardSchema },
       { name: User.name, schema: UserSchema },
+      { name: Card.name, schema: CardSchema },
     ]),
     LoggerModule,
     UserModule,
