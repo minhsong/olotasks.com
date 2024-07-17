@@ -139,7 +139,7 @@ const LabelsPopover = (props) => {
 
       <br />
       <Button
-        clickCallback={() => {
+        onClick={() => {
           props.arrowCallback(true);
           props.titleCallback("Create");
         }}

@@ -25,6 +25,7 @@
     "eslint-plugin-react-hooks": "^4.2.1-alpha-a44a7a2a3-20211111",
     "lodash-es": "^4.17.21",
     "moment": "^2.29.1",
+    "prop-types": "^15.8.1",
     "react": "^18.3.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-date-range": "^2.0.1",

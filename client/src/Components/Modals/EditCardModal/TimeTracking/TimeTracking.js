@@ -23,7 +23,7 @@ import TaskComment from "./TaskCommen";
 
 const TimeTracking = () => {
   const dispatch = useDispatch();
-  const timeTracking = useSelector((state) => state.card.timeTracking);
+  const timeTracking = useSelector((state) => state.card.timeTracking || {});
   const thisCard = useSelector((state) => state.card);
   const user = useSelector((state) => state.user);
   const [estimatePopover, setEstimatePopover] = useState(null);
@@ -76,7 +76,9 @@ const TimeTracking = () => {
   };
 
   const TimeRows = () => {
-    const users = uniqBy(timeTracking.userTimeTracking, "user").filter(
+    if (!timeTracking || !timeTracking.userTimeTracking) return null;
+
+    const users = uniqBy(timeTracking.userTimeTracking || [], "user").filter(
       (s) => s.user != user.userInfo._id
     );
 
@@ -117,9 +119,12 @@ const TimeTracking = () => {
   };
 
   const loggedUserTimeRow = () => {
-    const time = timeTracking.userTimeTracking
-      .filter((s) => s.user == user.userInfo._id)
-      .reduce((acc, time) => acc + time.loggedTime, 0);
+    const time =
+      timeTracking && timeTracking.userTimeTracking
+        ? timeTracking.userTimeTracking
+            .filter((s) => s.user == user.userInfo._id)
+            .reduce((acc, time) => acc + time.loggedTime, 0)
+        : 0;
     return (
       <TimeRow key={user.userInfo._id}>
         <div style={{ display: "flex", flexDirection: "row" }}>
@@ -166,7 +171,7 @@ const TimeTracking = () => {
         >
           <Button
             title={"Add Time"}
-            clickCallback={(event) => setAddime(event.currentTarget)}
+            onClick={(event) => setAddime(event.currentTarget)}
           />
           <TimeTrackingButton
             timeUpdate={timeSyncToServer}
@@ -210,7 +215,7 @@ const TimeTracking = () => {
           <div style={{ marginRight: "1em" }}>
             <span style={{ marginRight: "0.5em" }}>Time:</span>
             <Button
-              clickCallback={() => setShowTimeTracking(true)}
+              onClick={() => setShowTimeTracking(true)}
               title={
                 timeTracking?.spentTime
                   ? secondsToTimeString(timeTracking.spentTime)
@@ -226,7 +231,7 @@ const TimeTracking = () => {
                   ? secondsToTimeString(timeTracking.estimateTime)
                   : "-"
               }
-              clickCallback={(event) => setEstimatePopover(event.currentTarget)}
+              onClick={(event) => setEstimatePopover(event.currentTarget)}
             />
             {estimatePopover && (
               <BasePopover

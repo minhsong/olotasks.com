@@ -29,7 +29,7 @@ const AddToCard = () => {
       <Title>Add to card</Title>
 
       <Button
-        clickCallback={(event) => setMemberPopover(event.currentTarget)}
+        onClick={(event) => setMemberPopover(event.currentTarget)}
         title="Members"
         icon={<MemberIcon fontSize="small" />}
       ></Button>
@@ -45,7 +45,7 @@ const AddToCard = () => {
       )}
 
       <Button
-        clickCallback={(event) => setLabelPopover(event.currentTarget)}
+        onClick={(event) => setLabelPopover(event.currentTarget)}
         title="Labels"
         icon={<LabelIcon fontSize="small" />}
       ></Button>
@@ -76,7 +76,7 @@ const AddToCard = () => {
       )}
 
       <Button
-        clickCallback={(event) => setChecklistPopover(event.currentTarget)}
+        onClick={(event) => setChecklistPopover(event.currentTarget)}
         title="Checklist"
         icon={<CheckIcon fontSize="small" />}
       ></Button>
@@ -98,7 +98,7 @@ const AddToCard = () => {
       )}
 
       <Button
-        clickCallback={(event) => setDatePopover(event.currentTarget)}
+        onClick={(event) => setDatePopover(event.currentTarget)}
         title="Dates"
         icon={<DateIcon fontSize="small" />}
       ></Button>
@@ -120,7 +120,7 @@ const AddToCard = () => {
       )}
 
       <Button
-        clickCallback={(event) => setAttachmentPopover(event.currentTarget)}
+        onClick={(event) => setAttachmentPopover(event.currentTarget)}
         title="Attachment"
         icon={<AttachmentIcon fontSize="small" />}
       ></Button>
@@ -143,7 +143,7 @@ const AddToCard = () => {
 
       <Button
         title="Cover"
-        clickCallback={(event) => setCoverPopover(event.currentTarget)}
+        onClick={(event) => setCoverPopover(event.currentTarget)}
         icon={<CoverIcon fontSize="small" />}
       ></Button>
       {coverPopover && (

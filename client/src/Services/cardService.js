@@ -148,8 +148,6 @@ export const comment = async (
   dispatch
 ) => {
   try {
-    dispatch(setPending(true));
-
     let response = "";
     submitCall = submitCall.then(() =>
       axios
@@ -163,9 +161,7 @@ export const comment = async (
     await submitCall;
 
     dispatch(addComment(response.data));
-    dispatch(setPending(false));
   } catch (error) {
-    dispatch(setPending(false));
     dispatch(
       openAlert({
         message: error?.response?.data?.errMessage

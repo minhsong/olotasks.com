@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import EditCard from "../Modals/EditCardModal/EditCard";
 import FollowIcon from "@mui/icons-material/RemoveRedEyeOutlined";
-import WatchIcon from "@mui/icons-material/AccessTimeOutlined";
 import DescriptiondIcon from "@mui/icons-material/DescriptionOutlined";
 import CommentIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import CheckIcon from "@mui/icons-material/LibraryAddCheckOutlined";
@@ -131,17 +129,6 @@ const Card = (props) => {
                             : "darkgray"
                         }
                       >
-                        <WatchIcon
-                          style={{
-                            color:
-                              card.date?.completed ||
-                              moment(card.date?.dueDate).toDate().getTime() <
-                                new Date().getTime()
-                                ? "white"
-                                : "darkgray",
-                          }}
-                          fontSize="0.5rem"
-                        />
                         <Span
                           color={
                             card.date?.completed ||
@@ -217,14 +204,17 @@ const Card = (props) => {
                             <Avatar
                               key={i}
                               sx={{
-                                width: 28,
-                                height: 28,
+                                width: 20,
+                                height: 20,
                                 bgcolor: member.color,
-                                fontSize: "0.875rem",
-                                fontWeight: "800",
+                                fontSize: "0.6rem",
+                                fontWeight: "600",
                               }}
                             >
-                              {member.name[0].toUpperCase()}
+                              {member.name
+                                .split(" ")
+                                .map((s) => s[0].toUpperCase())
+                                .splice(0, 2)}
                             </Avatar>
                           );
                         })}
@@ -236,16 +226,6 @@ const Card = (props) => {
           );
         }}
       </Draggable>
-      {/* {openModal && (
-        <EditCard
-          open={openModal}
-          callback={handleOpenClose}
-          ids={{
-            cardId: props.info._id,
-            boardId: props.boardId,
-          }}
-        />
-      )} */}
     </>
   );
 };

@@ -85,11 +85,7 @@ const InviteMembers = () => {
             setMemberMail(e.target.value);
           }}
         />
-        <Button
-          title="Add"
-          style={{ flex: "1" }}
-          clickCallback={handleAddClick}
-        />
+        <Button title="Add" style={{ flex: "1" }} onClick={handleAddClick} />
       </SearchContainer>
       <ChipContainer>
         {members.map((member) => {
@@ -103,7 +99,7 @@ const InviteMembers = () => {
         })}
       </ChipContainer>
       {members.length > 0 && (
-        <Button clickCallback={handleInviteClick} title="Invite" />
+        <Button onClick={handleInviteClick} title="Invite" />
       )}
     </Container>
   );

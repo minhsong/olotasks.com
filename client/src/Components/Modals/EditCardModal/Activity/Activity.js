@@ -75,7 +75,7 @@ const Activity = () => {
           <TitleWrapper>
             <Title>Activity</Title>
             <Button
-              clickCallback={() => setDetails((prev) => !prev)}
+              onClick={() => setDetails((prev) => !prev)}
               title={details ? "Hide details" : "Show details"}
             />
           </TitleWrapper>

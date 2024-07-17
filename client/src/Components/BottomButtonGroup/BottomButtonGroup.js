@@ -6,13 +6,13 @@ const BottomButtonGroup = (props) => {
   const { clickCallback, closeCallback, title } = props;
   return (
     <style.Row>
-      <style.AddListButton onClick={() => clickCallback()}>
+      <Button color={"info"} onClick={() => clickCallback()}>
         {title}
-      </style.AddListButton>
+      </Button>
 
       <Button
         style={{ fontSize: "1em" }}
-        clickCallback={() => closeCallback()}
+        onClick={() => closeCallback()}
         title="Close"
       ></Button>
       {/* <CloseIcon fontSize='medium'/> */}

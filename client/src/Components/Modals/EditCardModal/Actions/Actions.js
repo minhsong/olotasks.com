@@ -14,7 +14,7 @@ const Actions = () => {
 			<Button title='Copy' icon={<CopyIcon fontSize='small' />}></Button>
 			<Button title='Watch' icon={<WatchIcon fontSize='small' />}></Button> */}
       <Button
-        clickCallback={() => {
+        onClick={() => {
           cardDelete(card.listId, card.boardId, card.cardId, dispatch);
         }}
         title="Delete"

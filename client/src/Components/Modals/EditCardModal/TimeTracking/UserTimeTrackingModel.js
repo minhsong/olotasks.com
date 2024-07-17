@@ -113,9 +113,7 @@ const UserTimeTrackingModel = (props) => {
                   </TableCell>
                   <TableCell align="center">
                     <Button
-                      clickCallback={(event) =>
-                        setDeletePopover(event.currentTarget)
-                      }
+                      onClick={(event) => setDeletePopover(event.currentTarget)}
                     >
                       <Delete fontSize="small" />
                     </Button>

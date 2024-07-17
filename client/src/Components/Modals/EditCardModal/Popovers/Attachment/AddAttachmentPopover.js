@@ -52,7 +52,7 @@ const AddAttachmentPopover = (props) => {
       <Button
         style={{ marginTop: "1rem" }}
         title="Attach"
-        clickCallback={handleAttachClick}
+        onClick={handleAttachClick}
       />
     </Container>
   );

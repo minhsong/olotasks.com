@@ -154,11 +154,11 @@ const Checklist = (props) => {
           <Title>{props.title}</Title>
           <RowRightButtonsWrapper>
             <Button
-              clickCallback={() => setHideItems((prev) => !prev)}
+              onClick={() => setHideItems((prev) => !prev)}
               title={hideItems ? "Show checkeds" : "Hide checkeds"}
             />
             <Button
-              clickCallback={() => handleChecklistDelete(props._id)}
+              onClick={() => handleChecklistDelete(props._id)}
               title="Delete"
             />
           </RowRightButtonsWrapper>
@@ -197,10 +197,7 @@ const Checklist = (props) => {
               />
             </TextAreaContainer>
           ) : (
-            <Button
-              clickCallback={() => setShowAddItem(true)}
-              title="Add an item"
-            />
+            <Button onClick={() => setShowAddItem(true)} title="Add an item" />
           )}
         </RightColumn>
       </Row>

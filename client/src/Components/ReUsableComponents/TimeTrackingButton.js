@@ -39,7 +39,7 @@ const TimeTrackingButton = ({ onStart, onStop, timeUpdate }) => {
 
   return (
     <Button
-      clickCallback={isRunning ? stopTracking : startTracking}
+      onClick={isRunning ? stopTracking : startTracking}
       active={isRunning}
       title={
         isRunning ? (

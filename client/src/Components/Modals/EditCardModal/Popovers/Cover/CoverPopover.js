@@ -112,7 +112,7 @@ const CoverPopover = () => {
       <Button
         title="Remove"
         style={{ marginTop: "1rem" }}
-        clickCallback={handleRemoveClick}
+        onClick={handleRemoveClick}
       />
     </Container>
   );
