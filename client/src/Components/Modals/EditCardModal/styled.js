@@ -49,6 +49,8 @@ export const Wrapper = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
+  position: relative;
+  ${(props) => props.isDragging && "border: 2px dashed #0079bf;"}
   ${xs({
     flexDirection: "column",
     paddingRight: "1rem",

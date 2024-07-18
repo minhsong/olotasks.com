@@ -9,6 +9,7 @@ export const WebSocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user.token && user.isAuthenticated && user.userInfo && !ws) {
+      console.log("Connecting to server user", new Date(), user);
       const socket = io(process.env.REACT_APP_API_URL, {
         auth: {
           token: "Bearer " + user.token,
@@ -17,7 +18,7 @@ export const WebSocketProvider = ({ children }) => {
       socket.on("connect", () => {
         console.log("Connected to server");
       });
-      setWs(socket);
+      setWs((state) => socket);
     }
     return () => {
       if (ws) {
@@ -28,7 +29,9 @@ export const WebSocketProvider = ({ children }) => {
   }, [user.userInfo]);
 
   return (
-    <WebSocketContext.Provider value={ws}>{children}</WebSocketContext.Provider>
+    <WebSocketContext.Provider value={{ ws, setWs }}>
+      {children}
+    </WebSocketContext.Provider>
   );
 };
 

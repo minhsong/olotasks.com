@@ -9,12 +9,20 @@ import {
   Req,
   Res,
   HttpStatus,
+  UploadedFile,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CardService } from '../services/card.service';
 import { Roles } from 'src/decorators/roles.decorator';
 import { CreateCardDto } from '../models/dto/card/card.create';
 import { UserService } from '../services/user.service';
 import { Response } from 'express';
+import { SpacesService } from '../services/spaces.service';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { WsGateway } from '../websocket/ws.gateway';
+import * as sharp from 'sharp';
+import { getFileCategory } from 'src/utils/helperMethods';
 
 @Controller('card')
 @Roles([])
@@ -22,6 +30,8 @@ export class cardController {
   constructor(
     private readonly cardService: CardService,
     private readonly userService: UserService,
+    private readonly spaceService: SpacesService,
+    private readonly wsGateway: WsGateway,
   ) {}
 
   @Delete(':cardId')
@@ -637,5 +647,53 @@ export class cardController {
       .catch((err) => {
         throw err;
       });
+  }
+
+  @Post('/:boardId/:cardId/upload-files')
+  @UseInterceptors(FileInterceptor('file'))
+  @Roles([])
+  async uploadAttachmentFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Param() params,
+    @Req() req,
+  ) {
+    // Get params
+    const user = req.user;
+    const { boardId, cardId } = params;
+    const loggedInUser = await this.userService.getUser(user.id);
+    // Call the card service
+    const fileKey = `${boardId}/${cardId}/${file.originalname}`;
+    try {
+      let fileData = await this.spaceService.uploadFile(file, fileKey);
+      if (getFileCategory(file.mimetype) === 'image') {
+        const thumbnailBuffer = await sharp(file.buffer)
+          .resize({ width: 150 })
+          .toBuffer();
+
+        const thumbnailKey = `${boardId}/${cardId}/thumbnails-${file.originalname}`;
+        const thumbnailData = await this.spaceService.uploadFileFromBuffer(
+          thumbnailBuffer,
+          thumbnailKey,
+          file.mimetype,
+        );
+        fileData = { ...fileData, thumbnail: thumbnailData };
+      }
+      const attached = await this.cardService.addAttachment(
+        cardId,
+        boardId,
+        loggedInUser,
+        fileData.Location,
+        file.originalname,
+        fileData,
+      );
+
+      return {
+        data: attached,
+        boardId,
+        cardId,
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 }

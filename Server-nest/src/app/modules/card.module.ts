@@ -11,9 +11,11 @@ import { Board, BoardSchema } from '../models/schemas/board.schema';
 import { User, UserSchema } from '../models/schemas/user.shema';
 import { UserModule } from './user.module';
 import { Activity, ActivitySchema } from '../models/schemas/activity.schema';
+import { SpacesService } from '../services/spaces.service';
+import { WsGateway } from '../websocket/ws.gateway';
 
 @Module({
-  providers: [CardService],
+  providers: [CardService, SpacesService, WsGateway],
   controllers: [cardController],
   exports: [CardService],
   imports: [

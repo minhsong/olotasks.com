@@ -1,3 +1,5 @@
+import { mimeTypes } from 'src/constants/variables';
+
 export const validateCardOwners = async (
   card = null,
   board = null,
@@ -51,3 +53,30 @@ export const userpublic = (user) => {
     updatedAt: undefined,
   };
 };
+
+export const getThumbnailFromMeta = (metadata) => {
+  if (metadata) {
+    if (metadata.image) return metadata.image;
+    if (metadata['og:image']) return metadata['og:image'];
+    if (metadata['twitter:image']) return metadata['twitter:image'];
+    if (metadata.favicons && metadata.favicons.length > 0) {
+      const favs = metadata.favicons
+        .map((fav) => {
+          return {
+            ...fav,
+            size: fav.sizes
+              .split('x')
+              .reduce((a, b) => parseInt(a) * parseInt(b)),
+          };
+        })
+        .sort((a, b) => b.size - a.size);
+
+      return favs[-1].href;
+    }
+  }
+  return null;
+};
+
+export function getFileCategory(mimeType: string): string {
+  return mimeTypes[mimeType] || 'other';
+}

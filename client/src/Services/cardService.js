@@ -32,6 +32,7 @@ import {
   updateCover,
   updateEstimateTime,
   updateTimeTracking,
+  updateAllAttachments,
 } from "../Redux/Slices/cardSlice";
 import {
   addAttachmentForCard,
@@ -46,6 +47,7 @@ import {
   setCardTitle,
   setChecklistItemCompletedOfCard,
   setChecklistItemTextOfCard,
+  updateAllAttachmentsOfCard,
   updateCoverOfCard,
   updateDateCompletedOfCard,
   updateDescriptionOfCard,
@@ -872,10 +874,6 @@ export const attachmentAdd = async (
   dispatch
 ) => {
   try {
-    dispatch(
-      addAttachment({ link: link, name: name, _id: "notUpdated", date: Date() })
-    );
-
     let response = "";
     submitCall = submitCall.then(() =>
       axios
@@ -888,16 +886,12 @@ export const attachmentAdd = async (
         })
     );
     await submitCall;
-
-    dispatch(updateAddedAttachmentId(response.data.attachmentId));
+    dispatch(updateAllAttachments(response.data));
     dispatch(
-      addAttachmentForCard({
+      updateAllAttachmentsOfCard({
         listId,
         cardId,
-        link: link,
-        name: name,
-        _id: response.data.attachmentId,
-        date: Date(),
+        attachments: response.data,
       })
     );
   } catch (error) {
@@ -1192,6 +1186,48 @@ export const deleteWorkingTime = async (
       })
     );
     return response.data;
+  } catch (error) {
+    dispatch(
+      openAlert({
+        message: error?.response?.data?.errMessage
+          ? error.response.data.errMessage
+          : error.message,
+        severity: "error",
+      })
+    );
+  }
+};
+
+export const uploadAttachment = async (
+  cardId,
+  listId,
+  boardId,
+  files,
+  dispatch
+) => {
+  try {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append(`file`, file);
+      await axios
+        .post(
+          baseUrl + "/" + boardId + "/" + cardId + "/upload-files",
+          formData
+        )
+        .then((res) => {
+          dispatch(updateAllAttachments(res.data.data));
+          dispatch(
+            updateAllAttachmentsOfCard({
+              listId,
+              cardId,
+              attachments: res.data.data,
+            })
+          );
+        });
+    }
+
+    return true;
   } catch (error) {
     dispatch(
       openAlert({

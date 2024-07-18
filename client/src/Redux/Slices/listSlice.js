@@ -342,7 +342,8 @@ const listSlice = createSlice({
       });
     },
     addAttachmentForCard: (state, action) => {
-      const { listId, cardId, link, name, _id, date } = action.payload;
+      const { listId, cardId, link, name, _id, date, fileType, thumbnail } =
+        action.payload;
       state.allLists = state.allLists.map((list) => {
         if (list._id === listId) {
           list.cards = list.cards.map((card) => {
@@ -352,7 +353,23 @@ const listSlice = createSlice({
                 name: name,
                 _id: _id,
                 date: date,
+                fileType,
+                thumbnail,
               });
+            }
+            return card;
+          });
+        }
+        return list;
+      });
+    },
+    updateAllAttachmentsOfCard: (state, action) => {
+      const { listId, cardId, attachments } = action.payload;
+      state.allLists = state.allLists.map((list) => {
+        if (list._id === listId) {
+          list.cards = list.cards.map((card) => {
+            if (card._id === cardId) {
+              card.attachments = attachments;
             }
             return card;
           });
@@ -437,6 +454,7 @@ export const {
   updateDateCompletedOfCard,
   addAttachmentForCard,
   deleteAttachmentOfCard,
+  updateAllAttachmentsOfCard,
   updateCoverOfCard,
   updateTimeTrackingOfCard,
 } = listSlice.actions;

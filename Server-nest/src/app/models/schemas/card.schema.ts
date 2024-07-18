@@ -78,7 +78,42 @@ export class CardTimeTracking {
 
 export const ChecklistItemSchema = SchemaFactory.createForClass(ChecklistItem);
 
-@Schema({ collection: 'cards' })
+@Schema({ _id: true })
+export class Attachment {
+  _id?: Types.ObjectId;
+
+  @Prop({ required: true })
+  link: string;
+
+  @Prop()
+  name: string;
+
+  @Prop({ default: Date.now })
+  date?: Date;
+
+  @Prop({ type: MongooseSchema.Types.Mixed })
+  metadata?: Record<string, any>;
+
+  @Prop()
+  thumbnail?: string;
+
+  @Prop({
+    type: String,
+    enum: ['link', 'file', 'image', 'video', 'audio', 'document', 'other'],
+    default: 'link',
+  })
+  fileType?: string;
+
+  @Prop({ default: false })
+  isInternal?: boolean;
+
+  @Prop()
+  mineType?: string;
+}
+
+export const AttachmentSchema = SchemaFactory.createForClass(Attachment);
+
+@Schema({ collection: 'cards', timestamps: true })
 export class Card extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Board', default: [] })
   board: Types.ObjectId;
@@ -152,22 +187,11 @@ export class Card extends Document {
   };
 
   @Prop({
-    type: [
-      {
-        link: { type: String },
-        name: { type: String, default: null },
-        date: { type: Date, default: Date.now },
-      },
-    ],
+    type: [AttachmentSchema],
     default: [],
     _id: true,
   })
-  attachments?: {
-    _id?: Types.ObjectId;
-    link: string;
-    name: string;
-    date?: Date;
-  }[];
+  attachments: Attachment[];
 
   activities?: Activity[];
 

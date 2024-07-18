@@ -9,7 +9,7 @@ import Attachments from "./Attachments/Attachments";
 import Features from "./Features/Features";
 import Title from "./Title/Title";
 import CardLoadingSvg from "../../../Images/cardLoading.svg";
-import { getCard } from "../../../Services/cardService";
+import { getCard, uploadAttachment } from "../../../Services/cardService";
 import { useSelector, useDispatch } from "react-redux";
 import IconButton from "../../ReUsableComponents/IconButton";
 import CoverIcon from "@mui/icons-material/TableChartOutlined";
@@ -39,12 +39,38 @@ export default function EditCard(props) {
   const { cardId, boardId } = props.ids;
   const dispatch = useDispatch();
   const thisCard = useSelector((state) => state.card);
+  const [isDragging, setIsDragging] = React.useState(false);
+
   React.useEffect(() => {
     if (props.open) {
       getCard(cardId, boardId, dispatch);
     }
   }, [boardId, cardId, dispatch, props.open]);
 
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    console.log(e);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      await uploadAttachment(cardId, thisCard.owner, boardId, files, dispatch);
+    }
+  };
   return (
     <div style={{ position: "relative" }}>
       <Modal
@@ -61,7 +87,13 @@ export default function EditCard(props) {
             </CoverButtonWrapper>
           </CoverContainer>
           <TitleContainer>{!thisCard.pending && <Title />}</TitleContainer>
-          <Wrapper>
+          <Wrapper
+            isDragging={isDragging}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          >
             <MainContainer>
               {!thisCard.pending ? (
                 <>

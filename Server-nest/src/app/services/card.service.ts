@@ -1,15 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Card, CardDocument, Label } from '../models/schemas/card.schema';
+import {
+  Attachment,
+  Card,
+  CardDocument,
+  Label,
+} from '../models/schemas/card.schema';
 import { List, ListDocument } from '../models/schemas/list.shema';
 import { Board, BoardDocument } from '../models/schemas/board.schema';
 import { User, UserDocument } from '../models/schemas/user.shema';
-import { validateCardOwners } from 'src/utils/helperMethods';
+import {
+  getFileCategory,
+  getThumbnailFromMeta,
+  validateCardOwners,
+} from 'src/utils/helperMethods';
 import { Activity, ActivityDocument } from '../models/schemas/activity.schema';
 import { ObjectId } from 'mongodb';
 import { uniqBy } from 'lodash';
 import { secondsToTimeString } from 'src/utils/timeHelper';
+import { SpacesService } from './spaces.service';
+const urlMetadata = require('url-metadata');
 
 @Injectable()
 export class CardService {
@@ -20,6 +31,7 @@ export class CardService {
     @InjectModel(Activity.name)
     private readonly activityModel: Model<ActivityDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly SpacesService: SpacesService,
   ) {}
 
   async create(
@@ -882,6 +894,7 @@ export class CardService {
     user: User,
     link: string,
     name: string,
+    uploadData?: any,
   ) {
     try {
       // Get models
@@ -899,7 +912,44 @@ export class CardService {
         ? link
         : 'http://' + link;
 
-      card.attachments?.push({ link: validLink, name: name });
+      const attachment: Attachment = {
+        link: validLink,
+        name: name,
+      };
+
+      if (!uploadData) {
+        let metadata = null;
+        try {
+          metadata = await urlMetadata(validLink);
+        } catch (e) {}
+
+        if (metadata) {
+          attachment.name = metadata.title;
+          attachment.thumbnail = getThumbnailFromMeta(metadata);
+        }
+      } else {
+        attachment.isInternal = true;
+        attachment.mineType = uploadData.ContentType;
+        attachment.metadata = {
+          Bucket: uploadData.Bucket,
+          Key: uploadData.Key,
+          ETag: uploadData.ETag,
+        };
+        attachment.fileType = getFileCategory(uploadData.ContentType);
+        if (attachment.fileType === 'image') {
+          attachment.thumbnail = uploadData.thumbnail.Location;
+          attachment.metadata.thumbnail = {
+            Bucket: uploadData.thumbnail.Bucket,
+            Key: uploadData.thumbnail.Key,
+            ETag: uploadData.thumbnail.ETag,
+          };
+        }
+      }
+
+      if (!card.attachments) {
+        card.attachments = [];
+      }
+      card.attachments.push(attachment);
       await card.save();
 
       //Add to board activity
@@ -909,12 +959,8 @@ export class CardService {
       //   action: `attached ${validLink} to ${card.title}`,
       //   color: user.color,
       // });
-      board.save();
 
-      return {
-        attachmentId:
-          card.attachments[card.attachments?.length - 1]._id.toString(),
-      };
+      return card.attachments;
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -937,7 +983,7 @@ export class CardService {
         throw new Error('You dont have permission to delete this attachment');
       }
 
-      let attachmentObj = card.attachments?.filter(
+      let attachmentObj = card.attachments?.find(
         (attachment) => attachment._id.toString() === attachmentId.toString(),
       );
 
@@ -946,7 +992,19 @@ export class CardService {
         (attachment) => attachment._id.toString() !== attachmentId.toString(),
       );
       await card.save();
+      if (attachmentObj?.isInternal) {
+        this.SpacesService.deleteFile(attachmentObj.metadata.Key).catch((e) => {
+          console.log(e);
+        });
 
+        if (attachmentObj.metadata.thumbnail) {
+          this.SpacesService.deleteFile(
+            attachmentObj.metadata.thumbnail.Key,
+          ).catch((e) => {
+            console.log(e);
+          });
+        }
+      }
       //Add to board activity
       // board.activity.unshift({
       //   user: user._id,
@@ -954,6 +1012,7 @@ export class CardService {
       //   action: `deleted the ${attachmentObj[0].link} attachment from ${card.title}`,
       //   color: user.color,
       // });
+
       await board.save();
 
       return { message: 'Success!' };
@@ -982,7 +1041,6 @@ export class CardService {
           'You dont have permission to update attachment of this card',
         );
       }
-
       //Update date completed event
       card.attachments = card.attachments?.map((attachment) => {
         if (attachment._id.toString() === attachmentId.toString()) {
@@ -993,6 +1051,7 @@ export class CardService {
       });
 
       await card.save();
+
       return { message: 'Success!' };
     } catch (error) {
       throw new Error('Something went wrong');

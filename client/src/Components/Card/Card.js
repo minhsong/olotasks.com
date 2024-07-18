@@ -212,8 +212,10 @@ const Card = (props) => {
                               }}
                             >
                               {member.name
-                                .split(" ")
-                                .map((s) => s[0].toUpperCase())
+                                .split(/\s+/)
+                                .map((s) => s.trim())
+                                .filter((s) => !!s)
+                                .map((s) => s[0].toUpperCase().toUpperCase())
                                 .splice(0, 2)}
                             </Avatar>
                           );

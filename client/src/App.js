@@ -9,6 +9,7 @@ import { loadUser } from "./Services/userService";
 import Store from "./Redux/Store";
 import Board from "./Pages/BoardPage/Board";
 import ProtectedArea from "./Utils/ProtectedArea";
+import { WebSocketProvider } from "./Components/Websocket/WebSocketContext";
 const App = () => {
   useEffect(() => {
     loadUser(Store.dispatch);
@@ -16,38 +17,40 @@ const App = () => {
   return (
     <BrowserRouter>
       <Alert />
-      <Routes>
-        <Route
-          exact
-          path="/boards"
-          element={
-            <ProtectedArea>
-              <Boards />
-            </ProtectedArea>
-          }
-        />
-        <Route
-          exact
-          path="/board/:id"
-          element={
-            <ProtectedArea>
-              <Board />
-            </ProtectedArea>
-          }
-        />
-        <Route
-          exact
-          path="/board/:id/:cardId"
-          element={
-            <ProtectedArea>
-              <Board />
-            </ProtectedArea>
-          }
-        />
-        <Route exact path="/login" element={<Login />} />
-        <Route exact path="/register" element={<Register />} />
-        <Route exact path="/" element={<Index />} />
-      </Routes>
+      <WebSocketProvider>
+        <Routes>
+          <Route
+            exact
+            path="/boards"
+            element={
+              <ProtectedArea>
+                <Boards />
+              </ProtectedArea>
+            }
+          />
+          <Route
+            exact
+            path="/board/:id"
+            element={
+              <ProtectedArea>
+                <Board />
+              </ProtectedArea>
+            }
+          />
+          <Route
+            exact
+            path="/board/:id/:cardId"
+            element={
+              <ProtectedArea>
+                <Board />
+              </ProtectedArea>
+            }
+          />
+          <Route exact path="/login" element={<Login />} />
+          <Route exact path="/register" element={<Register />} />
+          <Route exact path="/" element={<Index />} />
+        </Routes>
+      </WebSocketProvider>
     </BrowserRouter>
   );
 };

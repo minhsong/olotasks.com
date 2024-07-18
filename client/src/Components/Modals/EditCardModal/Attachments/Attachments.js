@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
 import AttachmentIcon from "@mui/icons-material/InsertLinkRounded";
+import Image from "@mui/icons-material/Image";
 import Button from "../../../ReUsableComponents/Button";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -16,12 +17,14 @@ import {
   AttachmentFooterWrapper,
   AttachmentDate,
   AttachmentOperations,
+  Thumbnail,
 } from "./styled";
 import { attachmentDelete } from "../../../../Services/cardService";
 import BasePopover from "../../../ReUsableComponents/BasePopover";
 import EditAttachmentPopover from "../Popovers/Attachment/EditAttachmentPopover";
 import moment from "moment";
 import AddAttachmentPopover from "../Popovers/Attachment/AddAttachmentPopover";
+import { DocumentScanner, VideoLibrary } from "@mui/icons-material";
 
 const Attachments = (props) => {
   const card = useSelector((state) => state.card);
@@ -39,6 +42,24 @@ const Attachments = (props) => {
       dispatch
     );
   };
+
+  const AttachmentFileIcon = (attachment) => {
+    const { fileType, thumbnail } = attachment;
+    switch (fileType) {
+      case "image":
+        return thumbnail ? (
+          <Thumbnail src={thumbnail} />
+        ) : (
+          <Image fontSize="large" />
+        );
+      case "document":
+        return <DocumentScanner fontSize="large" />;
+      case "video":
+        return <VideoLibrary fontSize="large" />;
+      default:
+        return <AttachmentIcon fontSize="large" />;
+    }
+  };
   return (
     <>
       <Container>
@@ -54,7 +75,7 @@ const Attachments = (props) => {
                 onClick={() => window.open(attachment.link, "_blank")}
               >
                 <FaviconWrapper>
-                  <AttachmentIcon fontSize="large" />
+                  {AttachmentFileIcon(attachment)}
                 </FaviconWrapper>
                 <AttachmentRightWrapper>
                   <AttachmentTitleWrapper>

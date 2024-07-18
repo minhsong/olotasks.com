@@ -220,8 +220,15 @@ const cardsSlice = createSlice({
       state.date.completed = action.payload;
     },
     addAttachment: (state, action) => {
-      const { link, name, _id, date } = action.payload;
-      state.attachments.push({ link: link, name: name, _id: _id, date: date });
+      const { link, name, _id, date, fileType, thumbnail } = action.payload;
+      state.attachments.push({
+        link: link,
+        name: name,
+        _id: _id,
+        date: date,
+        fileType,
+        thumbnail,
+      });
     },
     updateAddedAttachmentId: (state, action) => {
       state.attachments = state.attachments.map((attachment) => {
@@ -245,6 +252,9 @@ const cardsSlice = createSlice({
         }
         return attachment;
       });
+    },
+    updateAllAttachments: (state, action) => {
+      state.attachments = action.payload;
     },
     updateCover: (state, action) => {
       const { color, isSizeOne } = action.payload;
@@ -293,6 +303,7 @@ export const {
   updateAddedAttachmentId,
   deleteAttachment,
   updateAttachment,
+  updateAllAttachments,
   updateCover,
   updateEstimateTime,
   updateSpentTime,

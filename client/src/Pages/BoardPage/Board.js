@@ -15,11 +15,13 @@ import LoadingScreen from "../../Components/LoadingScreen";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { useNavigate, useParams } from "react-router-dom";
 import EditCard from "../../Components/Modals/EditCardModal/EditCard";
+import { useWebSocket } from "../../Components/Websocket/WebSocketContext";
 
 const Board = (props) => {
   /* props.match.params.id */
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { ws } = useWebSocket();
   let { id, cardId } = useParams();
   const { backgroundImageLink, isImage, loading, title } = useSelector(
     (state) => state.board
@@ -38,6 +40,13 @@ const Board = (props) => {
     getLists(boardId, dispatch);
   }, [id, dispatch, boardId]);
 
+  useEffect(() => {
+    if (!ws) return;
+    ws.emit("joinRoom", id);
+    return () => {
+      ws && ws.emit("leaveRoom", id);
+    };
+  }, [ws]);
   useEffect(() => {
     document.title = title + " | Olo Tasks";
   }, [title]);

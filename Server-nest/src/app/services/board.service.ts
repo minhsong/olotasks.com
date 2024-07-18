@@ -242,4 +242,34 @@ export class BoardService {
       throw new Error('Something went wrong');
     }
   }
+
+  async getFixedBoards(): Promise<Board[]> {
+    try {
+      //get all bard
+      const boards = await this.boardModel.find({});
+      //go through all boards and get all lists
+
+      boards.forEach(async (board) => {
+        const cards = await this.cardModel.updateMany(
+          {
+            owner: { $in: board.lists },
+          },
+          { board: board._id },
+        );
+
+        await this.cardModel.updateMany(
+          {
+            owner: { $in: board.lists.map((s) => s.toString()) },
+          },
+          { board: board._id },
+        );
+
+        console.log('cards', cards);
+      });
+
+      return boards;
+    } catch (error) {
+      throw new Error('Something went wrong');
+    }
+  }
 }

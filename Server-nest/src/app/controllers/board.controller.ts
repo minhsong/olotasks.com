@@ -24,6 +24,12 @@ export class BoardController {
     private readonly userService: UserService,
   ) {}
 
+  @Get('/fixed-boards')
+  @Roles([])
+  async getFixedBoards(@Request() req) {
+    return await this.boardService.getFixedBoards();
+  }
+
   @Post(':boardId/add-member')
   @Roles([])
   async addMember(

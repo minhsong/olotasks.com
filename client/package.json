@@ -5,6 +5,7 @@
   "dependencies": {
     "@atlaskit/css-reset": "^6.2.0",
     "@ckeditor/ckeditor5-build-classic": "^42.0.0",
+    "@ckeditor/ckeditor5-mention": "^42.0.1",
     "@ckeditor/ckeditor5-react": "^8.0.0",
     "@date-io/date-fns": "^3.0.0",
     "@emotion/react": "^11.0.0",
