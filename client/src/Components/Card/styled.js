@@ -25,14 +25,21 @@ export const Container = styled.div`
 `;
 
 export const Cover = styled.div`
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   width: 100%;
-  height: 2rem;
+
   background-color: ${(props) => props.color};
+  ${(props) =>
+    props.thumbnail
+      ? `background-image: url(${props.thumbnail});
+      background-size: cover;
+      height: 100px;
+      background-position: center;`
+      : `height: 2rem;`}
 `;
 
 export const LabelContainer = styled.div`

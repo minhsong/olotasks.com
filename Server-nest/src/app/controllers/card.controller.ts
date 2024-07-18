@@ -57,11 +57,11 @@ export class cardController {
   async updateCover(@Param() params, @Req() req, @Body() body) {
     const user = req.user;
     const { boardId, cardId } = params;
-    const { color, isSizeOne } = body;
+    const { color, isSizeOne, thumbnail } = body;
     const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .updateCover(cardId, boardId, loggedInUser, color, isSizeOne)
+      .updateCover(cardId, boardId, loggedInUser, color, isSizeOne, thumbnail)
       .then((result) => {
         return result;
       })
@@ -667,7 +667,7 @@ export class cardController {
       let fileData = await this.spaceService.uploadFile(file, fileKey);
       if (getFileCategory(file.mimetype) === 'image') {
         const thumbnailBuffer = await sharp(file.buffer)
-          .resize({ width: 150 })
+          .resize({ width: 220 })
           .toBuffer();
 
         const thumbnailKey = `${boardId}/${cardId}/thumbnails-${file.originalname}`;

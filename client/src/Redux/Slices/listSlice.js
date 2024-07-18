@@ -394,13 +394,14 @@ const listSlice = createSlice({
       });
     },
     updateCoverOfCard: (state, action) => {
-      const { listId, cardId, color, isSizeOne } = action.payload;
+      const { listId, cardId, color, isSizeOne, thumbnail } = action.payload;
       state.allLists = state.allLists.map((list) => {
         if (list._id === listId) {
           list.cards = list.cards.map((card) => {
             if (card._id === cardId) {
               card.cover.color = color;
               card.cover.isSizeOne = isSizeOne;
+              card.cover.thumbnail = thumbnail;
             }
             return card;
           });

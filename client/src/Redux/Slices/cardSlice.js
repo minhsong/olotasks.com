@@ -239,9 +239,14 @@ const cardsSlice = createSlice({
       });
     },
     deleteAttachment: (state, action) => {
+      const attachment = state.attachments.find(
+        (attachment) => attachment._id === action.payload
+      );
       state.attachments = state.attachments.filter(
         (attachment) => attachment._id !== action.payload
       );
+      if (attachment.thumbnail === state.cover.thumbnail)
+        state.cover = undefined;
     },
     updateAttachment: (state, action) => {
       const { attachmentId, link, name } = action.payload;
@@ -257,9 +262,10 @@ const cardsSlice = createSlice({
       state.attachments = action.payload;
     },
     updateCover: (state, action) => {
-      const { color, isSizeOne } = action.payload;
+      const { color, isSizeOne, thumbnail } = action.payload;
       state.cover.color = color;
       state.cover.isSizeOne = isSizeOne;
+      state.cover.thumbnail = thumbnail;
     },
     updateEstimateTime: (state, action) => {
       state.timeTracking.estimateTime = action.payload;

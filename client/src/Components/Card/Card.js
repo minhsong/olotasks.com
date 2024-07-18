@@ -76,9 +76,14 @@ const Card = (props) => {
               ref={provided.innerRef}
               isDragging={snapshot.isDragging}
               color={!card.cover?.isSizeOne ? card.cover?.color : "#fff"}
-              padding={card.cover?.color && card.cover?.isSizeOne}
+              // padding={card.cover?.color && card.cover?.isSizeOne}
             >
-              {card.cover?.isSizeOne && <Cover color={card.cover?.color} />}
+              {card.cover?.isSizeOne && (
+                <Cover
+                  color={card.cover?.color}
+                  thumbnail={card.cover?.thumbnail}
+                ></Cover>
+              )}
               {card.labels && (
                 <LabelContainer>
                   {card.labels.map((label) => {

@@ -81,6 +81,7 @@ export default function EditCard(props) {
         <Container>
           <CoverContainer
             color={!thisCard.pending ? thisCard.cover?.color : null}
+            thumbnail={!thisCard.pending ? thisCard.cover?.thumbnail : null}
           >
             <CoverButtonWrapper>
               <IconButton title="Cover" icon={<CoverIcon fontSize="small" />} />

@@ -202,12 +202,14 @@ export class Card extends Document {
     type: {
       color: { type: String, default: null },
       isSizeOne: { type: Boolean, default: null },
+      thumbnail: { type: String, default: null },
     },
     default: { color: null, isSizeOne: null },
   })
   cover?: {
     color: string;
     isSizeOne: boolean;
+    thumbnail?: string;
   };
 
   @Prop({

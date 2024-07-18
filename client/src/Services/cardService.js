@@ -886,12 +886,12 @@ export const attachmentAdd = async (
         })
     );
     await submitCall;
-    dispatch(updateAllAttachments(response.data));
+    dispatch(updateAllAttachments(response.data.attachments));
     dispatch(
       updateAllAttachmentsOfCard({
         listId,
         cardId,
-        attachments: response.data,
+        attachments: response.data.attachments,
       })
     );
   } catch (error) {
@@ -1216,7 +1216,19 @@ export const uploadAttachment = async (
           formData
         )
         .then((res) => {
-          dispatch(updateAllAttachments(res.data.data));
+          dispatch(updateAllAttachments(res.data.data.attachments));
+          if (res.data.data.cover) {
+            dispatch(updateCover(res.data.data.cover));
+            dispatch(
+              updateCoverOfCard({
+                listId,
+                cardId,
+                color: res.data.data.cover.color,
+                isSizeOne: res.data.data.cover.isSizeOne,
+                thumbnail: res.data.data.cover.thumbnail,
+              })
+            );
+          }
           dispatch(
             updateAllAttachmentsOfCard({
               listId,

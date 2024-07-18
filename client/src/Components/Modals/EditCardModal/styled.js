@@ -24,13 +24,22 @@ export const Container = styled.div`
 `;
 
 export const CoverContainer = styled.div`
-  display: ${(props) => (props.color ? "block" : "none")};
+  display: ${(props) => (props.color || props.thumbnail ? "block" : "none")};
   min-height: 7.25rem;
   background-color: ${(props) => props.color};
   margin: -0.5rem 0rem 0rem -0.25rem;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   position: relative;
+  ${(props) => {
+    return props.thumbnail
+      ? `background-image: url(${props.thumbnail});
+      background-repeat: no-repeat;
+      background-size: auto;
+      height: 100px;
+      background-position: center;`
+      : `height: 2rem;`;
+  }}
 `;
 
 export const CoverButtonWrapper = styled.div`

@@ -128,7 +128,6 @@ export class CardService {
       //   action: `deleted ${card.title} from ${list.title}`,
       //   color: user.color,
       // });
-      await board.save();
 
       return { message: 'Success' };
     } catch (error) {
@@ -271,8 +270,6 @@ export class CardService {
         cardTitle: card.title,
       });
 
-      await board.save();
-
       return { message: 'Success!' };
     } catch (error) {
       throw new Error('Something went wrong');
@@ -358,8 +355,6 @@ export class CardService {
         cardTitle: card.title,
       });
 
-      await board.save();
-
       return { message: 'success' };
     } catch (error) {
       throw new Error('Something went wrong');
@@ -405,8 +400,6 @@ export class CardService {
         actionType: 'member',
         cardTitle: card.title,
       });
-
-      await board.save();
 
       return { message: 'success' };
     } catch (error) {
@@ -600,7 +593,6 @@ export class CardService {
       //   action: `added '${title}' to ${card.title}`,
       //   color: user.color,
       // });
-      await board.save();
 
       return { checklistId: checklistId };
     } catch (error) {
@@ -637,7 +629,6 @@ export class CardService {
       //   action: `removed '${cl.title}' from ${card.title}`,
       //   color: user.color,
       // });
-      await board.save();
 
       return { message: 'Success!' };
     } catch (error) {
@@ -734,7 +725,7 @@ export class CardService {
       //     : `marked as uncompleted to '${clItem}' on ${card.title}`,
       //   color: user.color,
       // });
-      await board.save();
+
       return { message: 'Success!' };
     } catch (error) {
       throw new Error('Something went wrong');
@@ -880,7 +871,6 @@ export class CardService {
       //   }`,
       //   color: user.color,
       // });
-      await board.save();
 
       return { message: 'Success!' };
     } catch (error) {
@@ -917,6 +907,8 @@ export class CardService {
         name: name,
       };
 
+      let cover = undefined;
+
       if (!uploadData) {
         let metadata = null;
         try {
@@ -943,6 +935,18 @@ export class CardService {
             Key: uploadData.thumbnail.Key,
             ETag: uploadData.thumbnail.ETag,
           };
+
+          if (!card.cover.thumbnail) {
+            if (!card.cover) {
+              card.cover = {
+                color: '',
+                isSizeOne: true,
+              };
+            }
+            card.cover.thumbnail = uploadData.thumbnail.Location;
+            card.cover.isSizeOne = true;
+            cover = card.cover;
+          }
         }
       }
 
@@ -960,7 +964,7 @@ export class CardService {
       //   color: user.color,
       // });
 
-      return card.attachments;
+      return { attachments: card.attachments, cover };
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -1004,6 +1008,11 @@ export class CardService {
             console.log(e);
           });
         }
+
+        if (card.cover?.thumbnail === attachmentObj.thumbnail) {
+          card.cover = undefined;
+          await card.save();
+        }
       }
       //Add to board activity
       // board.activity.unshift({
@@ -1012,8 +1021,6 @@ export class CardService {
       //   action: `deleted the ${attachmentObj[0].link} attachment from ${card.title}`,
       //   color: user.color,
       // });
-
-      await board.save();
 
       return { message: 'Success!' };
     } catch (error) {
@@ -1064,6 +1071,7 @@ export class CardService {
     user: User,
     color: string,
     isSizeOne: boolean,
+    thumbnail: string = null,
   ) {
     try {
       // Get models
@@ -1079,8 +1087,15 @@ export class CardService {
       }
 
       //Update date cover color
-      card.cover.color = color;
+
       card.cover.isSizeOne = isSizeOne;
+      if (thumbnail) {
+        card.cover.thumbnail = thumbnail;
+      }
+
+      if (color) {
+        card.cover.color = color;
+      }
 
       await card.save();
       return { message: 'Success!' };
@@ -1126,7 +1141,6 @@ export class CardService {
         actionType: 'time',
         cardTitle: card.title,
       });
-      await board.save();
 
       return card.timeTracking;
     } catch (error) {
