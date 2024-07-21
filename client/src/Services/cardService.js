@@ -143,10 +143,8 @@ export const descriptionUpdate = async (
 
 export const comment = async (
   cardId,
-  listId,
   boardId,
-  text,
-  userName,
+  { content, mentions },
   dispatch
 ) => {
   try {
@@ -154,7 +152,8 @@ export const comment = async (
     submitCall = submitCall.then(() =>
       axios
         .post(baseUrl + "/" + boardId + "/" + cardId + "/add-comment", {
-          text: text,
+          text: content,
+          mentions: mentions,
         })
         .then((res) => {
           response = res;
@@ -177,18 +176,18 @@ export const comment = async (
 
 export const commentUpdate = async (
   cardId,
-  listId,
   boardId,
-  text,
+  { content, mentions },
   commentId,
   dispatch
 ) => {
   try {
-    dispatch(updateComment(commentId, text));
+    dispatch(updateComment(commentId, content));
 
     submitCall = submitCall.then(() =>
       axios.put(baseUrl + "/" + boardId + "/" + cardId + "/" + commentId, {
-        text: text,
+        text: content,
+        mentions: mentions,
       })
     );
     await submitCall;
@@ -204,13 +203,7 @@ export const commentUpdate = async (
   }
 };
 
-export const commentDelete = async (
-  cardId,
-  listId,
-  boardId,
-  commentId,
-  dispatch
-) => {
+export const commentDelete = async (cardId, boardId, commentId, dispatch) => {
   try {
     dispatch(deleteComment(commentId));
 

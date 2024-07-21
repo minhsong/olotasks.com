@@ -19,12 +19,14 @@ import {
   commentUpdate,
 } from "../../../../Services/cardService.js";
 import { Avatar } from "@mui/material";
-import HTMLEditor from "../../../ReUsableComponents/HTMLEditor.js";
 import moment from "moment";
 import BottomButtonGroup from "../../../BottomButtonGroup/BottomButtonGroup.js";
+import QuillEditor from "../../../QuillEditor/index.jsx";
 
 const Comment = (props) => {
+  const board = useSelector((state) => state.board);
   const [edit, setEdit] = useState(true);
+  const [mentions, setMentions] = useState([]);
   const [comment, setComment] = useState(props.text);
   const user = useSelector((state) => state.user.userInfo);
   const card = useSelector((state) => state.card);
@@ -33,22 +35,18 @@ const Comment = (props) => {
     setEdit(true);
     await commentUpdate(
       card.cardId,
-      card.listId,
       card.boardId,
-      comment,
+      {
+        content: comment,
+        mentions,
+      },
       props._id,
       dispatch
     );
   };
 
   const handleDeleteClick = async () => {
-    await commentDelete(
-      card.cardId,
-      card.listId,
-      card.boardId,
-      props._id,
-      dispatch
-    );
+    await commentDelete(card.cardId, card.boardId, props._id, dispatch);
   };
   return (
     <>
@@ -83,7 +81,16 @@ const Comment = (props) => {
           <CommentWrapper>
             {!edit ? (
               <CommentEditorContainer>
-                <HTMLEditor value={comment} onChange={(e) => setComment(e)} />
+                <QuillEditor
+                  onChanged={(e) => setComment(e)}
+                  value={comment}
+                  placeholder="Mention with @, Write a comment..."
+                  onMention={(e) => setMentions(e)}
+                  users={board.members.map((member) => ({
+                    id: member._id,
+                    value: member.name,
+                  }))}
+                />
               </CommentEditorContainer>
             ) : (
               //   <CommentArea

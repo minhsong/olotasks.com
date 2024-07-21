@@ -55,6 +55,9 @@ export const CommentEditorContainer = styled.div`
   .ck-editor__editable {
     min-height: 100px;
   }
+  .quill {
+    padding-bottom: 45px;
+  }
 `;
 
 export const CommentArea = styled.textarea`

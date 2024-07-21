@@ -18,23 +18,27 @@ import { comment } from "../../../../Services/cardService";
 import { Avatar } from "@mui/material";
 import { CommentEditorContainer } from "../Comment/styled";
 import HTMLEditor from "../../../ReUsableComponents/HTMLEditor";
+import QuillEditor from "../../../QuillEditor";
 
 const Activity = () => {
   const dispatch = useDispatch();
   const ref = useRef();
   const card = useSelector((state) => state.card);
   const user = useSelector((state) => state.user);
+  const board = useSelector((state) => state.board);
   const [focusComment, setFocusComment] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [details, setDetails] = useState(false);
+  const [mentions, setMentions] = useState([]);
 
   const handleSaveClick = async () => {
     await comment(
       card.cardId,
-      card.listId,
       card.boardId,
-      newComment,
-      user.name,
+      {
+        content: newComment,
+        mentions,
+      },
       dispatch
     );
     setNewComment("");
@@ -88,11 +92,16 @@ const Activity = () => {
               Save
             </SaveButton>
             <CommentEditorContainer>
-              <HTMLEditor
+              <QuillEditor
+                onChanged={(e) => setNewComment(e)}
                 value={newComment}
-                onChange={(e) => setNewComment(e)}
-                focus={focusComment}
-                placeholder="Write a comment..."
+                onFocus={focusComment}
+                placeholder="Mention with @, Write a comment..."
+                onMention={(e) => setMentions(e)}
+                users={board.members.map((member) => ({
+                  id: member._id,
+                  value: member.name,
+                }))}
               />
             </CommentEditorContainer>
           </CommentWrapper>
