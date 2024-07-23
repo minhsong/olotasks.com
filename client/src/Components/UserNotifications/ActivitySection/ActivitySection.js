@@ -76,7 +76,7 @@ const ActivitySection = () => {
             fontWeight: "800",
           }}
         >
-          {props.name[0].toUpperCase()}
+          {props.sender.name[0].toUpperCase()}
         </Avatar>
         <ActionWrapper>
           <Text>
