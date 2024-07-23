@@ -235,7 +235,7 @@ const DatePopover = (props) => {
               setFocusDue(true);
             }}
             readOnly={!enableDueDate}
-            style={{ width: "23.5%" }}
+            style={{ width: "23.5%", minWidth: 80 }}
             value={enableDueDate ? time : ""}
             onChange={(e) => setTime(e.target.value)}
             type={enableDueDate ? "time" : "text"}

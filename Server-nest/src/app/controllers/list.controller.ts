@@ -113,7 +113,9 @@ export class ListRouteController {
         return res.status(HttpStatus.OK).send(result);
       })
       .catch((err) => {
-        throw err;
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .send({ errMessage: err.message });
       });
   }
 

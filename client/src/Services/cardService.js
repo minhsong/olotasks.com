@@ -60,18 +60,15 @@ import {
 import { updateBoardLabels } from "../Redux/Slices/boardSlice";
 
 const baseUrl = process.env.REACT_APP_API_URL + "/card";
-let submitCall = Promise.resolve();
 
 export const getCard = async (cardId, boardId, dispatch) => {
   dispatch(setPending(true));
   try {
     let response = "";
-    submitCall = submitCall.then(() =>
-      axios.get(baseUrl + "/" + boardId + "/" + cardId).then((res) => {
-        response = res;
-      })
-    );
-    await submitCall;
+
+    await axios.get(baseUrl + "/" + boardId + "/" + cardId).then((res) => {
+      response = res;
+    });
 
     const card = await JSON.parse(JSON.stringify(response.data));
     dispatch(setCard(card));
@@ -94,12 +91,9 @@ export const titleUpdate = async (cardId, listId, boardId, title, dispatch) => {
     dispatch(setCardTitle({ listId, cardId, title }));
     dispatch(updateTitle(title));
 
-    submitCall = submitCall.then(() =>
-      axios.put(baseUrl + "/" + boardId + "/" + cardId, {
-        title: title,
-      })
-    );
-    await submitCall;
+    await axios.put(baseUrl + "/" + boardId + "/" + cardId, {
+      title: title,
+    });
   } catch (error) {
     dispatch(
       openAlert({
@@ -123,13 +117,10 @@ export const descriptionUpdate = async (
     dispatch(updateDescription(description));
     dispatch(updateDescriptionOfCard({ listId, cardId, description }));
 
-    submitCall = submitCall.then(() =>
-      axios.put(baseUrl + "/" + boardId + "/" + cardId, {
-        description: description,
-        mentions: mentions,
-      })
-    );
-    await submitCall;
+    await axios.put(baseUrl + "/" + boardId + "/" + cardId, {
+      description: description,
+      mentions: mentions,
+    });
   } catch (error) {
     dispatch(
       openAlert({
@@ -150,17 +141,14 @@ export const comment = async (
 ) => {
   try {
     let response = "";
-    submitCall = submitCall.then(() =>
-      axios
-        .post(baseUrl + "/" + boardId + "/" + cardId + "/add-comment", {
-          text: content,
-          mentions: mentions,
-        })
-        .then((res) => {
-          response = res;
-        })
-    );
-    await submitCall;
+    await axios
+      .post(baseUrl + "/" + boardId + "/" + cardId + "/add-comment", {
+        text: content,
+        mentions: mentions,
+      })
+      .then((res) => {
+        response = res;
+      });
 
     dispatch(addComment(response.data));
   } catch (error) {
@@ -185,13 +173,10 @@ export const commentUpdate = async (
   try {
     dispatch(updateComment(commentId, content));
 
-    submitCall = submitCall.then(() =>
-      axios.put(baseUrl + "/" + boardId + "/" + cardId + "/" + commentId, {
-        text: content,
-        mentions: mentions,
-      })
-    );
-    await submitCall;
+    await axios.put(baseUrl + "/" + boardId + "/" + cardId + "/" + commentId, {
+      text: content,
+      mentions: mentions,
+    });
   } catch (error) {
     dispatch(
       openAlert({
@@ -208,10 +193,9 @@ export const commentDelete = async (cardId, boardId, commentId, dispatch) => {
   try {
     dispatch(deleteComment(commentId));
 
-    submitCall = submitCall.then(() =>
-      axios.delete(baseUrl + "/" + boardId + "/" + cardId + "/" + commentId)
+    await axios.delete(
+      baseUrl + "/" + boardId + "/" + cardId + "/" + commentId
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -239,12 +223,9 @@ export const memberAdd = async (
       updateMemberOfCard({ listId, cardId, memberId, memberName, memberColor })
     );
 
-    submitCall = submitCall.then(() =>
-      axios.post(baseUrl + "/" + boardId + "/" + cardId + "/add-member", {
-        memberId: memberId,
-      })
-    );
-    await submitCall;
+    await axios.post(baseUrl + "/" + boardId + "/" + cardId + "/add-member", {
+      memberId: memberId,
+    });
   } catch (error) {
     dispatch(
       openAlert({
@@ -269,19 +250,9 @@ export const memberDelete = async (
     dispatch(deleteMember({ memberId }));
     dispatch(deleteMemberOfCard({ listId, cardId, memberId }));
 
-    submitCall = submitCall.then(() =>
-      axios.delete(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          cardId +
-          "/" +
-          memberId +
-          "/delete-member"
-      )
+    await axios.delete(
+      baseUrl + "/" + boardId + "/" + cardId + "/" + memberId + "/delete-member"
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -309,18 +280,15 @@ export const labelCreate = async (
     );
 
     let response = "";
-    submitCall = submitCall.then(() =>
-      axios
-        .post(baseUrl + "/" + boardId + "/" + cardId + "/create-label", {
-          text,
-          color,
-          backColor,
-        })
-        .then((res) => {
-          response = res;
-        })
-    );
-    await submitCall;
+    await axios
+      .post(baseUrl + "/" + boardId + "/" + cardId + "/create-label", {
+        text,
+        color,
+        backColor,
+      })
+      .then((res) => {
+        response = res;
+      });
 
     dispatch(updateCreatedLabelId(response.data.labelId));
     dispatch(
@@ -385,20 +353,10 @@ export const labelUpdate = async (
       })
     );
 
-    submitCall = submitCall.then(() =>
-      axios.put(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          cardId +
-          "/" +
-          labelId +
-          "/update-label",
-        label
-      )
+    await axios.put(
+      baseUrl + "/" + boardId + "/" + cardId + "/" + labelId + "/update-label",
+      label
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -422,12 +380,9 @@ export const labelDelete = async (
     dispatch(deleteLabel(labelId));
     dispatch(deleteLabelOfCard({ listId, cardId, labelId }));
 
-    submitCall = submitCall.then(() =>
-      axios.delete(
-        baseUrl + "/" + boardId + "/" + cardId + "/" + labelId + "/delete-label"
-      )
+    await axios.delete(
+      baseUrl + "/" + boardId + "/" + cardId + "/" + labelId + "/delete-label"
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -457,20 +412,17 @@ export const labelUpdateSelection = async (
       updateLabelSelectionOfCard({ listId, cardId, labelId, selected, label })
     );
 
-    submitCall = submitCall.then(() =>
-      axios.put(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          cardId +
-          "/" +
-          labelId +
-          "/update-label-selection",
-        { selected: selected }
-      )
+    await axios.put(
+      baseUrl +
+        "/" +
+        boardId +
+        "/" +
+        cardId +
+        "/" +
+        labelId +
+        "/update-label-selection",
+      { selected: selected }
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -494,16 +446,13 @@ export const checklistCreate = async (
     dispatch(createChecklist({ _id: "notUpdated", title }));
 
     let response = "";
-    submitCall = submitCall.then(() =>
-      axios
-        .post(baseUrl + "/" + boardId + "/" + cardId + "/create-checklist", {
-          title,
-        })
-        .then((res) => {
-          response = res;
-        })
-    );
-    await submitCall;
+    await axios
+      .post(baseUrl + "/" + boardId + "/" + cardId + "/create-checklist", {
+        title,
+      })
+      .then((res) => {
+        response = res;
+      });
 
     dispatch(updateCreatedChecklist(response.data.checklistId));
     dispatch(
@@ -536,19 +485,16 @@ export const checklistDelete = async (
   try {
     dispatch(deleteChecklist(checklistId));
     dispatch(deleteChecklistOfCard({ listId, cardId, checklistId }));
-    submitCall = submitCall.then(() =>
-      axios.delete(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          cardId +
-          "/" +
-          checklistId +
-          "/delete-checklist"
-      )
+    await axios.delete(
+      baseUrl +
+        "/" +
+        boardId +
+        "/" +
+        cardId +
+        "/" +
+        checklistId +
+        "/delete-checklist"
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -579,26 +525,23 @@ export const checklistItemAdd = async (
     );
 
     let response = "";
-    submitCall = submitCall.then(() =>
-      axios
-        .post(
-          baseUrl +
-            "/" +
-            boardId +
-            "/" +
-            cardId +
-            "/" +
-            checklistId +
-            "/add-checklist-item",
-          {
-            text,
-          }
-        )
-        .then((res) => {
-          response = res;
-        })
-    );
-    await submitCall;
+    await axios
+      .post(
+        baseUrl +
+          "/" +
+          boardId +
+          "/" +
+          cardId +
+          "/" +
+          checklistId +
+          "/add-checklist-item",
+        {
+          text,
+        }
+      )
+      .then((res) => {
+        response = res;
+      });
 
     dispatch(
       updateAddedChecklistItemId({
@@ -654,24 +597,21 @@ export const checklistItemCompletedSet = async (
       })
     );
 
-    submitCall = submitCall.then(() =>
-      axios.put(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          cardId +
-          "/" +
-          checklistId +
-          "/" +
-          checklistItemId +
-          "/set-checklist-item-completed",
-        {
-          completed,
-        }
-      )
+    await axios.put(
+      baseUrl +
+        "/" +
+        boardId +
+        "/" +
+        cardId +
+        "/" +
+        checklistId +
+        "/" +
+        checklistItemId +
+        "/set-checklist-item-completed",
+      {
+        completed,
+      }
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -711,24 +651,21 @@ export const checklistItemTextSet = async (
       })
     );
 
-    submitCall = submitCall.then(() =>
-      axios.put(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          cardId +
-          "/" +
-          checklistId +
-          "/" +
-          checklistItemId +
-          "/set-checklist-item-text",
-        {
-          text,
-        }
-      )
+    await axios.put(
+      baseUrl +
+        "/" +
+        boardId +
+        "/" +
+        cardId +
+        "/" +
+        checklistId +
+        "/" +
+        checklistItemId +
+        "/set-checklist-item-text",
+      {
+        text,
+      }
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -765,21 +702,18 @@ export const checklistItemDelete = async (
       })
     );
 
-    submitCall = submitCall.then(() =>
-      axios.delete(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          cardId +
-          "/" +
-          checklistId +
-          "/" +
-          checklistItemId +
-          "/delete-checklist-item"
-      )
+    await axios.delete(
+      baseUrl +
+        "/" +
+        boardId +
+        "/" +
+        cardId +
+        "/" +
+        checklistId +
+        "/" +
+        checklistItemId +
+        "/delete-checklist-item"
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -807,14 +741,11 @@ export const startDueDatesUpdate = async (
       updateStartDueDatesOfCard({ listId, cardId, startDate, dueDate, dueTime })
     );
 
-    submitCall = submitCall.then(() =>
-      axios.put(baseUrl + "/" + boardId + "/" + cardId + "/update-dates", {
-        startDate,
-        dueDate,
-        dueTime,
-      })
-    );
-    await submitCall;
+    await axios.put(baseUrl + "/" + boardId + "/" + cardId + "/update-dates", {
+      startDate,
+      dueDate,
+      dueTime,
+    });
   } catch (error) {
     dispatch(
       openAlert({
@@ -838,15 +769,12 @@ export const dateCompletedUpdate = async (
     dispatch(updateDateCompleted(completed));
     dispatch(updateDateCompletedOfCard({ listId, cardId, completed }));
 
-    submitCall = submitCall.then(() =>
-      axios.put(
-        baseUrl + "/" + boardId + "/" + cardId + "/update-date-completed",
-        {
-          completed,
-        }
-      )
+    await axios.put(
+      baseUrl + "/" + boardId + "/" + cardId + "/update-date-completed",
+      {
+        completed,
+      }
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -869,17 +797,14 @@ export const attachmentAdd = async (
 ) => {
   try {
     let response = "";
-    submitCall = submitCall.then(() =>
-      axios
-        .post(baseUrl + "/" + boardId + "/" + cardId + "/add-attachment", {
-          link: link,
-          name: name,
-        })
-        .then((res) => {
-          response = res;
-        })
-    );
-    await submitCall;
+    await axios
+      .post(baseUrl + "/" + boardId + "/" + cardId + "/add-attachment", {
+        link: link,
+        name: name,
+      })
+      .then((res) => {
+        response = res;
+      });
     dispatch(updateAllAttachments(response.data.attachments));
     dispatch(
       updateAllAttachmentsOfCard({
@@ -911,19 +836,16 @@ export const attachmentDelete = async (
     dispatch(deleteAttachment(attachmentId));
     dispatch(deleteAttachmentOfCard({ listId, cardId, attachmentId }));
 
-    submitCall = submitCall.then(() =>
-      axios.delete(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          cardId +
-          "/" +
-          attachmentId +
-          "/delete-attachment"
-      )
+    await axios.delete(
+      baseUrl +
+        "/" +
+        boardId +
+        "/" +
+        cardId +
+        "/" +
+        attachmentId +
+        "/delete-attachment"
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -950,20 +872,17 @@ export const attachmentUpdate = async (
       updateAttachment({ attachmentId: attachmentId, link: link, name: name })
     );
 
-    submitCall = submitCall.then(() =>
-      axios.put(
-        baseUrl +
-          "/" +
-          boardId +
-          "/" +
-          cardId +
-          "/" +
-          attachmentId +
-          "/update-attachment",
-        { link: link, name: name }
-      )
+    await axios.put(
+      baseUrl +
+        "/" +
+        boardId +
+        "/" +
+        cardId +
+        "/" +
+        attachmentId +
+        "/update-attachment",
+      { link: link, name: name }
     );
-    await submitCall;
   } catch (error) {
     dispatch(
       openAlert({
@@ -988,13 +907,10 @@ export const coverUpdate = async (
     dispatch(updateCover({ color: color, isSizeOne: isSizeOne }));
     dispatch(updateCoverOfCard({ listId, cardId, color, isSizeOne }));
 
-    submitCall = submitCall.then(() =>
-      axios.put(baseUrl + "/" + boardId + "/" + cardId + "/update-cover", {
-        color: color,
-        isSizeOne: isSizeOne,
-      })
-    );
-    await submitCall;
+    await axios.put(baseUrl + "/" + boardId + "/" + cardId + "/update-cover", {
+      color: color,
+      isSizeOne: isSizeOne,
+    });
   } catch (error) {
     dispatch(
       openAlert({
@@ -1017,16 +933,13 @@ export const estimateTimeUpdate = async (
   try {
     dispatch(updateEstimateTime(time));
     let response = "";
-    submitCall = submitCall.then(() =>
-      axios
-        .post(baseUrl + "/" + boardId + "/" + cardId + "/estimate-time", {
-          time,
-        })
-        .then((res) => {
-          response = res;
-        })
-    );
-    await submitCall;
+    await axios
+      .post(baseUrl + "/" + boardId + "/" + cardId + "/estimate-time", {
+        time,
+      })
+      .then((res) => {
+        response = res;
+      });
 
     dispatch(
       updateTimeTrackingOfCard({
@@ -1058,18 +971,15 @@ export const addWorkingTime = async (
 ) => {
   try {
     let response = "";
-    submitCall = submitCall.then(() =>
-      axios
-        .post(baseUrl + "/" + boardId + "/" + cardId + "/add-time", {
-          time,
-          comment,
-          date,
-        })
-        .then((res) => {
-          response = res;
-        })
-    );
-    await submitCall;
+    await axios
+      .post(baseUrl + "/" + boardId + "/" + cardId + "/add-time", {
+        time,
+        comment,
+        date,
+      })
+      .then((res) => {
+        response = res;
+      });
 
     dispatch(updateTimeTracking(response.data));
 
@@ -1105,28 +1015,18 @@ export const updateWorkingTime = async (
 ) => {
   try {
     let response = "";
-    submitCall = submitCall.then(() =>
-      axios
-        .put(
-          baseUrl +
-            "/" +
-            boardId +
-            "/" +
-            cardId +
-            "/" +
-            timeId +
-            "/update-time",
-          {
-            time,
-            comment,
-            date,
-          }
-        )
-        .then((res) => {
-          response = res;
-        })
-    );
-    await submitCall;
+    await axios
+      .put(
+        baseUrl + "/" + boardId + "/" + cardId + "/" + timeId + "/update-time",
+        {
+          time,
+          comment,
+          date,
+        }
+      )
+      .then((res) => {
+        response = res;
+      });
 
     dispatch(updateTimeTracking(response.data));
 
@@ -1159,16 +1059,13 @@ export const deleteWorkingTime = async (
 ) => {
   try {
     let response = "";
-    submitCall = submitCall.then(() =>
-      axios
-        .delete(
-          baseUrl + "/" + boardId + "/" + cardId + "/" + timeId + "/delete-time"
-        )
-        .then((res) => {
-          response = res;
-        })
-    );
-    await submitCall;
+    await axios
+      .delete(
+        baseUrl + "/" + boardId + "/" + cardId + "/" + timeId + "/delete-time"
+      )
+      .then((res) => {
+        response = res;
+      });
 
     dispatch(updateTimeTracking(response.data));
 

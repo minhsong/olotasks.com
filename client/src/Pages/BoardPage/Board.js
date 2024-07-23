@@ -16,6 +16,7 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { useNavigate, useParams } from "react-router-dom";
 import EditCard from "../../Components/Modals/EditCardModal/EditCard";
 import { useWebSocket } from "../../Components/Websocket/WebSocketContext";
+import { isEmpty } from "lodash-es";
 
 const Board = (props) => {
   /* props.match.params.id */
@@ -52,7 +53,6 @@ const Board = (props) => {
   }, [title]);
 
   const onDragEnd = async (result) => {
-    console.log(result);
     const { draggableId, source, destination } = result;
     if (!destination) return;
     if (result.type === "column") {
@@ -93,6 +93,16 @@ const Board = (props) => {
     // setOpenModal((current) => !current);
   };
 
+  if (loading) return <LoadingScreen />;
+
+  if (isEmpty(title))
+    return (
+      <>
+        <Navbar searchString={searchString} setSearchString={setSearchString} />
+        <style.Container isImage={false} color="blue"></style.Container>
+      </>
+    );
+
   return (
     <>
       <Navbar searchString={searchString} setSearchString={setSearchString} />
@@ -103,7 +113,7 @@ const Board = (props) => {
         }
       >
         <TopBar />
-        {(loading || loadingListService) && <LoadingScreen />}
+        {loadingListService && <LoadingScreen />}
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable
             droppableId="all-columns"

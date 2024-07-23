@@ -34,6 +34,7 @@ import {
   TimeTrackingContainer,
 } from "./styled";
 import TimeTracking from "./TimeTracking/TimeTracking";
+import { isEmpty } from "lodash-es";
 
 export default function EditCard(props) {
   const { cardId, boardId } = props.ids;
@@ -72,6 +73,7 @@ export default function EditCard(props) {
       await uploadAttachment(cId, thisCard.owner, bId, files, dispatch);
     }
   };
+
   return (
     <div style={{ position: "relative" }}>
       <Modal

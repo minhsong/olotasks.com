@@ -151,7 +151,7 @@ export class cardController {
         text: `added an attachment to the card`,
         board: { id: boardId, name: card.boardTitle },
         card: { id: new ObjectId(cardId), name: card.title },
-        type: 'card.attachment',
+        type: 'card.attachment.add',
       };
     });
 
@@ -584,7 +584,9 @@ export class cardController {
         return res.status(HttpStatus.CREATED).send(result);
       })
       .catch((err) => {
-        throw err;
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .send({ errMessage: err.message });
       });
   }
 

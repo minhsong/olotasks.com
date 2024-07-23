@@ -64,6 +64,7 @@ export const updateCardOrder = async (props, dispatch) => {
   try {
     await submitCall;
   } catch (error) {
+    submitCall = Promise.resolve();
     await dispatch(updateCardDragDrop(savedList));
     dispatch(
       openAlert({
@@ -102,6 +103,7 @@ export const updateListOrder = async (props, dispatch) => {
   try {
     await submitCall;
   } catch (error) {
+    submitCall = Promise.resolve();
     await dispatch(updateCardDragDrop(savedOrder));
     dispatch(
       openAlert({
