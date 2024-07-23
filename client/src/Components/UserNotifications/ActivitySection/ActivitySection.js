@@ -22,7 +22,6 @@ import { useParams } from "react-router-dom";
 import { markAllAsRead } from "../../../Services/notificationService";
 
 const ActivitySection = () => {
-  let { id, cardId } = useParams();
   const [notifications, isLoading] = useSelector((state) => [
     state.notification.notifications,
     state.notification.isLoading,
@@ -66,7 +65,9 @@ const ActivitySection = () => {
 
   const Action = (props) => {
     return (
-      <ActionContainer to={`/b/${id}/${props.card.id}-${props.card.name}`}>
+      <ActionContainer
+        to={`/b/${props.board.id}-${props.board.name}/${props.card.id}-${props.card.name}`}
+      >
         <Avatar
           sx={{
             width: 32,
