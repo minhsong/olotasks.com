@@ -107,7 +107,7 @@ export default function DropdownMenu(props) {
                   key={item._id}
                   onClick={() => {
                     setAnchorEl(null);
-                    navigate("/b/" + item._id + "-" + item.title);
+                    navigate("/b/" + item.shortId + "-" + item.title);
                   }}
                 >
                   <Span>{item.title}</Span>
