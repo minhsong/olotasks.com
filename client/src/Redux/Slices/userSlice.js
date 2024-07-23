@@ -31,7 +31,7 @@ export const userSlice = createSlice({
     loginFailure: (state) => {
       state.pending = false;
       state.isAuthenticated = false;
-      localStorage.removeItem("token");
+      // localStorage.removeItem("token");
     },
     loadStart: (state) => {
       state.pending = true;
@@ -51,15 +51,15 @@ export const userSlice = createSlice({
       state.token = null;
       localStorage.removeItem("token");
     },
-    fetchingStart: (state)=>{
+    fetchingStart: (state) => {
       state.loading = true;
     },
     fetchingFinish: (state) => {
       state.loading = false;
     },
-    addNewBoard: (state,action) => {
+    addNewBoard: (state, action) => {
       state.userInfo.boards.unshift(action.payload);
-    }
+    },
   },
 });
 
@@ -75,6 +75,6 @@ export const {
   logout,
   fetchingStart,
   fetchingFinish,
-  addNewBoard
+  addNewBoard,
 } = userSlice.actions;
 export default userSlice.reducer;

@@ -11,11 +11,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { descriptionUpdate } from "../../../../Services/cardService";
 import HTMLEditor from "../../../ReUsableComponents/HTMLEditor.js";
 import BottomButtonGroup from "../../../BottomButtonGroup/BottomButtonGroup.js";
+import QuillEditor from "../../../QuillEditor/index.jsx";
 const Description = () => {
   const thisCard = useSelector((state) => state.card);
+  const board = useSelector((state) => state.board);
   const dispatch = useDispatch();
   const [inputFocus, setInputFocus] = useState(false);
   const [description, setDescription] = useState(thisCard.description);
+  const [mentions, setMentions] = useState([]);
   const ref = useRef();
   const ref2 = useRef();
 
@@ -25,7 +28,10 @@ const Description = () => {
       thisCard.cardId,
       thisCard.listId,
       thisCard.boardId,
-      description,
+      {
+        description,
+        mentions,
+      },
       dispatch
     );
   };
@@ -67,11 +73,15 @@ const Description = () => {
             dangerouslySetInnerHTML={{ __html: description }}
           />
         ) : (
-          <HTMLEditor
-            ref={ref}
-            placeholder="Add a more detailed description..."
+          <QuillEditor
+            onChanged={(e) => setDescription(e)}
             value={description}
-            onChange={(e) => setDescription(e)}
+            placeholder="Mention with @, Add a more detailed description..."
+            onMention={(e) => setMentions(e)}
+            users={board.members.map((member) => ({
+              id: member._id,
+              value: member.name,
+            }))}
           />
         )}
         <div style={{ display: inputFocus ? "block" : "none" }}>

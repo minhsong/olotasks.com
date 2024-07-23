@@ -28,11 +28,13 @@ import moment from "moment";
 import { Avatar } from "@mui/material";
 import { secondsToTimeString } from "../../Utils/estimateTimeHelper";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 const Card = (props) => {
   const [openModal, setOpenModal] = useState(false);
+  const board = useSelector((state) => state.board);
   const navigate = useNavigate();
   const card = props.info;
-  const comment = card.activities?.filter((act) => act.isComment).length;
   let checks = { c: 0, n: 0 };
   card.checklists?.map((checklist) => {
     return checklist.items.map((item) => {
@@ -43,7 +45,9 @@ const Card = (props) => {
   });
 
   const handleOpenClose = () => {
-    navigate(`/board/${props.boardId}/${props.info._id}`);
+    navigate(
+      `/b/${props.boardId}-${board.title}/${props.info._id}-${card.title}`
+    );
     // setOpenModal((current) => !current);
   };
 
@@ -150,10 +154,10 @@ const Card = (props) => {
                       </DateContainer>
                     )}
                     {card.description && <DescriptiondIcon fontSize="0.5rem" />}
-                    {comment > 0 && (
+                    {card.comments?.length > 0 && (
                       <CommentContainer>
                         <CommentIcon fontSize="0.5rem" />
-                        <Span>{comment}</Span>
+                        <Span>{card.comments.length}</Span>
                       </CommentContainer>
                     )}
                     {card.checklists?.length > 0 && (

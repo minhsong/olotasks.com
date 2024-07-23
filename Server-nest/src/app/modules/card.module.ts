@@ -13,9 +13,14 @@ import { UserModule } from './user.module';
 import { Activity, ActivitySchema } from '../models/schemas/activity.schema';
 import { SpacesService } from '../services/spaces.service';
 import { WsGateway } from '../websocket/ws.gateway';
+import {
+  Notification,
+  NotificationSchema,
+} from '../models/schemas/notification.schema';
+import { NotificationService } from '../services/notification.service';
 
 @Module({
-  providers: [CardService, SpacesService, WsGateway],
+  providers: [CardService, SpacesService, NotificationService, WsGateway],
   controllers: [cardController],
   exports: [CardService],
   imports: [
@@ -25,6 +30,7 @@ import { WsGateway } from '../websocket/ws.gateway';
       { name: Board.name, schema: BoardSchema },
       { name: User.name, schema: UserSchema },
       { name: Activity.name, schema: ActivitySchema },
+      { name: Notification.name, schema: NotificationSchema },
     ]),
     LoggerModule,
     ListModule,

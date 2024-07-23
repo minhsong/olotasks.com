@@ -24,10 +24,16 @@ export class ListService {
   async create(model: CreateListModel, user): Promise<List> {
     try {
       // Create new List
-      const newList = await this.listModel.create(model);
+      const ownerBoard = await this.boardModel.findOne({
+        shortId: model.owner,
+      });
+
+      const newList = await this.listModel.create({
+        ...model,
+        owner: ownerBoard._id,
+      });
 
       // Get owner board
-      const ownerBoard = await this.boardModel.findById(model.owner);
 
       // Add newList's id to owner board
       ownerBoard.lists.push(newList._id as ObjectId);
@@ -46,21 +52,21 @@ export class ListService {
       // Return new list
       return newList;
     } catch (error) {
-      throw new Error('Something went wrong');
+      throw new Error(error);
     }
   }
 
   async getAll(boardId: string): Promise<List[]> {
     try {
       // Get lists whose owner id equals to boardId param
+      const board = await this.boardModel.findOne({ shortId: boardId });
+      if (!board) throw new Error('Board not found');
       const lists = await this.listModel
-        .find({ owner: boardId })
+        .find({ owner: board._id })
         .populate({ path: 'cards' })
         .exec();
 
       // Order the lists
-      const board = await this.boardModel.findById(boardId);
-      if (!board) throw new Error('Board not found');
 
       const responseObject = board.lists.map((listId) => {
         return lists.find(
@@ -77,7 +83,7 @@ export class ListService {
   async deleteById(listId, boardId, user): Promise<List> {
     try {
       // Get board to check the parent of list is this board
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate the parent of the list
       const validate = board.lists.find((list) => list.toString() === listId);
@@ -121,17 +127,18 @@ export class ListService {
     cardId,
     user,
   ): Promise<{ message: string }> {
-    if (destinationId == sourceId) {
-      return { message: 'Success' };
-    }
     try {
       // Validate the parent board of the lists
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
       const loggedInUser = await this.userModel.findById(user.id);
       const validate = board.lists.find((list) => list.toString() === sourceId);
-      const validate2 = board.lists.find(
-        (list) => list.toString() === destinationId,
-      );
+      // Validate the owner of board
+      const ownerValidate = user.boards.filter((board) => board === board._id);
+      if (!ownerValidate)
+        throw new Error('You cannot change the order of this card');
+
+      const validate2 =
+        board && board.lists.find((list) => list.toString() === destinationId);
       if (!validate || !validate2)
         throw new Error('List or board information is wrong');
 
@@ -142,22 +149,25 @@ export class ListService {
       );
       if (!validate3) throw new Error('List or card information is wrong');
 
-      // Remove the card from source list and save
-      sourceList.cards = sourceList.cards.filter(
-        (card) => card._id.toString() !== cardId,
-      );
-      await sourceList.save();
+      if (destinationId !== sourceId) {
+        // Remove the card from source list and save
+        sourceList.cards = sourceList.cards.filter(
+          (card) => card.toString() !== cardId,
+        );
+        await sourceList.save();
 
-      // Insert the card to destination list and save
-      const card = await this.cardModel.findById(cardId);
-      const destinationList = await this.listModel.findById(destinationId);
-      const temp = Array.from(destinationList.cards);
-      temp.splice(destinationIndex, 0, cardId);
-      destinationList.cards = temp;
-      await destinationList.save();
+        // Insert the card to destination list and save
+        const card = await this.cardModel.findById(cardId);
+        const destinationList = await this.listModel.findById(destinationId);
+        const temp = Array.from(destinationList.cards);
+        temp.splice(destinationIndex, 0, cardId);
+        destinationList.cards = temp;
+        await destinationList.save();
+        // Add card activity
+        // Change owner board of card
+        card.owner = destinationId;
+        await card.save();
 
-      // Add card activity
-      if (sourceId !== destinationId) {
         this.activityModel.create({
           board: boardId,
           userName: loggedInUser.name,
@@ -165,11 +175,19 @@ export class ListService {
           user: loggedInUser.id,
           text: `moved this card from ${sourceList.title} to ${destinationList.title}`,
           color: loggedInUser.color,
+          type: 'card.move',
         });
+      } else {
+        // Change order of card in the same list
+        const list = await this.listModel.findById(sourceId);
+        const sourceIndex = list.cards.findIndex(
+          (card) => card.toString() === cardId,
+        );
+
+        list.cards.splice(sourceIndex, 1);
+        list.cards.splice(destinationIndex, 0, cardId);
+        await list.save();
       }
-      // Change owner board of card
-      card.owner = destinationId;
-      await card.save();
 
       return { message: 'Success' };
     } catch (error) {
@@ -182,11 +200,21 @@ export class ListService {
     sourceIndex,
     destinationIndex,
     listId,
+    user,
   ): Promise<{ message: string }> {
     try {
       // Validate the parent board of the lists
-      const board = await this.boardModel.findById(boardId);
-      const validate = board.lists.find((list) => list === listId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
+
+      const validate =
+        board && board.lists.find((list) => list.toString() === listId);
+
+      // Validate the owner of board
+      const ownerValidate = user.boards.filter(
+        (board) => board === board._id.toString(),
+      );
+      if (!ownerValidate)
+        throw new Error('You cannot change the order of this list');
 
       if (!validate) throw new Error('List or board information is wrong');
 
@@ -197,7 +225,7 @@ export class ListService {
 
       return { message: 'Success' };
     } catch (error) {
-      throw new Error('Something went wrong');
+      throw new Error(error);
     }
   }
 
@@ -209,14 +237,15 @@ export class ListService {
   ): Promise<{ message: string }> {
     try {
       // Get board to check the parent of list is this board
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
       const list = await this.listModel.findById(listId.toString());
       // Validate the parent of the list
-      const validate = board.lists.find((list) => list === listId);
+      const validate =
+        board && board.lists.find((list) => list.toString() === listId);
       if (!validate) throw new Error('List or board information is wrong');
 
       // Validate whether the owner of the board is the user who sent the request.
-      if (!user.boards.includes(boardId))
+      if (!user.boards.includes(board._id.toString()))
         throw new Error(
           'You cannot delete a list that is not hosted by your boards',
         );
@@ -227,7 +256,7 @@ export class ListService {
 
       return { message: 'Success' };
     } catch (error) {
-      throw new Error('Something went wrong');
+      throw new Error(error);
     }
   }
 }

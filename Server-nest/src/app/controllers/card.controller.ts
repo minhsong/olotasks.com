@@ -13,16 +13,19 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
 import { CardService } from '../services/card.service';
 import { Roles } from 'src/decorators/roles.decorator';
 import { CreateCardDto } from '../models/dto/card/card.create';
 import { UserService } from '../services/user.service';
 import { Response } from 'express';
 import { SpacesService } from '../services/spaces.service';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { WsGateway } from '../websocket/ws.gateway';
 import * as sharp from 'sharp';
-import { getFileCategory } from 'src/utils/helperMethods';
+import { exportWatchers, getFileCategory } from 'src/utils/helperMethods';
+import { NotificationService } from '../services/notification.service';
+import { Notification } from '../models/schemas/notification.schema';
 
 @Controller('card')
 @Roles([])
@@ -31,8 +34,15 @@ export class cardController {
     private readonly cardService: CardService,
     private readonly userService: UserService,
     private readonly spaceService: SpacesService,
+    private readonly notificationService: NotificationService,
     private readonly wsGateway: WsGateway,
   ) {}
+
+  @Get('/fix-card-comment')
+  @Roles([])
+  async fixCardComment() {
+    return await this.cardService.fixCardComment();
+  }
 
   @Delete(':cardId')
   @Roles([])
@@ -96,7 +106,7 @@ export class cardController {
     const { boardId, cardId, attachmentId } = params;
     const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
-    return await this.cardService
+    const card = await this.cardService
       .deleteAttachment(cardId, boardId, loggedInUser, attachmentId)
       .then((result) => {
         return result;
@@ -104,6 +114,8 @@ export class cardController {
       .catch((err) => {
         throw err;
       });
+
+    return card.attachments;
   }
 
   @Post('/:boardId/:cardId/add-attachment')
@@ -116,7 +128,7 @@ export class cardController {
     const loggedInUser = await this.userService.getUser(user.id);
 
     // Call the card service
-    return await this.cardService
+    const card = await this.cardService
       .addAttachment(cardId, boardId, loggedInUser, link, name)
       .then((result) => {
         return result;
@@ -124,6 +136,38 @@ export class cardController {
       .catch((err) => {
         throw err;
       });
+
+    // create notifications for the watchers
+    const watchedUsers = exportWatchers(card).filter((id) => id !== user.id);
+    const notifications: Notification[] = watchedUsers.map((watcher) => {
+      return {
+        user: new ObjectId(watcher),
+        sender: {
+          id: new ObjectId(user.id),
+          name: user.name,
+          color: user.color,
+          avatar: user.avatar,
+        },
+        text: `added an attachment to the card`,
+        board: { id: card.board, name: '' },
+        card: { id: new ObjectId(cardId), name: card.title },
+        type: 'card.attachment',
+      };
+    });
+
+    // send notification to the watchers
+    this.notificationService
+      .createNotifications(notifications)
+      .then((notis) => {
+        notis.forEach((noti) => {
+          this.wsGateway.sendMessageToUser(noti.user.toString(), noti.type, {
+            notification: noti,
+            attachments: card.attachments,
+          });
+        });
+      });
+
+    return { attachments: card.attachments, cover: card.cover };
   }
 
   @Put('/:boardId/:cardId/update-dates')
@@ -136,7 +180,7 @@ export class cardController {
     const loggedInUser = await this.userService.getUser(user.id);
 
     // Call the card service
-    return await this.cardService
+    const card = await this.cardService
       .updateStartDueDates(
         cardId,
         boardId,
@@ -151,6 +195,8 @@ export class cardController {
       .catch((err) => {
         throw err;
       });
+
+    return card.members;
   }
 
   @Put('/:boardId/:cardId/update-date-completed')
@@ -163,7 +209,7 @@ export class cardController {
     const loggedInUser = await this.userService.getUser(user.id);
 
     // Call the card service
-    return await this.cardService
+    const date = await this.cardService
       .updateDateCompleted(cardId, boardId, loggedInUser, completed)
       .then((result) => {
         return result;
@@ -171,6 +217,8 @@ export class cardController {
       .catch((err) => {
         throw err;
       });
+
+    return date;
   }
 
   @Delete(
@@ -394,7 +442,7 @@ export class cardController {
     const { memberId } = body;
     const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
-    return await this.cardService
+    const card = await this.cardService
       .addMember(cardId, boardId, loggedInUser, memberId)
       .then((result) => {
         return result;
@@ -402,6 +450,39 @@ export class cardController {
       .catch((err) => {
         throw err;
       });
+
+    // create notifications for added member
+    const addedUser = card.members.find(
+      (member) => member.user.toString() === memberId,
+    );
+    const notifications: Notification[] = [
+      {
+        user: new ObjectId(memberId),
+        sender: {
+          id: new ObjectId(user.id),
+          name: user.name,
+          color: user.color,
+          avatar: user.avatar,
+        },
+        text: `added you to a card`,
+        board: { id: card.board, name: '' },
+        card: { id: new ObjectId(cardId), name: card.title },
+        type: 'card.member.add',
+      },
+    ];
+
+    this.notificationService
+      .createNotifications(notifications)
+      .then((notis) => {
+        notis.forEach((noti) => {
+          this.wsGateway.sendMessageToUser(noti.user.toString(), noti.type, {
+            notification: noti,
+            members: card.members,
+          });
+        });
+      });
+
+    return card.members;
   }
 
   @Delete('/:boardId/:cardId/:memberId/delete-member')
@@ -412,7 +493,7 @@ export class cardController {
     const { boardId, cardId, memberId } = params;
     const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
-    return await this.cardService
+    const card = await this.cardService
       .deleteMember(cardId, boardId, loggedInUser, memberId)
       .then((result) => {
         return result;
@@ -420,6 +501,36 @@ export class cardController {
       .catch((err) => {
         throw err;
       });
+
+    // create notifications for removed member
+    const notifications: Notification[] = [
+      {
+        user: new ObjectId(memberId),
+        sender: {
+          id: new ObjectId(user.id),
+          name: user.name,
+          color: user.color,
+          avatar: user.avatar,
+        },
+        text: `removed you from a card`,
+        board: { id: card.board, name: '' },
+        card: { id: new ObjectId(cardId), name: card.title },
+        type: 'card.member.delete',
+      },
+    ];
+
+    this.notificationService
+      .createNotifications(notifications)
+      .then((notis) => {
+        notis.forEach((noti) => {
+          this.wsGateway.sendMessageToUser(noti.user.toString(), noti.type, {
+            notification: noti,
+            members: card.members,
+          });
+        });
+      });
+
+    return card.members;
   }
 
   @Post('create')
@@ -520,7 +631,7 @@ export class cardController {
     const { boardId, cardId } = params;
     const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
-    return await this.cardService
+    const card = await this.cardService
       .addComment(cardId, boardId, loggedInUser, body)
       .then((result) => {
         return result;
@@ -528,6 +639,59 @@ export class cardController {
       .catch((err) => {
         throw err;
       });
+    // create notifications for the watchers
+
+    const mentionedUsers = (body.mentions || []).map((mention) => mention.id);
+    const watchedUsers = exportWatchers(card).filter(
+      (id) => id !== user.id && !mentionedUsers.includes(id),
+    );
+    const notifications: Notification[] = watchedUsers.map((watcher) => {
+      return {
+        user: new ObjectId(watcher),
+        sender: {
+          id: new ObjectId(user.id),
+          name: user.name,
+          color: user.color,
+          avatar: user.avatar,
+        },
+        text: `added an comment to the card`,
+        board: { id: card.board, name: '' },
+        card: { id: new ObjectId(cardId), name: card.title },
+        type: 'card.comment.add',
+      };
+    });
+
+    const mentionedNotifications: Notification[] = mentionedUsers.map(
+      (mention) => {
+        return {
+          user: new ObjectId(mention),
+          sender: {
+            id: new ObjectId(user.id),
+            name: user.name,
+            color: user.color,
+            avatar: user.avatar,
+          },
+          text: `mentioned you in a comment`,
+          board: { id: card.board, name: '' },
+          card: { id: new ObjectId(cardId), name: card.title },
+          type: 'card.comment.add',
+        };
+      },
+    );
+
+    // send notification to the watchers
+    this.notificationService
+      .createNotifications([...notifications, ...mentionedNotifications])
+      .then((notis) => {
+        notis.forEach((noti) => {
+          this.wsGateway.sendMessageToUser(noti.user.toString(), noti.type, {
+            notification: noti,
+            comments: card.comments,
+          });
+        });
+      });
+
+    return card.comments;
   }
 
   @Put('/:boardId/:cardId/:commentId')
@@ -538,7 +702,7 @@ export class cardController {
     const { boardId, cardId, commentId } = params;
     const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
-    return await this.cardService
+    const card = await this.cardService
       .updateComment(cardId, boardId, commentId, loggedInUser, body)
       .then((result) => {
         return result;
@@ -546,6 +710,37 @@ export class cardController {
       .catch((err) => {
         throw err;
       });
+    const mentionedUsers = (body.mentions || []).map((mention) => mention.id);
+    const mentionedNotifications: Notification[] = mentionedUsers.map(
+      (mention) => {
+        return {
+          user: new ObjectId(mention),
+          sender: {
+            id: new ObjectId(user.id),
+            name: user.name,
+            color: user.color,
+            avatar: user.avatar,
+          },
+          text: `mentioned you in a comment`,
+          board: { id: card.board, name: '' },
+          card: { id: new ObjectId(cardId), name: card.title },
+          type: 'card.comment.update',
+        };
+      },
+    );
+
+    // send notification to the watchers
+    this.notificationService
+      .createNotifications(mentionedNotifications)
+      .then((notis) => {
+        notis.forEach((noti) => {
+          this.wsGateway.sendMessageToUser(noti.user.toString(), noti.type, {
+            notification: noti,
+            comments: card.comments,
+          });
+        });
+      });
+    return card.comments;
   }
 
   @Delete('/:boardId/:cardId/:commentId')
@@ -556,7 +751,7 @@ export class cardController {
     const { boardId, cardId, commentId } = params;
     const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
-    return await this.cardService
+    const card = await this.cardService
       .deleteComment(cardId, boardId, commentId, loggedInUser)
       .then((result) => {
         return result;
@@ -564,6 +759,8 @@ export class cardController {
       .catch((err) => {
         throw err;
       });
+
+    return card.comments;
   }
 
   @Post('/:boardId/:cardId/estimate-time')
@@ -678,7 +875,7 @@ export class cardController {
         );
         fileData = { ...fileData, thumbnail: thumbnailData };
       }
-      const attached = await this.cardService.addAttachment(
+      const card = await this.cardService.addAttachment(
         cardId,
         boardId,
         loggedInUser,
@@ -687,8 +884,38 @@ export class cardController {
         fileData,
       );
 
+      // create notifications for the watchers
+      const watchedUsers = exportWatchers(card).filter((id) => id !== user.id);
+      const notifications: Notification[] = watchedUsers.map((watcher) => {
+        return {
+          user: new ObjectId(watcher),
+          sender: {
+            id: new ObjectId(user.id),
+            name: user.name,
+            color: user.color,
+            avatar: user.avatar,
+          },
+          text: `added an attachment to the card`,
+          board: { id: card.board, name: '' },
+          card: { id: new ObjectId(cardId), name: card.title },
+          type: 'card.attachment.add',
+        };
+      });
+
+      // send notification to the watchers
+      this.notificationService
+        .createNotifications(notifications)
+        .then((notis) => {
+          notis.forEach((noti) => {
+            this.wsGateway.sendMessageToUser(noti.user.toString(), noti.type, {
+              notification: noti,
+              attachments: card.attachments,
+            });
+          });
+        });
+
       return {
-        data: attached,
+        data: card,
         boardId,
         cardId,
       };

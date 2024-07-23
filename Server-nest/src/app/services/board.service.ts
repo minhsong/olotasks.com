@@ -9,6 +9,8 @@ import { UserTokenPayload } from '../models/dto/user/user.tokenPayload';
 import { ObjectId } from 'mongodb';
 import { uniqBy } from 'lodash';
 import { Card, CardDocument } from '../models/schemas/card.schema';
+import { generateRandomString } from 'src/utils/helperMethods';
+import { List, ListDocument } from '../models/schemas/list.shema';
 
 @Injectable()
 export class BoardService {
@@ -16,6 +18,7 @@ export class BoardService {
     @InjectModel(Board.name) private readonly boardModel: Model<BoardDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel(Card.name) private readonly cardModel: Model<CardDocument>,
+    @InjectModel(List.name) private readonly listModel: Model<ListDocument>,
   ) {}
 
   async create(
@@ -24,9 +27,12 @@ export class BoardService {
   ): Promise<Board> {
     try {
       const { title, backgroundImageLink, members } = data;
+
+      const id = generateRandomString();
       // Create and save new board
       const newBoard = await this.boardModel.create({
         title,
+        shortId: id,
         backgroundImageLink,
         labels: defaultlBoardabels.map((label) => ({
           ...label,
@@ -122,6 +128,16 @@ export class BoardService {
     try {
       // Get board by id
       const board = await this.boardModel.findById(id);
+      return board;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async getBoardByShortId(shortId): Promise<Board> {
+    try {
+      // Get board by id
+      const board = await this.boardModel.findOne({ shortId });
       return board;
     } catch (error) {
       throw new Error(error);
@@ -250,21 +266,22 @@ export class BoardService {
       //go through all boards and get all lists
 
       boards.forEach(async (board) => {
-        const cards = await this.cardModel.updateMany(
-          {
-            owner: { $in: board.lists },
-          },
-          { board: board._id },
-        );
+        // const cards = await this.cardModel.updateMany(
+        //   {
+        //     owner: { $in: board.lists },
+        //   },
+        //   { board: board._id },
+        // );
 
-        await this.cardModel.updateMany(
-          {
-            owner: { $in: board.lists.map((s) => s.toString()) },
-          },
-          { board: board._id },
-        );
+        // await this.cardModel.updateMany(
+        //   {
+        //     owner: { $in: board.lists.map((s) => s.toString()) },
+        //   },
+        //   { board: board._id },
+        // );
+        board.shortId = generateRandomString();
 
-        console.log('cards', cards);
+        board.save();
       });
 
       return boards;

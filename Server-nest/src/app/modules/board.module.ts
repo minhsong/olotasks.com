@@ -7,6 +7,7 @@ import { BoardService } from '../services/board.service';
 import { UserModule } from './user.module';
 import { User, UserSchema } from '../models/schemas/user.shema';
 import { Card, CardSchema } from '../models/schemas/card.schema';
+import { List, ListSchema } from '../models/schemas/list.shema';
 
 @Module({
   providers: [BoardService],
@@ -17,6 +18,7 @@ import { Card, CardSchema } from '../models/schemas/card.schema';
       { name: Board.name, schema: BoardSchema },
       { name: User.name, schema: UserSchema },
       { name: Card.name, schema: CardSchema },
+      { name: List.name, schema: ListSchema },
     ]),
     LoggerModule,
     UserModule,

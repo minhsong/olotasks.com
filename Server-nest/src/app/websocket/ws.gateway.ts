@@ -12,6 +12,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { UseGuards } from '@nestjs/common';
 import { extractTokenFromWS, jwtDecode } from 'src/utils/jwthelper';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @WebSocketGateway({
   cors: {
@@ -50,6 +51,7 @@ export class WsGateway
   }
 
   @SubscribeMessage('joinRoom')
+  @Roles([])
   handleJoinRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() room: string,

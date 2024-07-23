@@ -29,8 +29,7 @@ const App = () => {
             }
           />
           <Route
-            exact
-            path="/board/:id"
+            path="/b/:id"
             element={
               <ProtectedArea>
                 <Board />
@@ -39,7 +38,7 @@ const App = () => {
           />
           <Route
             exact
-            path="/board/:id/:cardId"
+            path="/b/:id/:cardId"
             element={
               <ProtectedArea>
                 <Board />

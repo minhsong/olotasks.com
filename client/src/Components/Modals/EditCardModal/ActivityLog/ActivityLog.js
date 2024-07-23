@@ -34,7 +34,10 @@ const ActivityLog = () => {
               </LeftContainer>
               <RightContainer>
                 <LogWrapper>
-                  <Title>{activity.userName}</Title> {activity.text}
+                  <Title>{activity.userName}</Title>{" "}
+                  <span
+                    dangerouslySetInnerHTML={{ __html: activity.text }}
+                  ></span>
                 </LogWrapper>
                 <Date>
                   {moment(activity.date).format("MMMM Do YYYY, h:mm:ss a")}

@@ -19,6 +19,7 @@ import { useWebSocket } from "../../Components/Websocket/WebSocketContext";
 
 const Board = (props) => {
   /* props.match.params.id */
+  console.log("Board", props);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { ws } = useWebSocket();
@@ -29,22 +30,22 @@ const Board = (props) => {
   const user = useSelector((state) => state.user);
   const { allLists, loadingListService } = useSelector((state) => state.list);
   const [searchString, setSearchString] = useState("");
-  const boardId = id;
+  const [boardId, boardTitle] = id.split("-");
 
   useEffect(() => {
     if (!user.isAuthenticated && !user.pending) navigate("/");
   });
 
   useEffect(() => {
-    getBoard(id, dispatch);
+    getBoard(boardId, dispatch);
     getLists(boardId, dispatch);
   }, [id, dispatch, boardId]);
 
   useEffect(() => {
     if (!ws) return;
-    ws.emit("joinRoom", id);
+    ws.emit("joinRoom", boardId);
     return () => {
-      ws && ws.emit("leaveRoom", id);
+      ws && ws.emit("leaveRoom", boardId);
     };
   }, [ws]);
   useEffect(() => {
@@ -52,6 +53,7 @@ const Board = (props) => {
   }, [title]);
 
   const onDragEnd = async (result) => {
+    console.log(result);
     const { draggableId, source, destination } = result;
     if (!destination) return;
     if (result.type === "column") {
@@ -88,7 +90,7 @@ const Board = (props) => {
   };
 
   const handleOpenClose = () => {
-    navigate(`/board/${id}`);
+    navigate(`/b/${id}`);
     // setOpenModal((current) => !current);
   };
 
@@ -141,7 +143,7 @@ const Board = (props) => {
           callback={handleOpenClose}
           ids={{
             cardId: cardId,
-            boardId: id,
+            boardId: boardId,
           }}
         />
       )}

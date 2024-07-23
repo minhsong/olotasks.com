@@ -173,7 +173,7 @@ export class BoardController {
 
   @Get(':id')
   getById(@Param('id') id: string) {
-    return this.boardService.getById(id);
+    return this.boardService.getBoardByShortId(id);
   }
 
   @Get(':id/activity')

@@ -40,12 +40,14 @@ export default function EditCard(props) {
   const dispatch = useDispatch();
   const thisCard = useSelector((state) => state.card);
   const [isDragging, setIsDragging] = React.useState(false);
+  const [bId, btitle] = boardId.split("-");
+  const [cId, ctitle] = cardId.split("-");
 
   React.useEffect(() => {
     if (props.open) {
-      getCard(cardId, boardId, dispatch);
+      getCard(cId, bId, dispatch);
     }
-  }, [boardId, cardId, dispatch, props.open]);
+  }, [bId, cId, dispatch, props.open]);
 
   const handleDragEnter = (e) => {
     e.preventDefault();
@@ -65,10 +67,9 @@ export default function EditCard(props) {
   const handleDrop = async (e) => {
     e.preventDefault();
     setIsDragging(false);
-    console.log(e);
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
-      await uploadAttachment(cardId, thisCard.owner, boardId, files, dispatch);
+      await uploadAttachment(cId, thisCard.owner, bId, files, dispatch);
     }
   };
   return (
@@ -138,7 +139,7 @@ export default function EditCard(props) {
                 <AddToCard />
               </AddToCardContainer>
               <ActionsContainer>
-                <Actions />
+                <Actions closeModal={props.callback} />
               </ActionsContainer>
             </RightContainer>
           </Wrapper>

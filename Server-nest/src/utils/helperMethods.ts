@@ -1,4 +1,7 @@
+import { Card } from 'src/app/models/schemas/card.schema';
 import { mimeTypes } from 'src/constants/variables';
+import { uniq } from 'lodash';
+import { customAlphabet, nanoid } from 'nanoid';
 
 export const validateCardOwners = async (
   card = null,
@@ -80,3 +83,14 @@ export const getThumbnailFromMeta = (metadata) => {
 export function getFileCategory(mimeType: string): string {
   return mimeTypes[mimeType] || 'other';
 }
+
+export const exportWatchers = (card: Card): string[] => {
+  const watchers = card.watchers.map((watcher) => watcher.toString());
+  const members = card.members.map((member) => member.user.toString());
+  return uniq([...watchers, ...members]);
+};
+
+export const generateRandomString = (length: number = 10): string => {
+  const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', length);
+  return nanoid();
+};

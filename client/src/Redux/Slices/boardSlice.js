@@ -30,6 +30,7 @@ const boardSlice = createSlice({
       state.activity = action.payload.activity;
       state.description = action.payload.description;
       state.labels = action.payload.labels;
+      state.shortId = action.payload.shortId;
     },
     updateTitle: (state, action) => {
       state.title = action.payload;

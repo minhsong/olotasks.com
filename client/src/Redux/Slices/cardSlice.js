@@ -59,6 +59,7 @@ const cardsSlice = createSlice({
       state.attachments = action.payload.attachments;
       state.cover = action.payload.cover;
       state.timeTracking = action.payload.timeTracking;
+      state.comments = action.payload.comments;
     },
     updateTitle: (state, action) => {
       state.title = action.payload;
@@ -67,19 +68,19 @@ const cardsSlice = createSlice({
       state.description = action.payload;
     },
     addComment: (state, action) => {
-      state.activities = action.payload;
+      state.comments = action.payload;
     },
     updateComment: (state, action) => {
       const { commentId, text } = action.payload;
-      state.activities = state.activities.map((activity) => {
-        if (activity._id === commentId) {
-          activity.text = text;
+      state.comments = state.comments.map((comment) => {
+        if (comment._id === commentId) {
+          comment.text = text;
         }
-        return activity;
+        return comment;
       });
     },
     deleteComment: (state, action) => {
-      state.activities = state.activities.filter(
+      state.comments = state.comments.filter(
         (act) => act._id !== action.payload
       );
     },

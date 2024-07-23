@@ -116,7 +116,7 @@ export const descriptionUpdate = async (
   cardId,
   listId,
   boardId,
-  description,
+  { description, mentions },
   dispatch
 ) => {
   try {
@@ -126,6 +126,7 @@ export const descriptionUpdate = async (
     submitCall = submitCall.then(() =>
       axios.put(baseUrl + "/" + boardId + "/" + cardId, {
         description: description,
+        mentions: mentions,
       })
     );
     await submitCall;

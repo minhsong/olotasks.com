@@ -107,11 +107,8 @@ const Activity = () => {
           </CommentWrapper>
         </RightContainer>
       </Container>
-      {card.activities?.map((activity) => {
-        if (activity.isComment) {
-          return <Comment key={activity._id} {...activity} />;
-        }
-        return undefined;
+      {card.comments?.map((comment) => {
+        return <Comment key={comment._id} {...comment} />;
       })}
 
       {details && <ActivityLog />}

@@ -20,6 +20,10 @@ import { ObjectId } from 'mongodb';
 import { uniqBy } from 'lodash';
 import { secondsToTimeString } from 'src/utils/timeHelper';
 import { SpacesService } from './spaces.service';
+import {
+  Notification,
+  NotificationDocument,
+} from '../models/schemas/notification.schema';
 const urlMetadata = require('url-metadata');
 
 @Injectable()
@@ -34,6 +38,40 @@ export class CardService {
     private readonly SpacesService: SpacesService,
   ) {}
 
+  async fixCardComment() {
+    try {
+      const cards = await this.cardModel.find();
+
+      cards.forEach(async (card) => {
+        const activities = await this.activityModel.find({
+          card: card._id,
+        });
+        card.comments = activities
+          .filter((a: any) => a.isComment)
+          .map((s: any) => {
+            return {
+              sender: {
+                user: s.user,
+                name: s.userName,
+                color: s.color,
+              },
+              text: s.text,
+              date: s.createdAt as Date,
+            };
+          });
+        await card.save();
+
+        // await this.activityModel.deleteMany({
+        //   card: card._id,
+        //   isComment: true,
+        // });
+      });
+      return { message: 'Success!' };
+    } catch (error) {
+      throw new Error('Something went wrong');
+    }
+  }
+
   async create(
     title: string,
     listId: string,
@@ -43,7 +81,7 @@ export class CardService {
     try {
       // Get list and board
       const list = await this.listModel.findById(listId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate the ownership
       const validate = await validateCardOwners(null, board, user, true);
@@ -55,7 +93,7 @@ export class CardService {
 
       // Create new card
       const card = await this.cardModel.create({
-        board: board._id as ObjectId,
+        board: board._id,
         title,
         owner: new ObjectId(listId),
         labels: [],
@@ -68,6 +106,7 @@ export class CardService {
         card: card._id,
         color: user.color,
         userName: user.name,
+        type: 'card.create',
         list: listId,
       });
 
@@ -95,16 +134,12 @@ export class CardService {
     }
   }
 
-  async deleteById(
-    cardId: string,
-    boardId: string,
-    user: User,
-  ): Promise<{ message: string }> {
+  async deleteById(cardId: string, boardId: string, user: User): Promise<Card> {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
       const list = await this.listModel.findById(card.owner);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -129,18 +164,25 @@ export class CardService {
       //   color: user.color,
       // });
 
-      return { message: 'Success' };
+      return await card.toJSON();
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  async getCard(cardId: string, boardId: string, user: User): Promise<any> {
+  async getCard(
+    cardId: string,
+    boardId: string,
+    user: User,
+  ): Promise<Card & any> {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
+      if (!card) {
+        throw new Error('Card not found');
+      }
       const list = await this.listModel.findById(card.owner);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
       const activities = await this.activityModel.find({
         card: new ObjectId(cardId),
       });
@@ -173,7 +215,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -195,30 +237,32 @@ export class CardService {
     boardId: string,
     user: User,
     body: any,
-  ): Promise<any> {
+  ): Promise<Card> {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
         throw new Error('You dont have permission to update this card');
       }
+
       // Add comment
-      await this.activityModel.create({
-        board: new ObjectId(boardId),
-        card: new ObjectId(cardId),
-        list: card.owner,
-        user: new ObjectId(user.id),
+      card.comments.push({
+        sender: {
+          user: user.id,
+          name: user.name,
+          color: user.color,
+        },
         text: body.text,
-        color: user.color,
-        userName: user.name,
-        isComment: true,
+        date: new Date(),
       });
 
-      return await this.activityModel.find({ card: new ObjectId(cardId) });
+      await card.save();
+
+      return await card.toJSON();
     } catch (error) {
       throw new Error(error);
     }
@@ -230,11 +274,11 @@ export class CardService {
     commentId: string,
     user: User,
     body: any,
-  ): Promise<{ message: string }> {
+  ): Promise<Card> {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -243,36 +287,39 @@ export class CardService {
       }
 
       // Update card
-      const comment = await this.activityModel.findById(commentId);
-      if (!comment) {
-        throw new Error('Comment not found');
-      }
-      if (comment.userName !== user.name) {
-        throw new Error('You can not edit the comment that you haven not');
-      }
+      const comment = card.comments.find(
+        (comment) =>
+          comment._id.toString() === commentId &&
+          comment.sender.user.toString() == user._id.toString(),
+      );
 
-      comment.text = body.text;
-      await comment.save();
-
+      if (comment) {
+        card.comments = card.comments.map((comment) => {
+          if (comment._id.toString() === commentId) {
+            comment.text = body.text;
+          }
+          return comment;
+        });
+      } else {
+        throw new Error('You dont have permission to update this comment');
+      }
       await card.save();
 
       // Add to board activity
       this.activityModel.create({
-        board: new ObjectId(boardId),
+        board: boardId,
         card: new ObjectId(cardId),
-        list: card.owner,
         user: new ObjectId(user.id),
         text: body.text,
         color: user.color,
         userName: user.name,
-        isComment: true,
-        actionType: 'comment',
+        type: 'card.comment.update',
         cardTitle: card.title,
       });
 
-      return { message: 'Success!' };
+      return card.toJSON();
     } catch (error) {
-      throw new Error('Something went wrong');
+      throw new Error(error);
     }
   }
 
@@ -281,11 +328,11 @@ export class CardService {
     boardId: string,
     commentId: string,
     user: User,
-  ): Promise<{ message: string }> {
+  ): Promise<Card> {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -294,22 +341,32 @@ export class CardService {
       }
 
       // Delete card
-      await this.activityModel.findByIdAndDelete(commentId);
+      const comment = card.comments.find(
+        (comment) =>
+          comment._id.toString() === commentId &&
+          comment.sender.user.toString() === user.id.toString(),
+      );
+      if (comment) {
+        card.comments = card.comments.filter(
+          (comment) => comment._id.toString() !== commentId,
+        );
+        await card.save();
+      } else {
+        throw new Error('You dont have permission to delete this comment');
+      }
 
       this.activityModel.create({
-        board: new ObjectId(boardId),
+        board: boardId,
         card: new ObjectId(cardId),
-        list: card.owner,
         user: user.id,
-        text: `deleted his/her own comment from ${card.title}`,
+        text: `deleted his/her own comment in card`,
         color: user.color,
         userName: user.name,
-        isComment: true,
-        actionType: 'comment',
+        type: 'card.comment.delete',
         cardTitle: card.title,
       });
 
-      return { message: 'Success!' };
+      return card.toJSON();
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -324,7 +381,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
       const member = await this.userModel.findById(memberId);
 
       // Validate owner
@@ -343,19 +400,18 @@ export class CardService {
       await card.save();
 
       this.activityModel.create({
-        board: new ObjectId(boardId),
+        board: boardId,
         card: new ObjectId(cardId),
         list: card.owner,
         user: user.id,
-        text: `added '${member.name}' to ${card.title}`,
+        text: `added '${member.name}' to card`,
         color: user.color,
         userName: user.name,
-        isComment: false,
-        actionType: 'member',
+        type: 'card.member.add',
         cardTitle: card.title,
       });
 
-      return { message: 'success' };
+      return await card.toJSON();
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -370,7 +426,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -389,19 +445,18 @@ export class CardService {
       const tempMember = await this.userModel.findById(memberId);
 
       this.activityModel.create({
-        board: new ObjectId(boardId),
+        board: boardId,
         card: new ObjectId(cardId),
         list: card.owner,
         user: user.id,
         text: `removed '${tempMember.name}' from ${card.title}`,
         color: user.color,
         userName: user.name,
-        isComment: false,
-        actionType: 'member',
+        type: 'card.member.delete',
         cardTitle: card.title,
       });
 
-      return { message: 'success' };
+      return card.toJSON();
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -411,7 +466,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -444,7 +499,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -480,7 +535,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -511,7 +566,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
@@ -561,7 +616,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
       const loggedInUser = await this.userModel.findById(user.id);
       // Validate owner
       const validate = await validateCardOwners(
@@ -604,7 +659,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -646,7 +701,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -690,7 +745,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -716,17 +771,21 @@ export class CardService {
       });
       await card.save();
 
-      //Add to board activity
-      // board.activity.unshift({
-      //   user: user._id,
-      //   name: user.name,
-      //   action: completed
-      //     ? `completed '${clItem}' on ${card.title}`
-      //     : `marked as uncompleted to '${clItem}' on ${card.title}`,
-      //   color: user.color,
-      // });
+      // Add card activity
+      this.activityModel.create({
+        board: boardId,
+        card: new ObjectId(cardId),
+        user: new ObjectId(user.id),
+        text: completed
+          ? `marked ${clItem} as completed on card`
+          : `marked ${clItem} as uncompleted on card`,
+        color: user.color,
+        userName: user.name,
+        type: 'card.checklist.update',
+        cardTitle: card.title,
+      });
 
-      return { message: 'Success!' };
+      return card.checklists;
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -743,7 +802,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -782,7 +841,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -801,7 +860,19 @@ export class CardService {
         return list;
       });
       await card.save();
-      return { message: 'Success!' };
+      // add card activity
+      this.activityModel.create({
+        board: boardId,
+        card: new ObjectId(cardId),
+        user: new ObjectId(user.id),
+        text: `deleted checklist item on card`,
+        color: user.color,
+        userName: user.name,
+        type: 'card.checklist.update',
+        cardTitle: card.title,
+      });
+
+      return card.checklists;
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -818,7 +889,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -832,7 +903,7 @@ export class CardService {
       card.date.dueTime = dueTime;
       if (dueDate === null) card.date.completed = false;
       await card.save();
-      return { message: 'Success!' };
+      return await card.toJSON();
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -847,7 +918,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -863,16 +934,20 @@ export class CardService {
       await card.save();
 
       // Add to board activity
-      // board.activity.unshift({
-      //   user: user._id,
-      //   name: user.name,
-      //   action: `marked the due date on ${card.title} ${
-      //     completed ? 'complete' : 'uncomplete'
-      //   }`,
-      //   color: user.color,
-      // });
+      this.activityModel.create({
+        board: boardId,
+        card: new ObjectId(cardId),
+        user: new ObjectId(user.id),
+        text: completed
+          ? `marked as completed on card`
+          : `update due date on card`,
+        color: user.color,
+        userName: user.name,
+        type: 'card.dueDate',
+        cardTitle: card.title,
+      });
 
-      return { message: 'Success!' };
+      return await card.date;
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -889,7 +964,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -964,7 +1039,7 @@ export class CardService {
       //   color: user.color,
       // });
 
-      return { attachments: card.attachments, cover };
+      return await card.toJSON();
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -979,7 +1054,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -1014,15 +1089,8 @@ export class CardService {
           await card.save();
         }
       }
-      //Add to board activity
-      // board.activity.unshift({
-      //   user: user._id,
-      //   name: user.name,
-      //   action: `deleted the ${attachmentObj[0].link} attachment from ${card.title}`,
-      //   color: user.color,
-      // });
 
-      return { message: 'Success!' };
+      return await card.toJSON();
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -1039,7 +1107,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -1076,7 +1144,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
 
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
@@ -1113,7 +1181,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
@@ -1130,15 +1198,14 @@ export class CardService {
 
       //Add to Card activity
       this.activityModel.create({
-        board: new ObjectId(boardId),
+        board: boardId,
         card: new ObjectId(cardId),
         list: card.owner,
         user: new ObjectId(user._id),
         text: `estimated time as ${secondsToTimeString(astimatedTime)} hours`,
         color: user.color,
         userName: user.name,
-        isComment: false,
-        actionType: 'time',
+        type: 'card.timeTracking.estimate',
         cardTitle: card.title,
       });
 
@@ -1159,7 +1226,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
@@ -1205,7 +1272,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
@@ -1253,7 +1320,7 @@ export class CardService {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
-      const board = await this.boardModel.findById(boardId);
+      const board = await this.boardModel.findOne({ shortId: boardId });
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {

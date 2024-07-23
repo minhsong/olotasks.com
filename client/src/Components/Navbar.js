@@ -6,6 +6,7 @@ import { xs } from "../BreakPoints";
 import ProfileBox from "./ProfileBox";
 import { useNavigate } from "react-router-dom";
 import logo_white from "../Images/olotasks_white.svg";
+import UserNotifications from "./UserNotifications";
 
 const Container = styled.div`
   height: 3rem;
@@ -93,6 +94,7 @@ const Navbar = (props) => {
           searchString={props.searchString}
           setSearchString={props.setSearchString}
         />
+        <UserNotifications content={4} />
         <ProfileBox />
       </RightSide>
     </Container>

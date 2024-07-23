@@ -1,40 +1,34 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Types, Document } from 'mongoose';
-import { Card } from './card.schema';
-import { Board } from './board.schema';
 
-export type ActivityDocument = Activity & Document;
+export type NotificationDocument = Notification & Document;
 
-@Schema({ collection: 'activities', timestamps: true })
-export class Activity {
-  @Prop({ type: Types.ObjectId, required: true, ref: 'Board' })
-  board: Types.ObjectId;
-
-  @Prop({ type: Types.ObjectId, ref: 'Card' })
-  card?: Types.ObjectId;
-
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+@Schema({ collection: 'notifications', timestamps: true })
+export class Notification {
+  @Prop({ type: Types.ObjectId, required: true, ref: 'User' })
   user: Types.ObjectId;
 
-  @Prop({ required: true })
-  userName: string;
+  @Prop({
+    type: { id: Types.ObjectId, name: String, color: String, avatar: String },
+    required: true,
+  })
+  sender: { id: Types.ObjectId; name: string; color: string; avatar: string };
 
   @Prop({ required: true })
   text: string;
 
-  @Prop()
-  date?: Date;
+  @Prop({ default: false })
+  isRead?: boolean;
 
-  @Prop({ required: true })
-  color: string;
+  @Prop({ type: { id: Types.ObjectId, name: String }, required: true })
+  board: { id: Types.ObjectId; name: string };
 
-  @Prop()
-  cardTitle?: string;
+  @Prop({ type: { id: Types.ObjectId, name: String } })
+  card?: { id: Types.ObjectId; name: string };
 
   @Prop({
     type: String,
     enum: [
-      'card.create',
       'card.update',
       'card.delete',
       'card.member.add',
@@ -64,4 +58,4 @@ export class Activity {
   type: string;
 }
 
-export const ActivitySchema = SchemaFactory.createForClass(Activity);
+export const NotificationSchema = SchemaFactory.createForClass(Notification);

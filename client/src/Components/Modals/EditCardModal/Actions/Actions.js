@@ -4,9 +4,14 @@ import Button from "../../../ReUsableComponents/IconButton";
 import DeleteIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { cardDelete } from "../../../../Services/listService";
-const Actions = () => {
+const Actions = (props) => {
   const card = useSelector((state) => state.card);
   const dispatch = useDispatch();
+  const deleteCard = () => {
+    cardDelete(card.cardId, card.boardId, dispatch).then(() => {
+      props.closeModal();
+    });
+  };
   return (
     <Container>
       <Title>Actions</Title>

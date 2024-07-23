@@ -61,21 +61,21 @@ const Comment = (props) => {
               fontWeight: "800",
             }}
           >
-            {props.userName[0].toUpperCase()}
+            {props.sender.name[0].toUpperCase()}
           </Avatar>
         </LeftContainer>
         <RightContainer>
           <div
             style={{ display: "flex", flexDirection: "row", alignItems: "end" }}
           >
-            <Title>{props.userName}</Title>
+            <Title>{props.sender.name}</Title>
 
-            {Date.now() - new Date(props.createdAt) > 60 * 60 * 1000 ? (
+            {Date.now() - new Date(props.date) > 60 * 60 * 1000 ? (
               <CommentTime>
-                {moment(props.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
+                {moment(props.date).format("MMMM Do YYYY, h:mm:ss a")}
               </CommentTime>
             ) : (
-              <TimeAgoText date={props.createdAt} />
+              <TimeAgoText date={props.date} />
             )}
           </div>
           <CommentWrapper>
@@ -121,7 +121,7 @@ const Comment = (props) => {
                 }}
               />
             </ButtonContainer>
-            <LinkContainer show={edit && user.name === props.userName}>
+            <LinkContainer show={edit && user._id === props.sender.user}>
               <Link onClick={() => setEdit(false)}>Edit</Link>
               <Link onClick={handleDeleteClick}>Delete</Link>
             </LinkContainer>

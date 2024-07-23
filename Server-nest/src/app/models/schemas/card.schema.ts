@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Schema as MongooseSchema, Types, Document } from 'mongoose';
 import { ObjectId } from 'mongodb';
-import { Activity } from './activity.schema';
+import { Activity, ActivitySchema } from './activity.schema';
 export type CardDocument = Card & Document;
 
 @Schema()
@@ -110,8 +110,33 @@ export class Attachment {
   @Prop()
   mineType?: string;
 }
-
 export const AttachmentSchema = SchemaFactory.createForClass(Attachment);
+
+@Schema()
+export class Comment {
+  _id?: Types.ObjectId;
+  @Prop({
+    type: {
+      user: { type: Types.ObjectId, ref: 'User' },
+      name: { type: String },
+      color: { type: String },
+    },
+    required: true,
+  })
+  sender: {
+    user: Types.ObjectId;
+    name: string;
+    color: string;
+  };
+
+  @Prop()
+  text: string;
+
+  @Prop({ default: Date.now })
+  date?: Date;
+}
+
+export const CommentSchema = SchemaFactory.createForClass(Comment);
 
 @Schema({ collection: 'cards', timestamps: true })
 export class Card extends Document {
@@ -136,10 +161,8 @@ export class Card extends Document {
       },
     ],
     default: [],
-    _id: true,
   })
   members: {
-    _id?: Types.ObjectId;
     user: Types.ObjectId;
     name: string;
     color: string;
@@ -192,6 +215,9 @@ export class Card extends Document {
     _id: true,
   })
   attachments: Attachment[];
+
+  @Prop({ type: [CommentSchema], default: [] })
+  comments: Comment[];
 
   activities?: Activity[];
 

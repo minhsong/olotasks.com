@@ -91,6 +91,13 @@ export default ({
 
       setQuill(quillInstance);
     }
+
+    return () => {
+      // destroy the quill editor
+      if (quill) {
+        console.log("destroying quill", quillRef);
+      }
+    };
   }, [quillRef, quill]);
 
   useEffect(() => {

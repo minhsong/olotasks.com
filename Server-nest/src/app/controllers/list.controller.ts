@@ -75,10 +75,7 @@ export class ListRouteController {
     }
     // Call the service to add new list
     return await this.listservice
-      .create(
-        { title: title, owner: new ObjectId(boardId as string) },
-        req.user,
-      )
+      .create({ title: title, owner: boardId }, loggedUser)
       .then((result) => {
         return res.status(HttpStatus.OK).send(result);
       })
@@ -159,13 +156,6 @@ export class ListRouteController {
         .status(HttpStatus.BAD_REQUEST)
         .send({ errMessage: 'All parameters not provided' });
 
-    // Validate the owner of board
-    const validate = user.boards.filter((board) => board === boardId);
-    if (!validate)
-      return res
-        .status(HttpStatus.FORBIDDEN)
-        .send({ errMessage: 'You cannot edit the board that you hasnt' });
-
     // Call the service
     return await this.listservice
       .updateCardOrder(
@@ -203,16 +193,9 @@ export class ListRouteController {
         .status(HttpStatus.BAD_REQUEST)
         .send({ errMessage: 'All parameters not provided' });
 
-    // Validate the owner of board
-    const validate = user.boards.filter((board) => board === boardId);
-    if (!validate)
-      return res
-        .status(HttpStatus.FORBIDDEN)
-        .send({ errMessage: 'You cannot edit the board that you hasnt' });
-
     // Call the service
     return await this.listservice
-      .updateListOrder(boardId, sourceIndex, destinationIndex, listId)
+      .updateListOrder(boardId, sourceIndex, destinationIndex, listId, user)
       .then((result) => {
         return res.status(HttpStatus.OK).send(result);
       })

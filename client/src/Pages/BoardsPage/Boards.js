@@ -24,7 +24,8 @@ const Boards = () => {
   }, [user]);
 
   const handleClick = (e) => {
-    navigate(`/board/${e.target.id}`);
+    const board = boardsData.find((board) => board.shortId === e.target.id);
+    navigate(`/b/${e.target.id}-${board.title}`);
   };
 
   useEffect(() => {
@@ -58,7 +59,7 @@ const Boards = () => {
                     key={item._id}
                     link={item.backgroundImageLink}
                     isImage={item.isImage}
-                    id={item._id}
+                    id={item.shortId}
                     onClick={(e) => handleClick(e)}
                   >
                     {item.title}

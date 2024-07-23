@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Types, Document } from 'mongoose';
 import { Label, LabelSchema } from './card.schema';
+import { generateRandomString } from 'src/utils/helperMethods';
 
 @Schema()
 export class BoardMember {
@@ -58,6 +59,9 @@ export type BoardDocument = Board & Document;
 
 @Schema({ collection: 'boards', timestamps: true, versionKey: '__v' })
 export class Board {
+  @Prop({ required: true, unique: true, default: generateRandomString() })
+  shortId: string;
+
   @Prop({ required: true })
   title: string;
 

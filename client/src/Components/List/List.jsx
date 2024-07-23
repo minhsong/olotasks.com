@@ -45,7 +45,7 @@ const List = (props) => {
 
   const handleFooterClick = async () => {
     setNewCardTitle("");
-    await createCard(newCardTitle, props.info._id, props.info.owner, dispatch);
+    await createCard(newCardTitle, props.info._id, props.boardId, dispatch);
     ref && ref.current && ref.current.scrollIntoView({ behavior: "smooth" });
   };
   const handleFooterCloseClick = () => {
@@ -60,14 +60,14 @@ const List = (props) => {
     if (props.info.title !== currentListTitle)
       await listTitleUpdate(
         props.info._id,
-        props.info.owner,
+        props.boardId,
         currentListTitle,
         dispatch
       );
   };
 
   const handleDeleteClick = () => {
-    DeleteList(props.info._id, props.info.owner, dispatch);
+    DeleteList(props.info._id, props.boardId, dispatch);
   };
 
   const handleClickOutside = (e) => {
