@@ -39,15 +39,6 @@ export class BoardController {
   ) {
     const loggedInUser = await this.userService.getUser(req.user.id);
 
-    // Validate whether params.id is in the user's boards or not
-    const validate = loggedInUser.boards.filter(
-      (board) => board.toString() === boardId,
-    );
-    if (!validate)
-      return res.status(HttpStatus.BAD_REQUEST).send({
-        errMessage:
-          'You can not add member to this board, you are not a member or owner!',
-      });
     const { members } = req.body;
     // Call the service
     return await this.boardService

@@ -8,26 +8,24 @@ import {
   Tooltip,
 } from "@mui/material";
 import { Notifications } from "@mui/icons-material";
-import React, { useState } from "react";
-import { MenuItemStyled, MenuStyled } from "./styled";
+import React, { useEffect, useState } from "react";
 import NotificationDrawer from "./NotificationDrawer";
+import { getNotifications } from "../../Services/notificationService";
+import { useDispatch, useSelector } from "react-redux";
 
 const UserNotifications = ({}) => {
-  const [anchorEl, setAnchorEl] = useState(null);
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: "New user registered" },
-    { id: 2, message: "New order received" },
-    { id: 3, message: "Server restarted" },
-  ]);
+  const unreadCount = useSelector((state) => state.notification.unreadCount);
 
   const handleClick = (event) => {
     setOpen((state) => !state);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  useEffect(() => {
+    // Fetch notifications
+    getNotifications(dispatch);
+  }, []);
 
   return (
     <>
@@ -45,7 +43,7 @@ const UserNotifications = ({}) => {
           aria-haspopup="true"
           onClick={handleClick}
         >
-          <Badge badgeContent={notifications.length} color="error">
+          <Badge badgeContent={unreadCount} color="error">
             <Notifications
               sx={{
                 color: "white",

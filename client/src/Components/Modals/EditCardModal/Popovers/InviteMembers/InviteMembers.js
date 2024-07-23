@@ -46,7 +46,7 @@ const InviteMembers = () => {
   const [members, setMembers] = useState([]);
   const dispatch = useDispatch();
   const boardMembers = useSelector((state) => state.board.members);
-  const boardId = useSelector((state) => state.board.id);
+  const boardId = useSelector((state) => state.board.shortId);
   const handleAddClick = async () => {
     const checkMember = boardMembers.filter((m) => m.email === memberMail)[0];
     if (checkMember) {

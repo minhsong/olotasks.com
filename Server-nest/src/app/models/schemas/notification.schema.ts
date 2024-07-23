@@ -11,6 +11,7 @@ export class Notification {
   @Prop({
     type: { id: Types.ObjectId, name: String, color: String, avatar: String },
     required: true,
+    _id: false,
   })
   sender: { id: Types.ObjectId; name: string; color: string; avatar: string };
 
@@ -20,10 +21,14 @@ export class Notification {
   @Prop({ default: false })
   isRead?: boolean;
 
-  @Prop({ type: { id: Types.ObjectId, name: String }, required: true })
-  board: { id: Types.ObjectId; name: string };
+  @Prop({
+    type: { id: String, name: String },
+    required: true,
+    _id: false,
+  })
+  board: { id: string; name: string };
 
-  @Prop({ type: { id: Types.ObjectId, name: String } })
+  @Prop({ type: { id: Types.ObjectId, name: String }, _id: false })
   card?: { id: Types.ObjectId; name: string };
 
   @Prop({

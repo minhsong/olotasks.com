@@ -90,7 +90,7 @@ export class ListService {
       if (!validate) throw new Error('List or board information is wrong');
 
       // Validate whether the owner of the board is the user who sent the request.
-      if (!user.boards.includes(boardId))
+      if (!user.boards.includes(board._id.toString()))
         throw new Error(
           'You cannot delete a list that is not hosted by your boards',
         );
@@ -115,7 +115,7 @@ export class ListService {
 
       return result;
     } catch (error) {
-      throw new Error('Something went wrong');
+      throw new Error(error);
     }
   }
 

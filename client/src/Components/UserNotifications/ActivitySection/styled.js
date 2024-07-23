@@ -107,3 +107,9 @@ export const LoadingBox = styled.div`
   background-position: center;
   background-repeat: no-repeat;
 `;
+
+export const CardTitle = styled.span`
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #172b4d;
+`;

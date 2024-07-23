@@ -5,6 +5,7 @@ import {
   Notification,
   NotificationDocument,
 } from '../models/schemas/notification.schema';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class NotificationService {
@@ -13,16 +14,26 @@ export class NotificationService {
     private readonly notificationModel: Model<NotificationDocument>,
   ) {}
 
-  async getRecentlyNotifications(userId: string): Promise<Notification[]> {
-    return this.notificationModel
-      .find({ user: userId })
+  async getRecentlyNotifications(
+    userId: string,
+  ): Promise<{ notifications: Notification[]; unreadCount: number }> {
+    const unreadCount = await this.notificationModel.countDocuments({
+      user: new ObjectId(userId),
+      isRead: false,
+    });
+    const notis = await this.notificationModel
+      .find({ user: new ObjectId(userId) })
       .sort({ createdAt: -1 })
       .limit(50)
       .exec();
+    return { unreadCount, notifications: notis };
   }
 
-  async markAllAsRead(userId: string): Promise<void> {
-    await this.notificationModel.updateMany({ user: userId }, { isRead: true });
+  async markAllAsRead(userId: string): Promise<any> {
+    return await this.notificationModel.updateMany(
+      { user: new ObjectId(userId) },
+      { isRead: true },
+    );
   }
 
   async markAsRead(notificationId: string): Promise<void> {
@@ -50,14 +61,17 @@ export class NotificationService {
   }
 
   async getUnreadCount(userId: string): Promise<number> {
-    return this.notificationModel.countDocuments({
-      user: userId,
+    return await this.notificationModel.countDocuments({
+      user: new ObjectId(userId),
       isRead: false,
     });
   }
 
   async getUnreadNotifications(userId: string): Promise<Notification[]> {
-    return this.notificationModel.find({ user: userId, isRead: false });
+    return this.notificationModel.find({
+      user: new ObjectId(userId),
+      isRead: false,
+    });
   }
 
   async getNotificationById(notificationId: string): Promise<Notification> {

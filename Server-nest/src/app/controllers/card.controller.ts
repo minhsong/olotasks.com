@@ -143,13 +143,13 @@ export class cardController {
       return {
         user: new ObjectId(watcher),
         sender: {
-          id: new ObjectId(user.id),
-          name: user.name,
-          color: user.color,
-          avatar: user.avatar,
+          id: loggedInUser._id,
+          name: loggedInUser.name,
+          color: loggedInUser.color,
+          avatar: loggedInUser.avatar,
         },
         text: `added an attachment to the card`,
-        board: { id: card.board, name: '' },
+        board: { id: boardId, name: card.boardTitle },
         card: { id: new ObjectId(cardId), name: card.title },
         type: 'card.attachment',
       };
@@ -459,13 +459,13 @@ export class cardController {
       {
         user: new ObjectId(memberId),
         sender: {
-          id: new ObjectId(user.id),
-          name: user.name,
-          color: user.color,
-          avatar: user.avatar,
+          id: loggedInUser._id,
+          name: loggedInUser.name,
+          color: loggedInUser.color,
+          avatar: loggedInUser.avatar,
         },
         text: `added you to a card`,
-        board: { id: card.board, name: '' },
+        board: { id: boardId, name: card.boardTitle },
         card: { id: new ObjectId(cardId), name: card.title },
         type: 'card.member.add',
       },
@@ -507,13 +507,13 @@ export class cardController {
       {
         user: new ObjectId(memberId),
         sender: {
-          id: new ObjectId(user.id),
-          name: user.name,
-          color: user.color,
-          avatar: user.avatar,
+          id: loggedInUser._id,
+          name: loggedInUser.name,
+          color: loggedInUser.color,
+          avatar: loggedInUser.avatar,
         },
         text: `removed you from a card`,
-        board: { id: card.board, name: '' },
+        board: { id: boardId, name: card.boardTitle },
         card: { id: new ObjectId(cardId), name: card.title },
         type: 'card.member.delete',
       },
@@ -649,13 +649,13 @@ export class cardController {
       return {
         user: new ObjectId(watcher),
         sender: {
-          id: new ObjectId(user.id),
-          name: user.name,
-          color: user.color,
-          avatar: user.avatar,
+          id: loggedInUser._id,
+          name: loggedInUser.name,
+          color: loggedInUser.color,
+          avatar: loggedInUser.avatar,
         },
         text: `added an comment to the card`,
-        board: { id: card.board, name: '' },
+        board: { id: boardId, name: card.boardTitle },
         card: { id: new ObjectId(cardId), name: card.title },
         type: 'card.comment.add',
       };
@@ -666,13 +666,13 @@ export class cardController {
         return {
           user: new ObjectId(mention),
           sender: {
-            id: new ObjectId(user.id),
-            name: user.name,
-            color: user.color,
-            avatar: user.avatar,
+            id: loggedInUser._id,
+            name: loggedInUser.name,
+            color: loggedInUser.color,
+            avatar: loggedInUser.avatar,
           },
           text: `mentioned you in a comment`,
-          board: { id: card.board, name: '' },
+          board: { id: boardId, name: card.boardTitle },
           card: { id: new ObjectId(cardId), name: card.title },
           type: 'card.comment.add',
         };
@@ -716,13 +716,13 @@ export class cardController {
         return {
           user: new ObjectId(mention),
           sender: {
-            id: new ObjectId(user.id),
-            name: user.name,
-            color: user.color,
-            avatar: user.avatar,
+            id: loggedInUser._id,
+            name: loggedInUser.name,
+            color: loggedInUser.color,
+            avatar: loggedInUser.avatar,
           },
           text: `mentioned you in a comment`,
-          board: { id: card.board, name: '' },
+          board: { id: boardId, name: card.boardTitle },
           card: { id: new ObjectId(cardId), name: card.title },
           type: 'card.comment.update',
         };
@@ -890,13 +890,13 @@ export class cardController {
         return {
           user: new ObjectId(watcher),
           sender: {
-            id: new ObjectId(user.id),
-            name: user.name,
-            color: user.color,
-            avatar: user.avatar,
+            id: loggedInUser._id,
+            name: loggedInUser.name,
+            color: loggedInUser.color,
+            avatar: loggedInUser.avatar,
           },
           text: `added an attachment to the card`,
-          board: { id: card.board, name: '' },
+          board: { id: boardId, name: card.boardTitle },
           card: { id: new ObjectId(cardId), name: card.title },
           type: 'card.attachment.add',
         };

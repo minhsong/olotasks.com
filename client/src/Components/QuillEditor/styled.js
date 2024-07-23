@@ -13,7 +13,7 @@ export const Container = styled.div`
   .ql-toolbar {
     background-color: white;
   }
-  .ql-toolbar:first-child {
+  .ql-toolbar:nth-child(n + 2) {
     display: none !important;
   }
 `;

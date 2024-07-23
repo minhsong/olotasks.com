@@ -14,41 +14,51 @@ import {
   LoadingBox,
   HeadTitle,
   Wrapper,
+  CardTitle,
 } from "./styled";
 import moment from "moment";
 import CardLoadingSvg from "../../../Images/cardLoading.svg";
-import { activityUpdate } from "../../../Services/boardService";
+import { useParams } from "react-router-dom";
+import { markAllAsRead } from "../../../Services/notificationService";
 
 const ActivitySection = () => {
-  const board = useSelector((state) => state.board);
+  let { id, cardId } = useParams();
+  const [notifications, isLoading] = useSelector((state) => [
+    state.notification.notifications,
+    state.notification.isLoading,
+  ]);
   const dispatch = useDispatch();
   useEffect(() => {
-    activityUpdate(board.id, dispatch);
-  }, [board.id, dispatch]);
+    // mark all notifications as read
+    markAllAsRead(dispatch);
+  }, [dispatch]);
 
   const Comment = (props) => {
     return (
-      <ActionContainer>
+      <ActionContainer
+        to={`/b/${props.board.id}-${props.board.name}/${props.card.id}-${props.card.name}`}
+      >
         <Avatar
           sx={{
             width: 32,
             height: 32,
-            bgcolor: props.color,
+            bgcolor: props.sender.color,
             fontSize: "0.875rem",
             fontWeight: "800",
           }}
         >
-          {props.name[0].toUpperCase()}
+          {props.sender.name[0].toUpperCase()}
         </Avatar>
         <ActionWrapper>
-          <CommentTitle>
-            <Text>
-              <b style={{ fontSize: "0.875rem" }}>{props.name}</b> on{" "}
-              {props.cardTitle}
-            </Text>
-            <Date>{moment(props.date).fromNow()}</Date>
-          </CommentTitle>
-          <CommentArea>{props.action}</CommentArea>
+          <Text>
+            <b style={{ fontSize: "0.875rem" }}>{props.sender.name}</b>{" "}
+            {props.text} on <CardTitle>{props.card.name}</CardTitle>
+          </Text>
+          <Date>
+            {moment(props.createdAt).calendar().indexOf("Today") === -1
+              ? moment(props.createdAt).calendar()
+              : moment(props.createdAt).fromNow()}
+          </Date>
         </ActionWrapper>
       </ActionContainer>
     );
@@ -56,7 +66,7 @@ const ActivitySection = () => {
 
   const Action = (props) => {
     return (
-      <ActionContainer>
+      <ActionContainer to={`/b/${id}/${props.card.id}-${props.card.name}`}>
         <Avatar
           sx={{
             width: 32,
@@ -70,12 +80,13 @@ const ActivitySection = () => {
         </Avatar>
         <ActionWrapper>
           <Text>
-            <b style={{ fontSize: "0.875rem" }}>{props.name}</b> {props.action}
+            <b style={{ fontSize: "0.875rem" }}>{props.sender.name}</b>{" "}
+            {props.text} on <CardTitle>{props.card.name}</CardTitle>
           </Text>
           <Date>
-            {moment(props.date).calendar().indexOf("Today") === -1
-              ? moment(props.date).calendar()
-              : moment(props.date).fromNow()}
+            {moment(props.createdAt).calendar().indexOf("Today") === -1
+              ? moment(props.createdAt).calendar()
+              : moment(props.createdAt).fromNow()}
           </Date>
         </ActionWrapper>
       </ActionContainer>
@@ -85,15 +96,17 @@ const ActivitySection = () => {
   return (
     <Container>
       <Wrapper>
-        {board.activityLoading ? (
+        {isLoading ? (
           <LoadingBox image={CardLoadingSvg} />
         ) : (
-          board.activity.map((act) => {
-            return act.actionType === "action" ? (
-              <Action key={act._id} {...act} />
-            ) : (
-              <Comment key={act._id} {...act} />
-            );
+          notifications.map((act) => {
+            switch (act.type) {
+              case "card.comment.add":
+              case "card.comment.update":
+                return <Comment key={act._id} {...act} />;
+              default:
+                return <Action key={act._id} {...act} />;
+            }
           })
         )}
       </Wrapper>

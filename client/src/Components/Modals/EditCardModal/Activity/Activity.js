@@ -98,10 +98,12 @@ const Activity = () => {
                 onFocus={focusComment}
                 placeholder="Mention with @, Write a comment..."
                 onMention={(e) => setMentions(e)}
-                users={board.members.map((member) => ({
-                  id: member._id,
-                  value: member.name,
-                }))}
+                users={board.members
+                  .filter((u) => u.user != user._id)
+                  .map((member) => ({
+                    id: member.user,
+                    value: member.name,
+                  }))}
               />
             </CommentEditorContainer>
           </CommentWrapper>

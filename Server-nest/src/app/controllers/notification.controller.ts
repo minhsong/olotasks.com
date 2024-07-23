@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req } from '@nestjs/common';
+import { Controller, Get, Param, Put, Req } from '@nestjs/common';
 import { NotificationService } from '../services/notification.service';
 import { Roles } from 'src/decorators/roles.decorator';
 
@@ -6,7 +6,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @Get('/recently')
+  @Get('/')
   @Roles([])
   async getRecentlyNotifications(@Req() req) {
     const user = req.user;
@@ -25,7 +25,7 @@ export class NotificationController {
     return await this.notificationService.getUnreadNotifications(req.user.id);
   }
 
-  @Get('/mark-all-as-read')
+  @Put('/mark-all-as-read')
   @Roles([])
   async markAllAsRead(@Req() req) {
     return await this.notificationService.markAllAsRead(req.user.id);

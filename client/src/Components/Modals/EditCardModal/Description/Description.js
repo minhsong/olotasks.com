@@ -15,6 +15,7 @@ import QuillEditor from "../../../QuillEditor/index.jsx";
 const Description = () => {
   const thisCard = useSelector((state) => state.card);
   const board = useSelector((state) => state.board);
+  const user = useSelector((state) => state.user.userInfo);
   const dispatch = useDispatch();
   const [inputFocus, setInputFocus] = useState(false);
   const [description, setDescription] = useState(thisCard.description);
@@ -78,10 +79,12 @@ const Description = () => {
             value={description}
             placeholder="Mention with @, Add a more detailed description..."
             onMention={(e) => setMentions(e)}
-            users={board.members.map((member) => ({
-              id: member._id,
-              value: member.name,
-            }))}
+            users={board.members
+              .filter((u) => u.user != user._id)
+              .map((member) => ({
+                id: member.user,
+                value: member.name,
+              }))}
           />
         )}
         <div style={{ display: inputFocus ? "block" : "none" }}>

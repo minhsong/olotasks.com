@@ -20,10 +20,6 @@ import { ObjectId } from 'mongodb';
 import { uniqBy } from 'lodash';
 import { secondsToTimeString } from 'src/utils/timeHelper';
 import { SpacesService } from './spaces.service';
-import {
-  Notification,
-  NotificationDocument,
-} from '../models/schemas/notification.schema';
 const urlMetadata = require('url-metadata');
 
 @Injectable()
@@ -262,7 +258,8 @@ export class CardService {
 
       await card.save();
 
-      return await card.toJSON();
+      const cardJson = await card.toJSON();
+      return await { ...cardJson, boardTitle: board.title };
     } catch (error) {
       throw new Error(error);
     }
@@ -317,7 +314,8 @@ export class CardService {
         cardTitle: card.title,
       });
 
-      return card.toJSON();
+      const cardJson = await card.toJSON();
+      return { ...cardJson, boardTitle: board.title };
     } catch (error) {
       throw new Error(error);
     }
@@ -377,7 +375,7 @@ export class CardService {
     boardId: string,
     user: User,
     memberId: string,
-  ) {
+  ): Promise<Card> {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
@@ -411,7 +409,9 @@ export class CardService {
         cardTitle: card.title,
       });
 
-      return await card.toJSON();
+      const jsonCard = await card.toJSON();
+
+      return { ...jsonCard, boardTitle: board.title };
     } catch (error) {
       throw new Error('Something went wrong');
     }
@@ -960,7 +960,7 @@ export class CardService {
     link: string,
     name: string,
     uploadData?: any,
-  ) {
+  ): Promise<Card> {
     try {
       // Get models
       const card = await this.cardModel.findById(cardId);
@@ -1038,8 +1038,8 @@ export class CardService {
       //   action: `attached ${validLink} to ${card.title}`,
       //   color: user.color,
       // });
-
-      return await card.toJSON();
+      const cardJson = await card.toJSON();
+      return { ...cardJson, boardTitle: board.title };
     } catch (error) {
       throw new Error('Something went wrong');
     }

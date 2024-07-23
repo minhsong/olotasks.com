@@ -219,8 +219,6 @@ export class Card extends Document {
   @Prop({ type: [CommentSchema], default: [] })
   comments: Comment[];
 
-  activities?: Activity[];
-
   @Prop({ type: Types.ObjectId, ref: 'List' })
   owner: Types.ObjectId;
 
@@ -263,6 +261,10 @@ export class Card extends Document {
     },
   })
   timeTracking?: CardTimeTracking;
+
+  // not mongoose field
+  activities?: Activity[];
+  boardTitle?: string;
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);

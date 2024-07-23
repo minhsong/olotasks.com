@@ -19,7 +19,6 @@ import { useWebSocket } from "../../Components/Websocket/WebSocketContext";
 
 const Board = (props) => {
   /* props.match.params.id */
-  console.log("Board", props);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { ws } = useWebSocket();

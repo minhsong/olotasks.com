@@ -220,14 +220,20 @@ export class BoardService {
   async addMember(id, members, user): Promise<any> {
     try {
       // Get board by id
-      const board = await this.boardModel.findById(id);
+      const board = await this.boardModel.findOne({ shortId: id });
 
+      // Validate whether params.id is in the user's boards or not
+      const validate = user.boards.filter(
+        (board) => board.toString() === board._id.toString(),
+      );
+      if (!validate)
+        throw new Error(
+          'You can not add member to this board, you are not a member or owner!',
+        );
       // Set variables
       await Promise.all(
         members.map(async (member) => {
-          const newMember = await this.userModel.findOne({
-            email: member.email,
-          });
+          const newMember = await this.userModel.findById(member._id);
           newMember.boards.push(board._id as any);
           await newMember.save();
           board.members.push({
@@ -255,7 +261,7 @@ export class BoardService {
 
       return board.members;
     } catch (error) {
-      throw new Error('Something went wrong');
+      throw new Error(error);
     }
   }
 
