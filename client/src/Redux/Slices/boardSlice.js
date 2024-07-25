@@ -35,6 +35,10 @@ const boardSlice = createSlice({
       state.description = action.payload.description;
       state.labels = action.payload.labels;
       state.shortId = action.payload.shortId;
+      state.Search = {
+        text: "",
+        mentions: [],
+      };
     },
     updateTitle: (state, action) => {
       state.title = action.payload;

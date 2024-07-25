@@ -131,7 +131,6 @@ const Board = (props) => {
                       return (
                         list && (
                           <List
-                            searchString={searchString}
                             key={list._id}
                             index={index}
                             info={list}

@@ -5,6 +5,7 @@ import SearchIcon from "../Images/search-icon.svg";
 import SearchInput from "./SearchInput";
 import { useDispatch, useSelector } from "react-redux";
 import { updateSearch } from "../Redux/Slices/boardSlice";
+import { uniqBy } from "lodash-es";
 const Container = styled.div`
   width: 25rem;
   min-width: 6rem;
@@ -96,7 +97,7 @@ const SearchBar = (props) => {
         placeholder="Search"
         value={searchString}
         onChange={handleSearch}
-        data={board?.members?.map((member) => ({
+        data={uniqBy(board?.members, "user").map((member) => ({
           ...member,
           id: member.user,
           display: `${member.name} ${member.surname}`,

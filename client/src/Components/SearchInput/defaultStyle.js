@@ -1,8 +1,11 @@
+import zIndex from "@mui/material/styles/zIndex";
+
 export default {
   control: {
     fontSize: 14,
     fontWeight: "normal",
     width: "100%",
+    zIndex: zIndex.modal,
   },
 
   "&multiLine": {
@@ -51,6 +54,7 @@ export default {
   },
 
   suggestions: {
+    zIndex: 999,
     list: {
       backgroundColor: "rgba(0, 0, 0, 0.3)",
       border: "1px solid rgba(0,0,0,0.15)",

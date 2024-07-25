@@ -91,7 +91,7 @@ const List = (props) => {
   }, [clickFooter]);
 
   const ShowingCards = (cards) => {
-    return props.info.cards
+    return cards
       .filter((card) => {
         let isValide = true;
         if (Search.text.trim() != "") {
