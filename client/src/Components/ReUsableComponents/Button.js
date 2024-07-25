@@ -66,6 +66,8 @@ export const ButtonStyled = styled.button`
          return "background-color: #f2cd00; color: #fff;";
        case "danger":
          return "background-color: #b04632; color: #fff;";
+       case "clasic":
+         return "background-color: rgba(255, 255, 255, 0.25); color: #fff;";
        case "default":
        default:
          return "background-color: #3e7cb1; color: #fff;";
@@ -79,7 +81,14 @@ const Button = (props) => {
 };
 
 Button.propTypes = {
-  color: PropTypes.oneOf(["info", "success", "warning", "danger", "default"]),
+  color: PropTypes.oneOf([
+    "info",
+    "success",
+    "warning",
+    "danger",
+    "default",
+    "clasic",
+  ]),
 };
 
 export default Button;

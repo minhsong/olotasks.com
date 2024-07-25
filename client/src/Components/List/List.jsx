@@ -16,7 +16,7 @@ import {
 import { ClickableIcon } from "../../Pages/BoardPage/CommonStyled";
 import BottomButtonGroup from "../BottomButtonGroup/BottomButtonGroup";
 import Card from "../Card/Card";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -32,6 +32,7 @@ const List = (props) => {
   const [clickFooter, setClickFooter] = useState(false);
   const [newCardTitle, setNewCardTitle] = useState("");
   const [currentListTitle, setCurrentListTitle] = useState(props.info.title);
+  const Search = useSelector((state) => state.board.Search);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const ref = useRef();
@@ -89,6 +90,40 @@ const List = (props) => {
     }
   }, [clickFooter]);
 
+  const ShowingCards = (cards) => {
+    return props.info.cards
+      .filter((card) => {
+        let isValide = true;
+        if (Search.text.trim() != "") {
+          isValide = card.title
+            .toLowerCase()
+            .includes(Search.text.trim().toLowerCase());
+          if (!isValide) {
+            return false;
+          }
+        }
+        if (Search.mentions.length > 0) {
+          isValide = card.members.some((mention) =>
+            Search.mentions.includes(mention.user)
+          );
+          if (!isValide) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .map((card, index) => {
+        return (
+          <Card
+            boardId={props.boardId}
+            listId={props.info._id}
+            key={card._id}
+            index={index}
+            info={card}
+          />
+        );
+      });
+  };
   return (
     <>
       <Draggable draggableId={props.info._id} index={props.index}>
@@ -108,6 +143,7 @@ const List = (props) => {
                   onClick={() => setClickTitle(true)}
                 >
                   {currentListTitle}
+                  {`(${props.info.cards.length})`}
                 </TitlePlaceholder>
                 <TitleInput
                   onBlur={() => {
@@ -154,25 +190,7 @@ const List = (props) => {
                       isDraggingOver={snapshot.isDraggingOver}
                     >
                       <CardWrapper dock={clickFooter}>
-                        {props.info.cards
-                          .filter((card) =>
-                            props.searchString
-                              ? card.title
-                                  .toLowerCase()
-                                  .includes(props.searchString.toLowerCase())
-                              : true
-                          )
-                          .map((card, index) => {
-                            return (
-                              <Card
-                                boardId={props.boardId}
-                                listId={props.info._id}
-                                key={card._id}
-                                index={index}
-                                info={card}
-                              />
-                            );
-                          })}
+                        {ShowingCards(props.info.cards)}
                         {provided.placeholder}
                         {clickFooter && (
                           <AddTitleCardContainer ref={ref}>

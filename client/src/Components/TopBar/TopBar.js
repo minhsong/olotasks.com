@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import * as style from "./styled";
-import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import * as common from "../../Pages/BoardPage/CommonStyled";
 import { useDispatch, useSelector } from "react-redux";
 import { boardTitleUpdate } from "../../Services/boardsService";
 import RightDrawer from "../Drawers/RightDrawer/RightDrawer";
-import BasePopover from "../ReUsableComponents/BasePopover";
-import InviteMembers from "../Modals/EditCardModal/Popovers/InviteMembers/InviteMembers";
+import Button from "../ReUsableComponents/Button";
 
 const TopBar = () => {
   const board = useSelector((state) => state.board);
   const [currentTitle, setCurrentTitle] = useState(board.title);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [invitePopover, setInvitePopover] = React.useState(null);
+
   const dispatch = useDispatch();
   useEffect(() => {
     if (!board.loading) setCurrentTitle(board.title);
@@ -24,35 +22,14 @@ const TopBar = () => {
   return (
     <style.TopBar>
       <style.LeftWrapper>
-        <style.InviteButton
-          onClick={(event) => setInvitePopover(event.currentTarget)}
-        >
-          <PersonAddAltIcon />
-          <style.TextSpan>Add Member</style.TextSpan>
-        </style.InviteButton>
-        {invitePopover && (
-          <BasePopover
-            anchorElement={invitePopover}
-            closeCallback={() => {
-              setInvitePopover(null);
-            }}
-            title="Invite Members"
-            contents={
-              <InviteMembers
-                closeCallback={() => {
-                  setInvitePopover(null);
-                }}
-              />
-            }
-          />
-        )}
-
         <style.BoardNameInput
           placeholder="Board Name"
           value={currentTitle}
           onChange={(e) => setCurrentTitle(e.target.value)}
           onBlur={handleTitleChange}
         />
+        <common.Button active>TASKS</common.Button>
+        <common.Button color={"clasic"}>REPORT</common.Button>
       </style.LeftWrapper>
 
       <style.RightWrapper>

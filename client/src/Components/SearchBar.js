@@ -2,9 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import { sm, xs } from "../BreakPoints";
 import SearchIcon from "../Images/search-icon.svg";
-
+import SearchInput from "./SearchInput";
+import { useDispatch, useSelector } from "react-redux";
+import { updateSearch } from "../Redux/Slices/boardSlice";
 const Container = styled.div`
-  width: 15rem;
+  width: 25rem;
   min-width: 6rem;
   display: flex;
   flex-direction: row;
@@ -57,11 +59,50 @@ const Icon = styled.img`
 `;
 
 const SearchBar = (props) => {
-  const {searchString, setSearchString} = props;
+  const dispatch = useDispatch();
+  const board = useSelector((state) => state.board);
+  const [searchString, setSearchString] = React.useState("");
+
+  const extractMentions = (str) => {
+    const regex = /@\[([^\]]+)\]\(([^)]+)\)|([^@]+)/g;
+
+    let matches;
+    const results = {
+      mentions: [],
+      text: "",
+    };
+
+    while ((matches = regex.exec(str)) !== null) {
+      if (matches[1] && matches[2]) {
+        // It's a mention
+        results.mentions.push(matches[2]);
+      } else if (matches[3]) {
+        // It's text
+        results.text += matches[3].trim(); // Add text, trimming whitespace
+      }
+    }
+    return results;
+  };
+
+  const handleSearch = (e) => {
+    setSearchString(e.target.value);
+
+    dispatch(updateSearch(extractMentions(e.target.value)));
+  };
   return (
     <Container>
       <Icon src={SearchIcon} />
-      <Input placeholder="Search" value={searchString} onChange={e=>setSearchString(e.target.value)}/>
+      <SearchInput
+        placeholder="Search"
+        value={searchString}
+        onChange={handleSearch}
+        data={board?.members?.map((member) => ({
+          ...member,
+          id: member.user,
+          display: `${member.name} ${member.surname}`,
+        }))}
+      />
+      {/* <Input placeholder="Search" value={searchString} onChange={e=>setSearchString(e.target.value)}/> */}
     </Container>
   );
 };

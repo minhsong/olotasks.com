@@ -42,9 +42,13 @@ export const getLists = async (boardId, dispatch) => {
 export const activityUpdate = async (boardId, dispatch) => {
   dispatch(setActivityLoading(true));
   try {
-    const res = await axios.get(boardRoute + "/" + boardId + "/activity");
-    dispatch(updateActivity(res.data));
-    dispatch(setActivityLoading(false));
+    return await axios
+      .get(boardRoute + "/" + boardId + "/activity")
+      .then((res) => {
+        dispatch(updateActivity(res.data));
+        dispatch(setActivityLoading(false));
+        return res.data;
+      });
   } catch (error) {
     dispatch(setActivityLoading(false));
     dispatch(

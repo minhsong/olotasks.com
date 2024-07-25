@@ -11,6 +11,10 @@ const initialState = {
   loading: true,
   description: "",
   activityLoading: false,
+  Search: {
+    text: "",
+    mentions: [],
+  },
 };
 
 const boardSlice = createSlice({
@@ -63,6 +67,9 @@ const boardSlice = createSlice({
         return label;
       });
     },
+    updateSearch: (state, action) => {
+      state.Search = action.payload;
+    },
   },
 });
 
@@ -76,5 +83,6 @@ export const {
   updateBackground,
   addMembers,
   updateBoardLabels,
+  updateSearch,
 } = boardSlice.actions;
 export default boardSlice.reducer;

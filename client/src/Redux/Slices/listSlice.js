@@ -16,7 +16,7 @@ const listSlice = createSlice({
       state.allLists.push(action.payload);
     },
     successFetchingLists: (state, action) => {
-      state.allLists = action.payload;
+      state.allLists = action.payload.filter((s) => !!s);
     },
     successDeletingList: (state, action) => {
       state.allLists = state.allLists.filter(

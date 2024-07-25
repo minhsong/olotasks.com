@@ -17,11 +17,14 @@ export class BoardMember {
   @Prop({ required: true })
   email: string;
 
-  @Prop({ default: 'member' })
+  @Prop({ enum: ['owner', 'admin', 'member'], default: 'member' })
   role: string;
 
   @Prop({ required: true })
   color: string;
+
+  @Prop({ enum: ['active', 'invited'], default: 'active' })
+  status: string;
 }
 
 export const BoardMemberSchema = SchemaFactory.createForClass(BoardMember);

@@ -98,14 +98,14 @@ const Board = (props) => {
   if (isEmpty(title))
     return (
       <>
-        <Navbar searchString={searchString} setSearchString={setSearchString} />
+        <Navbar />
         <style.Container isImage={false} color="blue"></style.Container>
       </>
     );
 
   return (
     <>
-      <Navbar searchString={searchString} setSearchString={setSearchString} />
+      <Navbar />
       <style.Container
         isImage={isImage}
         bgImage={
@@ -127,15 +127,17 @@ const Board = (props) => {
                   ref={provided.innerRef}
                 >
                   {!loading &&
-                    allLists.map((list, index) => {
+                    allLists?.map((list, index) => {
                       return (
-                        <List
-                          searchString={searchString}
-                          key={list._id}
-                          index={index}
-                          info={list}
-                          boardId={boardId}
-                        />
+                        list && (
+                          <List
+                            searchString={searchString}
+                            key={list._id}
+                            index={index}
+                            info={list}
+                            boardId={boardId}
+                          />
+                        )
                       );
                     })}
                   {provided.placeholder}
