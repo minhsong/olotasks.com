@@ -12,6 +12,6 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "types": ["node", "Multer"]
+    "types": ["node"]
   }
 }

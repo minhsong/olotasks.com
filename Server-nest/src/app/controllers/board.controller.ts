@@ -16,12 +16,15 @@ import { BoardService } from '../services/board.service';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserTokenPayload } from '../models/dto/user/user.tokenPayload';
 import { UserService } from '../services/user.service';
+import { EmailService } from '../services/email.service';
+import { User } from '../models/schemas/user.shema';
 
 @Controller('board')
 export class BoardController {
   constructor(
     private readonly boardService: BoardService,
     private readonly userService: UserService,
+    private readonly mailService: EmailService,
   ) {}
 
   @Get('/fixed-boards')
@@ -49,6 +52,70 @@ export class BoardController {
       .catch((err) => {
         return res.status(HttpStatus.BAD_REQUEST).send(err);
       });
+  }
+
+  @Post(':boardId/add-member-by-email')
+  @Roles([])
+  async addMemberByEmail(
+    @Param('boardId') boardId: string,
+    @Res() res: Response,
+    @Request() req: any,
+  ) {
+    const loggedInUser = await this.userService.getUser(req.user.id);
+    const board = await this.boardService.getBoardByShortId(boardId);
+    if (!board) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .send({ errMessage: 'Board not found' });
+    }
+
+    const loggedBoardMember = board.members.find(
+      (member) => member.user.toString() === loggedInUser._id.toString(),
+    );
+    if (['owner', 'admin'].includes(loggedBoardMember.role)) {
+      const { email } = req.body;
+      const user = await this.userService.getUserWithMail(email);
+      if (!user) {
+        // create user with email
+        const newUser = await this.userService
+          .createUserWithEmail({
+            email: email,
+          })
+          .catch((err) => {
+            return null;
+          });
+
+        // send email to new user
+
+        if (newUser) {
+          return await this.boardService
+            .addMember(boardId, newUser, loggedInUser, true)
+            .then((result) => {
+              return res.status(HttpStatus.OK).send(result);
+            })
+            .catch((err) => {
+              return res.status(HttpStatus.BAD_REQUEST).send(err);
+            });
+        } else {
+          return res
+            .status(HttpStatus.BAD_REQUEST)
+            .send({ errMessage: 'User not found' });
+        }
+      } else {
+        return await this.boardService
+          .addMember(boardId, user, loggedInUser)
+          .then((result) => {
+            return res.status(HttpStatus.OK).send(result);
+          })
+          .catch((err) => {
+            return res.status(HttpStatus.BAD_REQUEST).send(err);
+          });
+      }
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).send({
+        errMessage: 'You are not allowed to add member to this board',
+      });
+    }
   }
 
   @Put(':boardId/update-background')
@@ -148,7 +215,7 @@ export class BoardController {
     @Request() req: any,
   ) {
     const { title, backgroundImageLink } = createBoardDto;
-    const user = req.user as UserTokenPayload;
+    const user = req.user as User;
     if (!(title && backgroundImageLink)) {
       return res
         .status(HttpStatus.BAD_REQUEST)
@@ -175,7 +242,7 @@ export class BoardController {
   @Get('/')
   @Roles([])
   async getAll(@Request() req) {
-    const userId = req.user.id;
-    return await this.boardService.getAll(userId);
+    const user = req.user;
+    return await this.boardService.getAll(user);
   }
 }

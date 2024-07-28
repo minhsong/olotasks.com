@@ -17,7 +17,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { comment } from "../../../../Services/cardService";
 import { Avatar } from "@mui/material";
 import { CommentEditorContainer } from "../Comment/styled";
-import HTMLEditor from "../../../ReUsableComponents/HTMLEditor";
 import QuillEditor from "../../../QuillEditor";
 
 const Activity = () => {

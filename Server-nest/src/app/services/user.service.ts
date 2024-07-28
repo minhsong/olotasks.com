@@ -39,14 +39,25 @@ export class UserService {
 
   async getUserWithMail(email): Promise<any> {
     try {
-      const user = await this.userModel.findOne({ email });
+      let user = await this.userModel.findOne({ email });
       if (!user) {
-        throw new Error('There is no registered user with this e-mail.');
+        return null;
       }
 
       return { ...user.toJSON() };
     } catch (error) {
       throw new Error(error);
     }
+  }
+
+  async createUserWithEmail(email): Promise<User> {
+    return await this.userModel.create({
+      email,
+      color: createRandomHexColor(),
+      name: email.split('@')[0],
+      surname: '',
+      password: '',
+      status: 'inviting',
+    });
   }
 }

@@ -8,21 +8,35 @@ import { Reflector } from '@nestjs/core';
 import { Roles } from 'src/decorators/roles.decorator';
 import { extractTokenFromHeader, jwtDecode } from 'src/utils/jwthelper';
 import { isEmpty } from 'lodash';
+import { RedisService } from 'src/app/redis/redis.service';
+import { UserService } from 'src/app/services/user.service';
+
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    private readonly redisService: RedisService,
+    private readonly userService: UserService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const roles = this.reflector.get(Roles, context.getHandler());
-    let payload = null;
+    let user = null;
     const token = extractTokenFromHeader(request);
     if (!isEmpty(token)) {
       try {
-        payload = await jwtDecode(token);
+        const payload = await jwtDecode(token);
         // 💡 We're assigning the payload to the request object here
         // so that we can access it in our route handlers
-        request['user'] = payload;
+        user = await this.redisService.GetUserData(payload.id);
+        if (user) {
+          request['user'] = user;
+        } else {
+          const user = await this.userService.getUser(payload.id);
+          this.redisService.SetUserData(payload.id, user);
+          request['user'] = user;
+        }
       } catch {}
     }
 
@@ -32,8 +46,8 @@ export class AuthGuard implements CanActivate {
     } else {
       // 💡 If the route is decorated with the @Roles decorator
       // emtpy array means that the route is public
-      if (!isEmpty(payload)) {
-        if (roles && (roles.length == 0 || roles.includes(payload.role))) {
+      if (!isEmpty(user)) {
+        if (roles && (roles.length == 0 || roles.includes(user.role))) {
           return true;
         }
       }

@@ -5,6 +5,7 @@ export type UserDocument = User & Document;
 @Schema({ collection: 'users', timestamps: true })
 export class User extends Document {
   _id: Types.ObjectId;
+
   @Prop({ required: true })
   name: string;
 
@@ -23,8 +24,14 @@ export class User extends Document {
   @Prop()
   color: string;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Board' }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Board' }], default: [] })
   boards: Types.ObjectId[];
+
+  @Prop({
+    enum: ['inviting', 'invited', 'accepted', 'rejected'],
+    default: 'inviting',
+  })
+  status: 'inviting' | 'invited' | 'accepted' | 'rejected';
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

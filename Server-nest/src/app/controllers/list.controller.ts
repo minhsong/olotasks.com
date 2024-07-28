@@ -16,6 +16,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Response } from 'express';
 import { UserService } from '../services/user.service';
 import { ObjectId } from 'mongodb';
+import { User } from '../models/schemas/user.shema';
 
 @Controller('list')
 export class ListRouteController {
@@ -57,16 +58,16 @@ export class ListRouteController {
   @Post('create')
   async create(@Body() body: any, @Req() req: any, @Res() res: Response) {
     // Deconstruct the body
-
+    const user = req.user as User;
     const { title, boardId } = body;
     // Validate the title
     if (!(title && boardId))
       return res
         .status(HttpStatus.BAD_REQUEST)
         .send({ errMessage: 'Title cannot be empty' });
-    const loggedUser = await this.userService.getUser(req.user.id);
+
     // Validate whether boardId is in the user's boards or not
-    const validate = loggedUser.boards.filter((board) => board === boardId);
+    const validate = user.boards.filter((board) => board === boardId);
     if (!validate) {
       return res.status(HttpStatus.BAD_REQUEST).send({
         errMessage:
@@ -75,7 +76,7 @@ export class ListRouteController {
     }
     // Call the service to add new list
     return await this.listservice
-      .create({ title: title, owner: boardId }, loggedUser)
+      .create({ title: title, owner: boardId }, user)
       .then((result) => {
         return res.status(HttpStatus.OK).send(result);
       })
@@ -93,11 +94,12 @@ export class ListRouteController {
   ) {
     // Assing parameter to constant
     // Validate whether boardId is in the user's board or not
-    const loggedUser = await this.userService.getUser(req.user.id);
-    if (!loggedUser) {
+    const user = req.user as User;
+
+    if (!user) {
       throw new UnauthorizedException();
     }
-    const validate = loggedUser.boards.filter(
+    const validate = user.boards.filter(
       (board) => board.toString() === boardId,
     );
     if (!validate)

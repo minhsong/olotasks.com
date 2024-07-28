@@ -6,7 +6,7 @@ const initialState = {
   labels: [],
   members: [],
   watchers: [],
-  activities: [],
+  activities: undefined,
   checklists: [],
   owner: "",
   description: "",
@@ -48,7 +48,6 @@ const cardsSlice = createSlice({
       state.labels = action.payload.labels;
       state.members = action.payload.members;
       state.watchers = action.payload.watchers;
-      state.activities = action.payload.activities;
       state.owner = action.payload.owner;
       state.listTitle = action.payload.listTitle;
       state.listId = action.payload.listId;
@@ -60,6 +59,9 @@ const cardsSlice = createSlice({
       state.cover = action.payload.cover;
       state.timeTracking = action.payload.timeTracking;
       state.comments = action.payload.comments;
+    },
+    setCardActivities: (state, action) => {
+      state.activities = action.payload;
     },
     updateTitle: (state, action) => {
       state.title = action.payload;
@@ -315,5 +317,6 @@ export const {
   updateEstimateTime,
   updateSpentTime,
   updateTimeTracking,
+  setCardActivities,
 } = cardsSlice.actions;
 export default cardsSlice.reducer;

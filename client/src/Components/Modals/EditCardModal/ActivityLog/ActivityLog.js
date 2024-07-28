@@ -1,7 +1,7 @@
 import { Avatar } from "@mui/material";
 import moment from "moment";
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Container,
   LeftContainer,
@@ -10,9 +10,30 @@ import {
   Title,
   Date,
 } from "./styled";
+import { loadCardActivities } from "../../../../Services/cardService";
+import CardLoadingSvg from "../../../../Images/cardLoading.svg";
+import { LoadingScreen } from "../styled";
 
 const ActivityLog = () => {
   const card = useSelector((state) => state.card);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (card.activities == undefined && !loading) {
+      setLoading(true);
+      loadCardActivities(card.boardId, card.cardId, dispatch).then((data) => {
+        setLoading(false);
+      });
+    }
+  }, [card.activities]);
+
+  if (loading) {
+    return (
+      <Container>
+        <LoadingScreen image={CardLoadingSvg} />
+      </Container>
+    );
+  }
   return (
     <>
       {card.activities?.map((activity, index) => {

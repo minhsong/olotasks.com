@@ -10,6 +10,7 @@ import {
   Notification,
   NotificationSchema,
 } from '../models/schemas/notification.schema';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   providers: [UserService, NotificationService],
@@ -21,6 +22,7 @@ import {
       { name: Notification.name, schema: NotificationSchema },
     ]),
     LoggerModule,
+    RedisModule,
   ],
 })
 export class UserModule {}

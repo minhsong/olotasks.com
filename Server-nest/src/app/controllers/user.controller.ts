@@ -8,6 +8,8 @@ import {
   Res,
   HttpStatus,
 } from '@nestjs/common';
+import Redis from 'ioredis';
+import { InjectRedis } from '@nestjs-modules/ioredis';
 import { UserService } from '../services/user.service';
 import { hashPassword, jwtSign } from 'src/utils/jwthelper';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -19,7 +21,10 @@ import { GetUserWithEmailDto } from '../models/dto/user/user.getByEmail';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    @InjectRedis() private readonly redis: Redis,
+  ) {}
 
   @Post('register')
   async register(
@@ -78,17 +83,13 @@ export class UserController {
   @Get('get-user')
   @Roles([])
   async getUser(@Req() req: any): Promise<any> {
-    const userId = req.user.id;
-    console.log(userId);
-    return await this.userService
-      .getUser(userId)
-      .then((result) => {
-        if (!result) throw new Error('User not found!');
-        return { ...result.toJSON(), password: undefined, __v: undefined };
-      })
-      .catch((err) => {
-        throw err;
-      });
+    const user = req.user;
+
+    if (user) {
+      return { ...user, password: undefined, __v: undefined };
+    } else {
+      throw new Error('User not found!');
+    }
   }
 
   @Post('get-user-with-email')

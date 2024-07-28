@@ -11,11 +11,13 @@ import { CardModule } from './app/modules/card.module';
 import { UserModule } from './app/modules/user.module';
 import { ListModule } from './app/modules/list.module';
 import { WsGateway } from './app/websocket/ws.gateway';
+import { RedisModule } from './app/redis/redis.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGODB_CONNECTION_URL),
+    RedisModule,
     LoggerModule,
     BoardModule,
     CardModule,

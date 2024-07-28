@@ -33,6 +33,7 @@ import {
   updateEstimateTime,
   updateTimeTracking,
   updateAllAttachments,
+  setCardActivities,
 } from "../Redux/Slices/cardSlice";
 import {
   addAttachmentForCard,
@@ -1141,4 +1142,18 @@ export const uploadAttachment = async (
       })
     );
   }
+};
+
+export const loadCardActivities = async (boardId, cardId, dispatch) => {
+  try {
+    let response = "";
+    await axios
+      .get(baseUrl + "/" + boardId + "/" + cardId + "/card-activities")
+      .then((res) => {
+        response = res;
+      });
+
+    dispatch(setCardActivities(response.data));
+    return response;
+  } catch (err) {}
 };

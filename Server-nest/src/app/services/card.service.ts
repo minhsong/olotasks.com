@@ -177,11 +177,7 @@ export class CardService {
       if (!card) {
         throw new Error('Card not found');
       }
-      const list = await this.listModel.findById(card.owner);
       const board = await this.boardModel.findOne({ shortId: boardId });
-      const activities = await this.activityModel.find({
-        card: new ObjectId(cardId),
-      });
       // Validate owner
       const validate = await validateCardOwners(card, board, user, false);
       if (!validate) {
@@ -190,10 +186,8 @@ export class CardService {
 
       const returnObject = {
         ...card.toJSON(),
-        listTitle: list.title,
         listId: card.owner,
         boardId,
-        activities,
       };
 
       return returnObject;
@@ -1345,5 +1339,11 @@ export class CardService {
     } catch (error) {
       throw new Error(error);
     }
+  }
+
+  async getCardActivities(cardId: string) {
+    return await this.activityModel.find({
+      card: new ObjectId(cardId),
+    });
   }
 }

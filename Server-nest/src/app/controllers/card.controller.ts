@@ -26,6 +26,7 @@ import * as sharp from 'sharp';
 import { exportWatchers, getFileCategory } from 'src/utils/helperMethods';
 import { NotificationService } from '../services/notification.service';
 import { Notification } from '../models/schemas/notification.schema';
+import { User } from '../models/schemas/user.shema';
 
 @Controller('card')
 @Roles([])
@@ -48,12 +49,10 @@ export class cardController {
   @Roles([])
   async deleteCard(@Param() params, @Req() req) {
     const { boardId, cardId } = params;
-    const user = req.user;
-    const loggedInUser = await this.userService.getUser(user.id);
 
     // Call the card service
     return await this.cardService
-      .deleteById(cardId, boardId, loggedInUser)
+      .deleteById(cardId, boardId, req.user)
       .then((result) => {
         return result;
       })
@@ -68,10 +67,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId } = params;
     const { color, isSizeOne, thumbnail } = body;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .updateCover(cardId, boardId, loggedInUser, color, isSizeOne, thumbnail)
+      .updateCover(cardId, boardId, user, color, isSizeOne, thumbnail)
       .then((result) => {
         return result;
       })
@@ -86,10 +84,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId, attachmentId } = params;
     const { link, name } = body;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .updateAttachment(cardId, boardId, loggedInUser, attachmentId, link, name)
+      .updateAttachment(cardId, boardId, user, attachmentId, link, name)
       .then((result) => {
         return result;
       })
@@ -104,10 +101,9 @@ export class cardController {
     // Get params
     const user = req.user;
     const { boardId, cardId, attachmentId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     const card = await this.cardService
-      .deleteAttachment(cardId, boardId, loggedInUser, attachmentId)
+      .deleteAttachment(cardId, boardId, user, attachmentId)
       .then((result) => {
         return result;
       })
@@ -125,11 +121,10 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId } = params;
     const { link, name } = body;
-    const loggedInUser = await this.userService.getUser(user.id);
 
     // Call the card service
     const card = await this.cardService
-      .addAttachment(cardId, boardId, loggedInUser, link, name)
+      .addAttachment(cardId, boardId, user, link, name)
       .then((result) => {
         return result;
       })
@@ -143,10 +138,10 @@ export class cardController {
       return {
         user: new ObjectId(watcher),
         sender: {
-          id: loggedInUser._id,
-          name: loggedInUser.name,
-          color: loggedInUser.color,
-          avatar: loggedInUser.avatar,
+          id: user._id,
+          name: user.name,
+          color: user.color,
+          avatar: user.avatar,
         },
         text: `added an attachment to the card`,
         board: { id: boardId, name: card.boardTitle },
@@ -177,18 +172,10 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId } = params;
     const { startDate, dueDate, dueTime } = body;
-    const loggedInUser = await this.userService.getUser(user.id);
 
     // Call the card service
     const card = await this.cardService
-      .updateStartDueDates(
-        cardId,
-        boardId,
-        loggedInUser,
-        startDate,
-        dueDate,
-        dueTime,
-      )
+      .updateStartDueDates(cardId, boardId, user, startDate, dueDate, dueTime)
       .then((result) => {
         return result;
       })
@@ -206,11 +193,10 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId } = params;
     const { completed } = body;
-    const loggedInUser = await this.userService.getUser(user.id);
 
     // Call the card service
     const date = await this.cardService
-      .updateDateCompleted(cardId, boardId, loggedInUser, completed)
+      .updateDateCompleted(cardId, boardId, user, completed)
       .then((result) => {
         return result;
       })
@@ -229,16 +215,9 @@ export class cardController {
     // Get params
     const user = req.user;
     const { boardId, cardId, checklistId, checklistItemId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .deleteChecklistItem(
-        cardId,
-        boardId,
-        loggedInUser,
-        checklistId,
-        checklistItemId,
-      )
+      .deleteChecklistItem(cardId, boardId, user, checklistId, checklistItemId)
       .then((result) => {
         return result;
       })
@@ -256,13 +235,12 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId, checklistId, checklistItemId } = params;
     const text = body.text;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
       .setChecklistItemText(
         cardId,
         boardId,
-        loggedInUser,
+        user,
         checklistId,
         checklistItemId,
         text,
@@ -284,13 +262,12 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId, checklistId, checklistItemId } = req.params;
     const completed = req.body.completed;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
       .setChecklistItemCompleted(
         cardId,
         boardId,
-        loggedInUser,
+        user,
         checklistId,
         checklistItemId,
         completed,
@@ -309,10 +286,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId, checklistId } = params;
     const text = body.text;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .addChecklistItem(cardId, boardId, loggedInUser, checklistId, text)
+      .addChecklistItem(cardId, boardId, user, checklistId, text)
       .then((result) => {
         return result;
       })
@@ -327,10 +303,9 @@ export class cardController {
     // Get params
     const user = req.user;
     const { boardId, cardId, checklistId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .deleteChecklist(cardId, boardId, checklistId, loggedInUser)
+      .deleteChecklist(cardId, boardId, checklistId, user)
       .then((result) => {
         return result;
       })
@@ -346,10 +321,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId } = params;
     const title = body.title;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .createChecklist(cardId, boardId, loggedInUser, title)
+      .createChecklist(cardId, boardId, user, title)
       .then((result) => {
         return result;
       })
@@ -365,10 +339,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId, labelId } = params;
     const { selected } = body;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .updateLabelSelection(cardId, boardId, labelId, loggedInUser, selected)
+      .updateLabelSelection(cardId, boardId, labelId, user, selected)
       .then((result) => {
         return result;
       })
@@ -383,10 +356,9 @@ export class cardController {
     // Get params
     const user = req.user;
     const { boardId, cardId, labelId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .deleteLabel(cardId, boardId, labelId, loggedInUser)
+      .deleteLabel(cardId, boardId, labelId, user)
       .then((result) => {
         return result;
       })
@@ -402,10 +374,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId, labelId } = params;
     const label = body;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .updateLabel(cardId, boardId, labelId, loggedInUser, label)
+      .updateLabel(cardId, boardId, labelId, user, label)
       .then((result) => {
         return result;
       })
@@ -421,10 +392,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId } = params;
     const label = body;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .createLabel(cardId, boardId, loggedInUser, label)
+      .createLabel(cardId, boardId, user, label)
       .then((result) => {
         return result;
       })
@@ -440,10 +410,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId } = params;
     const { memberId } = body;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     const card = await this.cardService
-      .addMember(cardId, boardId, loggedInUser, memberId)
+      .addMember(cardId, boardId, user, memberId)
       .then((result) => {
         return result;
       })
@@ -459,10 +428,10 @@ export class cardController {
       {
         user: new ObjectId(memberId),
         sender: {
-          id: loggedInUser._id,
-          name: loggedInUser.name,
-          color: loggedInUser.color,
-          avatar: loggedInUser.avatar,
+          id: user._id,
+          name: user.name,
+          color: user.color,
+          avatar: user.avatar,
         },
         text: `added you to a card`,
         board: { id: boardId, name: card.boardTitle },
@@ -491,10 +460,9 @@ export class cardController {
     // Get params
     const user = req.user;
     const { boardId, cardId, memberId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     const card = await this.cardService
-      .deleteMember(cardId, boardId, loggedInUser, memberId)
+      .deleteMember(cardId, boardId, user, memberId)
       .then((result) => {
         return result;
       })
@@ -507,10 +475,10 @@ export class cardController {
       {
         user: new ObjectId(memberId),
         sender: {
-          id: loggedInUser._id,
-          name: loggedInUser.name,
-          color: loggedInUser.color,
-          avatar: loggedInUser.avatar,
+          id: user._id,
+          name: user.name,
+          color: user.color,
+          avatar: user.avatar,
         },
         text: `removed you from a card`,
         board: { id: boardId, name: card.boardTitle },
@@ -552,10 +520,9 @@ export class cardController {
           'The create operation could not be completed because there is missing information',
       });
 
-    const loggedInUser = await this.userService.getUser(user.id);
     //Call the card service
     return await this.cardService
-      .create(title, listId, boardId, loggedInUser)
+      .create(title, listId, boardId, user)
       .then((result) => {
         return res.status(HttpStatus.CREATED).send(result);
       })
@@ -576,10 +543,9 @@ export class cardController {
     const user = req.user;
 
     const { boardId, cardId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .getCard(cardId, boardId, loggedInUser)
+      .getCard(cardId, boardId, user)
       .then((result) => {
         return res.status(HttpStatus.CREATED).send(result);
       })
@@ -595,10 +561,10 @@ export class cardController {
   async update(@Param() params, @Req() req, @Body() body) {
     // Get params
     const { boardId, cardId } = params;
-    const loggedInUser = await this.userService.getUser(req.user.id);
+    const user = req.user as User;
     // Call the card service
     return await this.cardService
-      .update(cardId, boardId, loggedInUser, body)
+      .update(cardId, boardId, user, body)
       .then((result) => {
         return result;
       })
@@ -613,10 +579,9 @@ export class cardController {
     // Get params
     const user = req.user;
     const { boardId, cardId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .deleteById(cardId, boardId, loggedInUser)
+      .deleteById(cardId, boardId, user)
       .then((result) => {
         return result;
       })
@@ -631,10 +596,9 @@ export class cardController {
     // Get params
     const user = req.user;
     const { boardId, cardId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     const card = await this.cardService
-      .addComment(cardId, boardId, loggedInUser, body)
+      .addComment(cardId, boardId, user, body)
       .then((result) => {
         return result;
       })
@@ -651,10 +615,10 @@ export class cardController {
       return {
         user: new ObjectId(watcher),
         sender: {
-          id: loggedInUser._id,
-          name: loggedInUser.name,
-          color: loggedInUser.color,
-          avatar: loggedInUser.avatar,
+          id: user._id,
+          name: user.name,
+          color: user.color,
+          avatar: user.avatar,
         },
         text: `added an comment to the card`,
         board: { id: boardId, name: card.boardTitle },
@@ -668,10 +632,10 @@ export class cardController {
         return {
           user: new ObjectId(mention),
           sender: {
-            id: loggedInUser._id,
-            name: loggedInUser.name,
-            color: loggedInUser.color,
-            avatar: loggedInUser.avatar,
+            id: user._id,
+            name: user.name,
+            color: user.color,
+            avatar: user.avatar,
           },
           text: `mentioned you in a comment`,
           board: { id: boardId, name: card.boardTitle },
@@ -702,10 +666,9 @@ export class cardController {
     // Get params
     const user = req.user;
     const { boardId, cardId, commentId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     const card = await this.cardService
-      .updateComment(cardId, boardId, commentId, loggedInUser, body)
+      .updateComment(cardId, boardId, commentId, user, body)
       .then((result) => {
         return result;
       })
@@ -718,10 +681,10 @@ export class cardController {
         return {
           user: new ObjectId(mention),
           sender: {
-            id: loggedInUser._id,
-            name: loggedInUser.name,
-            color: loggedInUser.color,
-            avatar: loggedInUser.avatar,
+            id: user._id,
+            name: user.name,
+            color: user.color,
+            avatar: user.avatar,
           },
           text: `mentioned you in a comment`,
           board: { id: boardId, name: card.boardTitle },
@@ -751,10 +714,9 @@ export class cardController {
     // Get params
     const user = req.user;
     const { boardId, cardId, commentId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     const card = await this.cardService
-      .deleteComment(cardId, boardId, commentId, loggedInUser)
+      .deleteComment(cardId, boardId, commentId, user)
       .then((result) => {
         return result;
       })
@@ -772,10 +734,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId } = params;
     const { time } = body;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .estimateTime(cardId, boardId, loggedInUser, time)
+      .estimateTime(cardId, boardId, user, time)
       .then((result) => {
         return result;
       })
@@ -791,10 +752,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId } = params;
     const { time, comment, date } = body;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .addTimeTracking(cardId, boardId, loggedInUser, time, comment, date)
+      .addTimeTracking(cardId, boardId, user, time, comment, date)
       .then((result) => {
         return result;
       })
@@ -810,18 +770,9 @@ export class cardController {
     const user = req.user;
     const { boardId, cardId, timeId } = params;
     const { time, comment, date } = body;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .updateTimeTracking(
-        cardId,
-        boardId,
-        timeId,
-        loggedInUser,
-        time,
-        comment,
-        date,
-      )
+      .updateTimeTracking(cardId, boardId, timeId, user, time, comment, date)
       .then((result) => {
         return result;
       })
@@ -836,10 +787,9 @@ export class cardController {
     // Get params
     const user = req.user;
     const { boardId, cardId, timeId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     return await this.cardService
-      .deleteTimeTracking(cardId, boardId, timeId, loggedInUser)
+      .deleteTimeTracking(cardId, boardId, timeId, user)
       .then((result) => {
         return result;
       })
@@ -852,14 +802,13 @@ export class cardController {
   @UseInterceptors(FileInterceptor('file'))
   @Roles([])
   async uploadAttachmentFile(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Param() params,
     @Req() req,
   ) {
     // Get params
-    const user = req.user;
+    const user = req.user as User;
     const { boardId, cardId } = params;
-    const loggedInUser = await this.userService.getUser(user.id);
     // Call the card service
     const fileKey = `${boardId}/${cardId}/${file.originalname}`;
     try {
@@ -880,22 +829,24 @@ export class cardController {
       const card = await this.cardService.addAttachment(
         cardId,
         boardId,
-        loggedInUser,
+        user,
         fileData.Location,
         file.originalname,
         fileData,
       );
 
       // create notifications for the watchers
-      const watchedUsers = exportWatchers(card).filter((id) => id !== user.id);
+      const watchedUsers = exportWatchers(card).filter(
+        (id) => id !== user._id.toString(),
+      );
       const notifications: Notification[] = watchedUsers.map((watcher) => {
         return {
           user: new ObjectId(watcher),
           sender: {
-            id: loggedInUser._id,
-            name: loggedInUser.name,
-            color: loggedInUser.color,
-            avatar: loggedInUser.avatar,
+            id: user._id,
+            name: user.name,
+            color: user.color,
+            avatar: user.avatar,
           },
           text: `added an attachment to the card`,
           board: { id: boardId, name: card.boardTitle },
@@ -924,5 +875,15 @@ export class cardController {
     } catch (err) {
       throw err;
     }
+  }
+
+  @Get('/:boardId/:cardId/card-activities')
+  @Roles([])
+  async getCardActivities(@Param() params, @Req() req) {
+    const user = req.user as User;
+    const { cardId } = params;
+    return this.cardService.getCardActivities(cardId).catch((err) => {
+      return [];
+    });
   }
 }

@@ -21,10 +21,7 @@ export class BoardService {
     @InjectModel(List.name) private readonly listModel: Model<ListDocument>,
   ) {}
 
-  async create(
-    data: CreateBoardDto,
-    loggedUser: UserTokenPayload,
-  ): Promise<Board> {
+  async create(data: CreateBoardDto, loggedUser: User): Promise<Board> {
     try {
       const { title, backgroundImageLink, members } = data;
 
@@ -41,7 +38,7 @@ export class BoardService {
       });
 
       // Add this board to owner's boards
-      const user = await this.userModel.findById(loggedUser.id);
+      const user = await this.userModel.findById(loggedUser._id);
       user.boards.unshift(newBoard.id);
       await user.save();
 
@@ -96,15 +93,13 @@ export class BoardService {
 
       return newBoard;
     } catch (error) {
-      console.log(error);
       throw new Error(error.message);
     }
   }
 
-  async getAll(userId): Promise<Board[]> {
+  async getAll(user): Promise<Board[]> {
     try {
       // Get user
-      const user = await this.userModel.findById(userId);
 
       // Get board's ids of user
       const boardIds = user.boards;
@@ -217,7 +212,7 @@ export class BoardService {
     }
   }
 
-  async addMember(id, members, user): Promise<any> {
+  async addMember(id, members, user, inviting = false): Promise<any> {
     try {
       // Get board by id
       const board = await this.boardModel.findOne({ shortId: id });
@@ -233,7 +228,9 @@ export class BoardService {
       // Set variables
       await Promise.all(
         members.map(async (member) => {
-          const newMember = await this.userModel.findById(member._id);
+          const newMember = inviting
+            ? user
+            : await this.userModel.findById(member._id);
           newMember.boards.push(board._id as any);
           await newMember.save();
           board.members.push({
@@ -243,6 +240,7 @@ export class BoardService {
             email: newMember.email,
             color: newMember.color,
             role: 'member',
+            status: inviting ? 'inviting' : 'active',
           });
 
           board.members = uniqBy(board.members, 'user');
@@ -272,19 +270,19 @@ export class BoardService {
       //go through all boards and get all lists
 
       boards.forEach(async (board) => {
-        // const cards = await this.cardModel.updateMany(
-        //   {
-        //     owner: { $in: board.lists },
-        //   },
-        //   { board: board._id },
-        // );
+        await this.cardModel.updateMany(
+          {
+            owner: { $in: board.lists },
+          },
+          { board: board._id },
+        );
 
-        // await this.cardModel.updateMany(
-        //   {
-        //     owner: { $in: board.lists.map((s) => s.toString()) },
-        //   },
-        //   { board: board._id },
-        // );
+        await this.cardModel.updateMany(
+          {
+            owner: { $in: board.lists.map((s) => s.toString()) },
+          },
+          { board: board._id },
+        );
         board.shortId = generateRandomString();
 
         board.save();

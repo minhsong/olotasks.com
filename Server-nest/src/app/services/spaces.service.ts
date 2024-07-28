@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
-import { v4 as uuid } from 'uuid';
+
 @Injectable()
 export class SpacesService {
   private readonly s3: AWS.S3;
@@ -18,7 +18,7 @@ export class SpacesService {
   }
 
   async uploadFile(
-    file: Express.Multer.File,
+    file: any,
     fileKey: string,
   ): Promise<AWS.S3.ManagedUpload.SendData & any> {
     const params = {
