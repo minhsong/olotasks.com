@@ -41,12 +41,12 @@ export default {
       height: "100%",
       width: "100%",
       overflow: "hidden",
-      "&::placeholder": {
+      "::placeholder": {
         color: "white",
       },
-      "&:focus": {
+      ":focus": {
         fontWeight: 600,
-        "&::placeholder": {
+        "::placeholder": {
           color: "transparent",
         },
       },

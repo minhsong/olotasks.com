@@ -94,16 +94,15 @@ const SearchBar = (props) => {
     <Container>
       <Icon src={SearchIcon} />
       <SearchInput
-        placeholder="Search"
         value={searchString}
         onChange={handleSearch}
+        placeholder="@ to member search.."
         data={uniqBy(board?.members, "user").map((member) => ({
           ...member,
           id: member.user,
           display: `${member.name} ${member.surname}`,
         }))}
       />
-      {/* <Input placeholder="Search" value={searchString} onChange={e=>setSearchString(e.target.value)}/> */}
     </Container>
   );
 };
