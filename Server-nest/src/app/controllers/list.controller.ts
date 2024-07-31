@@ -35,7 +35,7 @@ export class ListRouteController {
     @Res() res: any,
   ) {
     // deconstruct the params
-    const user = await this.userService.getUser(req.user.id);
+    const user = req.user as User;
     const { title } = body;
 
     // Validate the listId and boardId
@@ -129,7 +129,7 @@ export class ListRouteController {
     @Res() res: any,
   ) {
     // deconstruct the params
-    const user = await this.userService.getUser(req.user.id);
+    const user = req.user as User;
 
     // Validate the listId and boardId
     if (!(listId && boardId))
@@ -152,7 +152,7 @@ export class ListRouteController {
     // deconstruct the params
     const { boardId, sourceId, destinationId, destinationIndex, cardId } =
       req.body;
-    const user = await this.userService.getUser(req.user.id);
+    const user = req.user as User;
 
     // Validate the params
     if (!(boardId && sourceId && destinationId && cardId))
@@ -182,7 +182,7 @@ export class ListRouteController {
   async updateListOrder(@Body() body: any, @Req() req: any, @Res() res: any) {
     // deconstruct the params
     const { boardId, sourceIndex, destinationIndex, listId } = body;
-    const user = await this.userService.getUser(req.user.id);
+    const user = req.user as User;
 
     // Validate the params
     if (

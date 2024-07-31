@@ -37,38 +37,7 @@ export const getBoards = async (fromDropDown, dispatch) => {
 };
 
 export const createBoard = async (props, dispatch) => {
-  dispatch(startCreatingBoard());
-  if (!(props.title && props.backgroundImageLink)) {
-    dispatch(failCreatingBoard());
-    dispatch(
-      openAlert({
-        message: "Please enter a title for board!",
-        severity: "warning",
-      })
-    );
-    return;
-  }
-  try {
-    const res = await axios.post(baseUrl + "/create", props);
-    dispatch(addNewBoard(res.data));
-    dispatch(successCreatingBoard(res.data));
-    dispatch(
-      openAlert({
-        message: `${res.data.title} board has been successfully created`,
-        severity: "success",
-      })
-    );
-  } catch (error) {
-    dispatch(failCreatingBoard());
-    dispatch(
-      openAlert({
-        message: error?.response?.data?.errMessage
-          ? error.response.data.errMessage
-          : error.message,
-        severity: "error",
-      })
-    );
-  }
+  return axios.post(baseUrl + "/create", props);
 };
 
 export const getBoard = async (boardId, dispatch) => {

@@ -10,6 +10,7 @@ import {
   loadStart,
   fetchingStart,
   fetchingFinish,
+  logout,
 } from "../Redux/Slices/userSlice";
 import { openAlert } from "../Redux/Slices/alertSlice";
 import setBearer from "../Utils/setBearer";
@@ -91,10 +92,20 @@ export const loadUser = async (dispatch) => {
   if (!localStorage.token) return dispatch(loadFailure());
   setBearer(localStorage.token);
   try {
-    const res = await axios.get(baseUrl + "get-user");
-    dispatch(loadSuccess({ user: res.data }));
+    await axios
+      .get(baseUrl + "get-user")
+      .then((res) => {
+        dispatch(loadSuccess({ user: res.data }));
+      })
+      .catch((error) => {
+        if (error.response.status === 401) {
+          localStorage.removeItem("token");
+          dispatch(loadFailure());
+        } else {
+          dispatch(loadFailure());
+        }
+      });
   } catch (error) {
-    localStorage.removeItem("token");
     dispatch(loadFailure());
   }
 };
@@ -128,4 +139,17 @@ export const getUserFromEmail = async (email, dispatch) => {
     dispatch(fetchingFinish());
     return null;
   }
+};
+
+export const userLogout = (dispatch) => {
+  axios.delete(baseUrl + "logout");
+  dispatch(logout());
+};
+
+export const requestResetPassword = async (data) => {
+  return axios.post(baseUrl + "request-reset-password", data);
+};
+
+export const resetPassword = async (data) => {
+  return axios.post(baseUrl + "reset-password", data);
 };

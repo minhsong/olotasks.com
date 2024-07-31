@@ -10,7 +10,10 @@ import { useNavigate } from "react-router";
 const Boards = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { pending, boardsData } = useSelector((state) => state.boards);
+  const [boardsData, pending] = useSelector((state) => [
+    state.user.userInfo.boards,
+    state.user.pending,
+  ]);
   const user = useSelector((state) => state.user);
   const [openModal, setOpenModal] = useState(false);
   const [searchString, setSearchString] = useState("");
@@ -29,10 +32,6 @@ const Boards = () => {
   };
 
   useEffect(() => {
-    getBoards(false, dispatch);
-  }, [dispatch]);
-
-  useEffect(() => {
     document.title = "Boards | Olo Tasks";
   }, []);
 
@@ -44,7 +43,7 @@ const Boards = () => {
         <Wrapper>
           <Title>Your Boards</Title>
           {!pending &&
-            boardsData.length > 0 &&
+            boardsData?.length > 0 &&
             boardsData
               .filter((item) =>
                 searchString

@@ -18,7 +18,6 @@ export class BoardService {
     @InjectModel(Board.name) private readonly boardModel: Model<BoardDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel(Card.name) private readonly cardModel: Model<CardDocument>,
-    @InjectModel(List.name) private readonly listModel: Model<ListDocument>,
   ) {}
 
   async create(data: CreateBoardDto, loggedUser: User): Promise<Board> {
@@ -51,6 +50,7 @@ export class BoardService {
         email: user.email,
         color: user.color,
         role: 'owner',
+        status: 'active',
       });
 
       // Save newBoard's id to boards of members and,
@@ -69,6 +69,7 @@ export class BoardService {
             email: newMember.email,
             color: newMember.color,
             role: 'member',
+            status: 'active',
           });
           // Add to board activity
           newBoard.activity.push({
@@ -97,7 +98,7 @@ export class BoardService {
     }
   }
 
-  async getAll(user): Promise<Board[]> {
+  async getAll(user): Promise<any[]> {
     try {
       // Get user
 
@@ -108,12 +109,16 @@ export class BoardService {
       const boards = await this.boardModel.find({ _id: { $in: boardIds } });
 
       // Delete unnecessary objects
-      boards.forEach((board) => {
-        // board.activity = undefined;
-        board.lists = undefined;
-      });
 
-      return boards;
+      return boards.map((s) => {
+        return {
+          _id: s._id,
+          title: s.title,
+          isImage: s.isImage,
+          backgroundImageLink: s.backgroundImageLink,
+          shortId: s.shortId,
+        };
+      });
     } catch (error) {
       throw new Error(error);
     }

@@ -130,7 +130,6 @@ export class ListService {
     try {
       // Validate the parent board of the lists
       const board = await this.boardModel.findOne({ shortId: boardId });
-      const loggedInUser = await this.userModel.findById(user.id);
       const validate = board.lists.find((list) => list.toString() === sourceId);
       // Validate the owner of board
       const ownerValidate = user.boards.filter((board) => board === board._id);
@@ -170,11 +169,11 @@ export class ListService {
 
         this.activityModel.create({
           board: boardId,
-          userName: loggedInUser.name,
+          userName: user.name,
           card: new ObjectId(cardId),
-          user: loggedInUser.id,
+          user: user.id,
           text: `moved this card from ${sourceList.title} to ${destinationList.title}`,
-          color: loggedInUser.color,
+          color: user.color,
           type: 'card.move',
         });
       } else {

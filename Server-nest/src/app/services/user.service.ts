@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { createRandomHexColor } from 'src/utils/helperMethods';
+import { createRandomHexColor, userpublic } from 'src/utils/helperMethods';
 import { User, UserDocument } from '../models/schemas/user.shema';
 import { comparePasswords } from 'src/utils/jwthelper';
+import { Board, BoardDocument } from '../models/schemas/board.schema';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Board.name) private readonly boardModel: Model<BoardDocument>,
+    private readonly redisService: RedisService,
+  ) {}
 
   async register(user) {
     return this.userModel.create({
@@ -27,14 +33,42 @@ export class UserService {
       if (!isMatch) {
         return null;
       }
-      return { ...user.toJSON() };
+      const boards = await this.boardModel.find({ _id: { $in: user.boards } });
+      return {
+        ...user.toJSON(),
+        boards: boards.map((s) => {
+          return {
+            _id: s._id,
+            shortId: s.shortId,
+            title: s.title,
+            isImage: s.isImage,
+            backgroundImageLink: s.backgroundImageLink,
+          };
+        }),
+      };
     } catch (err) {
       throw new Error('Something went wrong');
     }
   }
 
-  async getUser(id) {
-    return await this.userModel.findById(id);
+  async getUser(id): Promise<any> {
+    const user = await this.userModel.findById(id);
+
+    if (!user) return null;
+    const boards = await this.boardModel.find({ _id: { $in: user.boards } });
+    const trimmedUser = await userpublic(user.toJSON());
+    return {
+      ...trimmedUser,
+      boards: boards.map((s) => {
+        return {
+          _id: s._id,
+          shortId: s.shortId,
+          title: s.title,
+          isImage: s.isImage,
+          backgroundImageLink: s.backgroundImageLink,
+        };
+      }),
+    };
   }
 
   async getUserWithMail(email): Promise<any> {
@@ -59,5 +93,29 @@ export class UserService {
       password: '',
       status: 'inviting',
     });
+  }
+
+  async updateCacheUser(userIds): Promise<any> {
+    if (userIds) {
+      userIds.map(async (userId) => {
+        this.getUser(userId).then((user) => {
+          this.redisService.SetUserData(user);
+        });
+      });
+    }
+  }
+
+  async updatePassword(email, password): Promise<any> {
+    try {
+      const user = await this.userModel.findOne({ email });
+      if (!user) {
+        return null;
+      }
+      user.password = password;
+      await user.save();
+      return user;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }

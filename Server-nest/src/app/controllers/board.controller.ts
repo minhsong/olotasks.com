@@ -40,12 +40,12 @@ export class BoardController {
     @Res() res: Response,
     @Request() req: any,
   ) {
-    const loggedInUser = await this.userService.getUser(req.user.id);
+    const user = req.user as User;
 
     const { members } = req.body;
     // Call the service
     return await this.boardService
-      .addMember(boardId, members, loggedInUser)
+      .addMember(boardId, members, user)
       .then((result) => {
         return res.status(HttpStatus.OK).send(result);
       })
@@ -61,7 +61,7 @@ export class BoardController {
     @Res() res: Response,
     @Request() req: any,
   ) {
-    const loggedInUser = await this.userService.getUser(req.user.id);
+    const loggedInUser = req.user as User;
     const board = await this.boardService.getBoardByShortId(boardId);
     if (!board) {
       return res
@@ -125,7 +125,7 @@ export class BoardController {
     @Res() res: Response,
     @Request() req: any,
   ) {
-    const loggedInUser = await this.userService.getUser(req.user.id);
+    const loggedInUser = req.user as User;
     // Validate whether params.id is in the user's boards or not
     const validate = loggedInUser.boards.filter(
       (board) => board.toString() === boardId,
@@ -155,7 +155,7 @@ export class BoardController {
     @Res() res: Response,
     @Request() req: any,
   ) {
-    const loggedInUser = await this.userService.getUser(req.user.id);
+    const loggedInUser = req.user as User;
     // Validate whether params.id is in the user's boards or not
     const validate = loggedInUser.boards.filter(
       (board) => board.toString() === boardId,
@@ -185,7 +185,7 @@ export class BoardController {
     @Res() res: Response,
     @Request() req: any,
   ) {
-    const loggedInUser = await this.userService.getUser(req.user.id);
+    const loggedInUser = req.user as User;
     // Validate whether params.id is in the user's boards or not
     const validate = loggedInUser.boards.filter(
       (board) => board.toString() === boardId,
@@ -224,6 +224,7 @@ export class BoardController {
     return await this.boardService
       .create(createBoardDto, user)
       .then((result) => {
+        this.userService.updateCacheUser(result.members.map((s) => s.user));
         result.__v = undefined;
         return res.status(HttpStatus.CREATED).send(result);
       });

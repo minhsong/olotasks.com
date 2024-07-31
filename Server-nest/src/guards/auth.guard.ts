@@ -29,12 +29,19 @@ export class AuthGuard implements CanActivate {
         const payload = await jwtDecode(token);
         // 💡 We're assigning the payload to the request object here
         // so that we can access it in our route handlers
-        user = await this.redisService.GetUserData(payload.id);
+        if (!payload) throw new UnauthorizedException();
+
+        user = await this.redisService.GetUserData(payload.id).catch(() => {
+          return null;
+        });
         if (user) {
           request['user'] = user;
         } else {
-          const user = await this.userService.getUser(payload.id);
-          this.redisService.SetUserData(payload.id, user);
+          user = await this.userService.getUser(payload.id);
+
+          if (!user) throw new UnauthorizedException();
+
+          this.redisService.SetUserData(user);
           request['user'] = user;
         }
       } catch {}

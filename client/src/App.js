@@ -10,6 +10,8 @@ import Store from "./Redux/Store";
 import Board from "./Pages/BoardPage/Board";
 import ProtectedArea from "./Utils/ProtectedArea";
 import { WebSocketProvider } from "./Components/Websocket/WebSocketContext";
+import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./Pages/ResetPassword/ResetPassword";
 const App = () => {
   useEffect(() => {
     loadUser(Store.dispatch);
@@ -47,6 +49,12 @@ const App = () => {
           />
           <Route exact path="/login" element={<Login />} />
           <Route exact path="/register" element={<Register />} />
+          <Route exact path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            exact
+            path="/reset-password/:token"
+            element={<ResetPassword />}
+          />
           <Route exact path="/" element={<Index />} />
         </Routes>
       </WebSocketProvider>

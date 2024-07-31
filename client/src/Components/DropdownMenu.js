@@ -51,7 +51,7 @@ const StyledIcon = styled(DownIcon)({
 });
 
 export default function DropdownMenu(props) {
-  const boardsData = useSelector((state) => state.boards.boardsData);
+  const boardsData = useSelector((state) => state.user.userInfo?.boards);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -61,10 +61,6 @@ export default function DropdownMenu(props) {
     setAnchorEl(event.currentTarget);
     getBoards(true, dispatch);
   };
-
-  /* 	React.useEffect(() => {
-		if (!Object.keys(boardsData).length) getBoards(dispatch);
-	}, []); */
 
   const handleClose = () => {
     setAnchorEl(null);

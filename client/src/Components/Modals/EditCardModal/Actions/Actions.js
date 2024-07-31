@@ -1,30 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import { Container, Title } from "./styled";
 import Button from "../../../ReUsableComponents/IconButton";
 import DeleteIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { cardDelete } from "../../../../Services/listService";
+import BasePopover from "../../../ReUsableComponents/BasePopover";
+import { PopoverContainer } from "../TimeTracking/Styled";
+import {
+  BlueButton,
+  ButtonContainer,
+  RedButton,
+} from "../Popovers/Labels/styled";
+import ConfirmModal from "../../../ConfirmModal";
+
 const Actions = (props) => {
   const card = useSelector((state) => state.card);
+  const [deletePopover, setDeletePopover] = useState(false);
   const dispatch = useDispatch();
   const deleteCard = () => {
-    cardDelete(card.cardId, card.boardId, dispatch).then(() => {
+    cardDelete(card.listId, card.boardId, card.cardId, dispatch).then(() => {
       props.closeModal();
     });
   };
   return (
     <Container>
       <Title>Actions</Title>
-      {/* 	<Button title='Move' icon={<ArrowForwardIcon fontSize='1rem' />}></Button>
-			<Button title='Copy' icon={<CopyIcon fontSize='small' />}></Button>
-			<Button title='Watch' icon={<WatchIcon fontSize='small' />}></Button> */}
       <Button
         onClick={() => {
-          cardDelete(card.listId, card.boardId, card.cardId, dispatch);
+          setDeletePopover(true);
         }}
         title="Delete"
         icon={<DeleteIcon fontSize="small" />}
       ></Button>
+      {deletePopover && (
+        <ConfirmModal
+          open={true}
+          closeHandle={() => setDeletePopover(false)}
+          confirmHandle={deleteCard}
+          title="Are you sure to delete card?"
+        />
+      )}
     </Container>
   );
 };

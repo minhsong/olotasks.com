@@ -10,25 +10,33 @@ export class NotificationController {
   @Roles([])
   async getRecentlyNotifications(@Req() req) {
     const user = req.user;
-    return await this.notificationService.getRecentlyNotifications(user.id);
+    return await this.notificationService.getRecentlyNotifications(
+      user._id.toString(),
+    );
   }
 
   @Get('/unread-count')
   @Roles([])
   async getUnreadCount(@Req() req) {
-    return await this.notificationService.getUnreadCount(req.user.id);
+    return await this.notificationService.getUnreadCount(
+      req.user._id.toString(),
+    );
   }
 
   @Get('/unread')
   @Roles([])
   async getUnreadNotifications(@Req() req) {
-    return await this.notificationService.getUnreadNotifications(req.user.id);
+    return await this.notificationService.getUnreadNotifications(
+      req.user._id.toString(),
+    );
   }
 
   @Put('/mark-all-as-read')
   @Roles([])
   async markAllAsRead(@Req() req) {
-    return await this.notificationService.markAllAsRead(req.user.id);
+    return await this.notificationService.markAllAsRead(
+      req.user._id.toString(),
+    );
   }
 
   @Get('/mark-as-read/:id')
@@ -46,7 +54,9 @@ export class NotificationController {
   @Get('/delete-all')
   @Roles([])
   async deleteAllNotifications(@Req() req) {
-    return await this.notificationService.deleteAllNotifications(req.user.id);
+    return await this.notificationService.deleteAllNotifications(
+      req.user._id.toString(),
+    );
   }
 
   @Get('/:id')

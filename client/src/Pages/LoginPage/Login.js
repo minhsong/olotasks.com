@@ -78,6 +78,12 @@ const Login = () => {
               <Link fontSize="0.85rem" onClick={() => navigate("/register")}>
                 Sign up for an account
               </Link>
+              <Link
+                fontSize="0.85rem"
+                onClick={() => navigate("/forgot-password")}
+              >
+                Forgot your password?
+              </Link>
             </Form>
           </FormCard>
         </FormSection>

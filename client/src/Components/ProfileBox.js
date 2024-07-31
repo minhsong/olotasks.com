@@ -8,8 +8,8 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../Redux/Slices/userSlice";
 import { reset } from "../Redux/Slices/boardsSlice";
+import { userLogout } from "../Services/userService";
 
 export default function ProfileBox() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -79,7 +79,7 @@ export default function ProfileBox() {
         <MenuItem
           onClick={() => {
             dispatch(reset);
-            dispatch(logout());
+            userLogout(dispatch);
           }}
         >
           <ListItemIcon>

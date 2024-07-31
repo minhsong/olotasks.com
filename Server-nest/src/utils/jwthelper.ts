@@ -24,10 +24,11 @@ export const jwtDecode = async (token: string): Promise<UserTokenPayload> => {
 export const jwtSign = async (
   payload: UserTokenPayload,
   options = {},
+  expiresIn = null,
 ): Promise<string> => {
   const token = jwt
     .sign(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.TOKEN_EXPIRE_TIME,
+      expiresIn: expiresIn || process.env.TOKEN_EXPIRE_TIME,
       ...options,
     })
     .toString();

@@ -11,6 +11,7 @@ import {
   NotificationSchema,
 } from '../models/schemas/notification.schema';
 import { RedisModule } from '../redis/redis.module';
+import { Board, BoardSchema } from '../models/schemas/board.schema';
 
 @Module({
   providers: [UserService, NotificationService],
@@ -20,6 +21,7 @@ import { RedisModule } from '../redis/redis.module';
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Notification.name, schema: NotificationSchema },
+      { name: Board.name, schema: BoardSchema },
     ]),
     LoggerModule,
     RedisModule,

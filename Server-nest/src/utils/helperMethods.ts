@@ -51,7 +51,6 @@ export const userpublic = (user) => {
     ...user,
     password: undefined,
     __v: undefined,
-    email: undefined,
     createdAt: undefined,
     updatedAt: undefined,
   };
