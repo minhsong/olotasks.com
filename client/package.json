@@ -29,6 +29,7 @@
     "moment": "^2.29.1",
     "prop-types": "^15.8.1",
     "quill": "^2.0.2",
+    "quill-magic-url": "^4.2.0",
     "quill-mention": "^6.0.1",
     "react": "^18.3.0",
     "react-beautiful-dnd": "^13.1.0",

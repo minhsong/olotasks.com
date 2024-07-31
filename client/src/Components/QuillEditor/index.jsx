@@ -3,6 +3,7 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css"; // Add css for snow theme
 import { Mention, MentionBlot } from "quill-mention"; // Import quill-mention
 import "quill-mention/dist/quill.mention.css"; // Import quill-mention default styles
+import MagicUrl from "quill-magic-url";
 import { Container } from "./styled";
 
 export default ({
@@ -23,11 +24,13 @@ export default ({
       Quill.register({
         "blots/mention": MentionBlot,
         "modules/mention": Mention,
+        "modules/magicUrl": MagicUrl,
       });
       const quillInstance = new Quill(quillRef.current, {
         theme: "snow",
         placeholder: placeholder,
         modules: {
+          magicUrl: true,
           toolbar: [
             ["bold", "italic", "underline", "strike", "blockquote"],
             [
