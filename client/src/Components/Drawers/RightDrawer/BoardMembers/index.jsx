@@ -6,31 +6,68 @@ import {
   MemberSectionContainer,
   MemberInfoContainer,
   SectionHeaderContainer,
-  DescriptionSectionContainer,
   MemberEmail,
   IconWrapper,
   SectionTitle,
   MemberName,
-  DescriptionInput,
-  HiddenText,
+  MemberMenu,
+  MemberMenuButton,
 } from "./styled";
-import MemberIcon from "@mui/icons-material/PersonOutlineOutlined";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import EmailOutlined from "@mui/icons-material/EmailOutlined";
-import { boardDescriptionUpdate } from "../../../../Services/boardService";
 import { Avatar } from "@mui/material";
-import BottomButtonGroup from "../../../BottomButtonGroup/BottomButtonGroup";
 import { InviteButton, TextSpan } from "../../../TopBar/styled";
 import BasePopover from "../../../ReUsableComponents/BasePopover";
 import InviteMembers from "../../../Modals/EditCardModal/Popovers/InviteMembers/InviteMembers";
+import ConfirmModal from "../../../ConfirmModal";
+import { boardMemberDelete } from "../../../../Services/boardService";
+import { openAlert } from "../../../../Redux/Slices/alertSlice";
+import { updateMembers } from "../../../../Redux/Slices/boardSlice";
+
 const BoardMembers = () => {
-  const [invitePopover, setInvitePopover] = React.useState(null);
+  const [invitePopover, setInvitePopover] = useState(null);
+  const [removeMember, setRemoveMember] = useState(null);
+  const [board, user] = useSelector((state) => [
+    state.board,
+    state.user.userInfo,
+  ]);
+
   const dispatch = useDispatch();
 
-  const board = useSelector((state) => state.board);
+  const handleRemoveMember = () => {
+    boardMemberDelete(board.shortId, removeMember.user)
+      .then((res) => {
+        setRemoveMember(null);
+        dispatch(updateMembers(res.data));
+        dispatch(
+          openAlert({
+            message: "Member removed successfully",
+            severity: "success",
+          })
+        );
+      })
+      .catch((error) => {
+        dispatch(
+          openAlert({
+            message: error?.response?.data?.errMessage
+              ? error.response.data.errMessage
+              : error.message,
+            severity: "error",
+          })
+        );
+      });
+  };
 
   return (
     <Container>
+      {removeMember && (
+        <ConfirmModal
+          open={true}
+          closeHandle={() => setRemoveMember(null)}
+          confirmHandle={handleRemoveMember}
+          title="Are you sure to remove member?"
+        />
+      )}
       <SectionContainer>
         <SectionHeaderContainer>
           <InviteButton
@@ -61,6 +98,17 @@ const BoardMembers = () => {
                     member.name[0].toUpperCase()
                   )} ${member.surname.toUpperCase()}`}</MemberName>
                   <MemberEmail>{member.email}</MemberEmail>
+                  <MemberMenu>
+                    <MemberMenuButton>{member.role}</MemberMenuButton>
+                    {member.role != "owner" && (
+                      <MemberMenuButton
+                        className="remove"
+                        onClick={() => setRemoveMember(member)}
+                      >
+                        Remove
+                      </MemberMenuButton>
+                    )}
+                  </MemberMenu>
                 </MemberInfoContainer>
               </MemberSectionContainer>
             );
@@ -73,7 +121,50 @@ const BoardMembers = () => {
           </IconWrapper>
           <SectionTitle>Invited Members</SectionTitle>
         </SectionHeaderContainer>
-
+        {board.members
+          .filter((s) => s.status == "inviting")
+          .map((member) => {
+            return (
+              <MemberSectionContainer key={member.email}>
+                <Avatar
+                  sx={{
+                    width: "30px",
+                    height: "30px",
+                    bgcolor: member.color,
+                    fontWeight: "800",
+                  }}
+                >
+                  {member.name[0].toUpperCase()}
+                </Avatar>
+                <MemberInfoContainer>
+                  <MemberName>{`${member.name.replace(
+                    /^./,
+                    member.name[0].toUpperCase()
+                  )} ${member.surname.toUpperCase()}`}</MemberName>
+                  <MemberEmail>{member.email}</MemberEmail>
+                  <MemberMenu>
+                    <MemberMenuButton>{member.role}</MemberMenuButton>
+                    {member.role != "owner" &&
+                      (member.user != user._id ? (
+                        <MemberMenuButton
+                          className="remove"
+                          onClick={() => setRemoveMember(member)}
+                        >
+                          Remove
+                        </MemberMenuButton>
+                      ) : (
+                        <MemberMenuButton
+                          className="remove"
+                          onClick={() => setRemoveMember(member)}
+                        >
+                          Leave Board
+                        </MemberMenuButton>
+                      ))}
+                  </MemberMenu>
+                </MemberInfoContainer>
+              </MemberSectionContainer>
+            );
+          })}
         {invitePopover && (
           <BasePopover
             anchorElement={invitePopover}

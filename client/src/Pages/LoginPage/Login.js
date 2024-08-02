@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { login } from "../../Services/userService";
 import Background from "../../Components/Background";
 import {
@@ -22,20 +22,22 @@ import logo from "../../Images/trello-logo.svg";
 const Login = () => {
   let navigate = useNavigate();
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const [userInformations, setUserInformations] = useState({
     email: "",
     password: "",
   });
-
   useEffect(() => {
     document.title = "Log in to Olo Tasks";
   }, []);
   const handleSubmit = (e) => {
     e.preventDefault();
-    login(userInformations, dispatch);
+    login(userInformations, dispatch, redirect || "/boards");
   };
 
-  if (localStorage.getItem("token")) return <Navigate push to="/boards" />;
+  if (localStorage.getItem("token"))
+    return <Navigate push to={redirect || "/boards"} />;
   return (
     <>
       <BgContainer>

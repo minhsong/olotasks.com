@@ -45,6 +45,17 @@ export const MemberSectionContainer = styled.div`
   align-items: center;
   justify-content: flex-start;
   gap: 0.5rem;
+  .remove {
+    display: none;
+    cursor: pointer;
+  }
+  &:hover {
+    background-color: rgba(9, 30, 66, 0.04);
+    .remove {
+      display: flex;
+      color: red;
+    }
+  }
 `;
 
 export const MemberInfoContainer = styled.div`
@@ -52,6 +63,7 @@ export const MemberInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex-grow: 1;
 `;
 
 export const MemberName = styled.div`
@@ -116,4 +128,24 @@ export const HiddenText = styled.div`
   width: 280px;
   top: 0;
   left: 0;
+`;
+
+export const MemberMenu = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 3px;
+  padding-right: 3px;
+`;
+
+export const MemberMenuButton = styled.div`
+  font-size: 0.875rem;
+  color: #5e6c84;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 `;

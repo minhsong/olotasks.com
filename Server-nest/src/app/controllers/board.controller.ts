@@ -7,6 +7,7 @@ import {
   Body,
   Request,
   Res,
+  Delete,
 } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common/enums/http-status.enum';
 import { Response } from 'express';
@@ -245,5 +246,16 @@ export class BoardController {
   async getAll(@Request() req) {
     const user = req.user;
     return await this.boardService.getAll(user);
+  }
+
+  @Delete(':id/remove-member/:memberId')
+  @Roles([])
+  async removeMember(
+    @Param('id') id: string,
+    @Param('memberId') memberId: string,
+    @Request() req,
+  ) {
+    const user = req.user as User;
+    return await this.boardService.removeMember(id, memberId, user);
   }
 }

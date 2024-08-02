@@ -67,13 +67,13 @@ export const getThumbnailFromMeta = (metadata) => {
           return {
             ...fav,
             size: fav.sizes
-              .split('x')
-              .reduce((a, b) => parseInt(a) * parseInt(b)),
+              ? fav.sizes.split('x').reduce((a, b) => parseInt(a) * parseInt(b))
+              : 0,
           };
         })
         .sort((a, b) => b.size - a.size);
 
-      return favs[-1].href;
+      return favs[favs.length - 1].href;
     }
   }
   return null;

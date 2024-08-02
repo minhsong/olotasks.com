@@ -13,6 +13,7 @@ import {
   updateActivity,
   updateBackground,
   updateDescription,
+  updateMembers,
 } from "../Redux/Slices/boardSlice";
 
 const listRoute = process.env.REACT_APP_API_URL + "/list";
@@ -190,4 +191,37 @@ export const boardMemberAdd = async (boardId, members, dispatch) => {
       })
     );
   }
+};
+
+export const boardAddMemberByEmail = async (boardId, email, dispatch) => {
+  try {
+    const result = await axios.post(
+      `${boardRoute}/${boardId}/add-member-by-email`,
+      {
+        email,
+      }
+    );
+    await dispatch(updateMembers(result.data));
+    dispatch(
+      openAlert({
+        message: "Member is added to this board successfully",
+        severity: "success",
+      })
+    );
+  } catch (error) {
+    dispatch(
+      openAlert({
+        message: error?.response?.data?.errMessage
+          ? error.response.data.errMessage
+          : error.message,
+        severity: "error",
+      })
+    );
+  }
+};
+
+export const boardMemberDelete = async (boardId, memberId) => {
+  return await axios.delete(
+    `${boardRoute}/${boardId}/remove-member/${memberId}`
+  );
 };

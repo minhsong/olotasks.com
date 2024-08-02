@@ -173,13 +173,18 @@ export class CardService {
   ): Promise<Card & any> {
     try {
       // Get models
-      const card = await this.cardModel.findById(cardId);
-      if (!card) {
+      const card = (await this.cardModel
+        .findById(cardId)
+        .populate('board')
+        .exec()) as any;
+
+      if (!card || !card.board || card.board.shortId !== boardId) {
         throw new Error('Card not found');
       }
-      const board = await this.boardModel.findOne({ shortId: boardId });
       // Validate owner
-      const validate = await validateCardOwners(card, board, user, false);
+      const validate = card.board.members.find(
+        (m) => m.user.toString() === user._id.toString(),
+      );
       if (!validate) {
         throw new Error('You dont have permission to update this card');
       }
@@ -188,6 +193,7 @@ export class CardService {
         ...card.toJSON(),
         listId: card.owner,
         boardId,
+        board: card.board._id,
       };
 
       return returnObject;
@@ -1035,7 +1041,7 @@ export class CardService {
       const cardJson = await card.toJSON();
       return { ...cardJson, boardTitle: board.title };
     } catch (error) {
-      throw new Error('Something went wrong');
+      throw new Error(error);
     }
   }
 

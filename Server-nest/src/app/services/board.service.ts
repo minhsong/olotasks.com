@@ -298,4 +298,59 @@ export class BoardService {
       throw new Error('Something went wrong');
     }
   }
+
+  async removeMember(boardId, memberId, user: User): Promise<any> {
+    try {
+      // Get board by id
+      const board = await this.boardModel.findOne({ shortId: boardId });
+
+      if (!board) throw new Error('Board not found!');
+
+      // Validate user is owner or member of this board
+      const validate = board.members.filter(
+        (member) =>
+          member.user.toString() === user._id.toString() &&
+          member.role === 'owner',
+      );
+      if (!validate)
+        throw new Error(
+          'You can not remove member from this board, you are not a member or owner!',
+        );
+
+      // Set variables
+      const member = await this.userModel.findById(memberId);
+      if (member) {
+        const memberBoard = board.members.find(
+          (member) => member.user.toString() === memberId,
+        );
+        if (memberBoard.role === 'owner') {
+          throw new Error('You can not remove owner of this board!');
+        }
+
+        member.boards = member.boards.filter(
+          (board) => board.toString() !== board._id.toString(),
+        );
+        await member.save();
+      }
+
+      board.members = board.members.filter(
+        (member) => member.user.toString() !== memberId,
+      );
+
+      // Add to board activity
+      board.activity.push({
+        user: user.id,
+        name: user.name,
+        action: `removed user '${member.name}' from this board`,
+        color: user.color,
+      });
+
+      // Save changes
+      await board.save();
+
+      return board.members;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }

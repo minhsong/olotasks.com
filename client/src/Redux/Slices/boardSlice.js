@@ -74,6 +74,9 @@ const boardSlice = createSlice({
     updateSearch: (state, action) => {
       state.Search = action.payload;
     },
+    updateMembers: (state, action) => {
+      state.members = action.payload;
+    },
   },
 });
 
@@ -88,5 +91,6 @@ export const {
   addMembers,
   updateBoardLabels,
   updateSearch,
+  updateMembers,
 } = boardSlice.actions;
 export default boardSlice.reducer;

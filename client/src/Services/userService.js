@@ -58,7 +58,7 @@ export const register = async (
   dispatch(registrationEnd());
 };
 
-export const login = async ({ email, password }, dispatch) => {
+export const login = async ({ email, password }, dispatch, redirect) => {
   dispatch(loginStart());
   try {
     const res = await axios.post(baseUrl + "login", { email, password });
@@ -71,7 +71,7 @@ export const login = async ({ email, password }, dispatch) => {
         message,
         severity: "success",
         duration: 500,
-        nextRoute: "/boards",
+        nextRoute: redirect,
       })
     );
   } catch (error) {
