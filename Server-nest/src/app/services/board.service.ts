@@ -233,10 +233,9 @@ export class BoardService {
       // Set variables
       await Promise.all(
         members.map(async (member) => {
-          const newMember = inviting
-            ? user
-            : await this.userModel.findById(member._id);
+          const newMember = await this.userModel.findById(member._id);
           newMember.boards.push(board._id as any);
+          newMember.boards = uniqBy(newMember.boards, 'toString');
           await newMember.save();
           board.members.push({
             user: newMember._id,
@@ -251,12 +250,12 @@ export class BoardService {
           board.members = uniqBy(board.members, 'user');
 
           // Add to board activity
-          // board.activity.push({
-          //   user: user.id,
-          //   name: user.name,
-          //   action: `added user '${newMember.name}' to this board`,
-          //   color: user.color,
-          // });
+          board.activity.push({
+            user: user.id,
+            name: user.name,
+            action: `${user.name} added user '${newMember.name}' to this board`,
+            color: user.color,
+          });
         }),
       );
       // Save changes
@@ -317,6 +316,10 @@ export class BoardService {
           'You can not remove member from this board, you are not a member or owner!',
         );
 
+      if (memberId === user._id.toString()) {
+        throw new Error('You can not remove yourself from this board!');
+      }
+
       // Set variables
       const member = await this.userModel.findById(memberId);
       if (member) {
@@ -342,6 +345,52 @@ export class BoardService {
         user: user.id,
         name: user.name,
         action: `removed user '${member.name}' from this board`,
+        color: user.color,
+      });
+
+      // Save changes
+      await board.save();
+
+      return board.members;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async leaveBoard(boardId, user: User): Promise<any> {
+    try {
+      // Get board by id
+      const board = await this.boardModel.findOne({ shortId: boardId });
+
+      if (!board) throw new Error('Board not found!');
+
+      // Validate user is owner or member of this board
+      const validate = board.members.filter(
+        (member) =>
+          member.user.toString() === user._id.toString() &&
+          member.role === 'owner',
+      );
+      if (!validate)
+        throw new Error('You can not leave this board, you are owner!');
+
+      // Set variables
+      const member = await this.userModel.findById(user._id);
+      if (member) {
+        member.boards = member.boards.filter(
+          (board) => board.toString() !== board._id.toString(),
+        );
+        await member.save();
+      }
+
+      board.members = board.members.filter(
+        (member) => member.user.toString() !== user._id.toString(),
+      );
+
+      // Add to board activity
+      board.activity.push({
+        user: user.id,
+        name: user.name,
+        action: `left this board`,
         color: user.color,
       });
 

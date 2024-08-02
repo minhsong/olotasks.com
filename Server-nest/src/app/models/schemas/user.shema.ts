@@ -9,8 +9,8 @@ export class User extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
-  surname: string;
+  @Prop()
+  surname?: string;
 
   @Prop({ required: true, unique: true })
   email: string;
@@ -28,10 +28,10 @@ export class User extends Document {
   boards: Types.ObjectId[];
 
   @Prop({
-    enum: ['inviting', 'invited', 'accepted', 'rejected'],
+    enum: ['inviting', 'invited', 'registered'],
     default: 'inviting',
   })
-  status: 'inviting' | 'invited' | 'accepted' | 'rejected';
+  status: 'inviting' | 'invited' | 'registered';
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

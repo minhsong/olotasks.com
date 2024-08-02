@@ -11,7 +11,7 @@ export class BoardMember {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop()
   surname: string;
 
   @Prop({ required: true })
@@ -23,7 +23,7 @@ export class BoardMember {
   @Prop({ required: true })
   color: string;
 
-  @Prop({ enum: ['active', 'invited'], default: 'active' })
+  @Prop({ enum: ['active', 'invited', 'inviting'], default: 'active' })
   status: string;
 }
 

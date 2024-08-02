@@ -20,7 +20,10 @@ import { InviteButton, TextSpan } from "../../../TopBar/styled";
 import BasePopover from "../../../ReUsableComponents/BasePopover";
 import InviteMembers from "../../../Modals/EditCardModal/Popovers/InviteMembers/InviteMembers";
 import ConfirmModal from "../../../ConfirmModal";
-import { boardMemberDelete } from "../../../../Services/boardService";
+import {
+  boardMemberDelete,
+  boardMemberResendInvite,
+} from "../../../../Services/boardService";
 import { openAlert } from "../../../../Redux/Slices/alertSlice";
 import { updateMembers } from "../../../../Redux/Slices/boardSlice";
 
@@ -57,6 +60,19 @@ const BoardMembers = () => {
         );
       });
   };
+
+  const resentInviteClick = (email) => {
+    boardMemberResendInvite(board.shortId, email).then((res) => {
+      dispatch(
+        openAlert({
+          message: "Invite resent successfully",
+          severity: "success",
+        })
+      );
+    });
+  };
+
+  const loggedMember = board.members.find((m) => m.user == user._id);
 
   return (
     <Container>
@@ -100,14 +116,24 @@ const BoardMembers = () => {
                   <MemberEmail>{member.email}</MemberEmail>
                   <MemberMenu>
                     <MemberMenuButton>{member.role}</MemberMenuButton>
-                    {member.role != "owner" && (
-                      <MemberMenuButton
-                        className="remove"
-                        onClick={() => setRemoveMember(member)}
-                      >
-                        Remove
-                      </MemberMenuButton>
-                    )}
+                    {loggedMember.role == "owner" &&
+                      member.user != loggedMember.user && (
+                        <MemberMenuButton
+                          className="remove"
+                          onClick={() => setRemoveMember(member)}
+                        >
+                          Remove
+                        </MemberMenuButton>
+                      )}
+                    {loggedMember.role != "owner" &&
+                      member.user == loggedMember.user && (
+                        <MemberMenuButton
+                          className="remove"
+                          onClick={() => setRemoveMember(member)}
+                        >
+                          Leave Board
+                        </MemberMenuButton>
+                      )}
                   </MemberMenu>
                 </MemberInfoContainer>
               </MemberSectionContainer>
@@ -144,22 +170,27 @@ const BoardMembers = () => {
                   <MemberEmail>{member.email}</MemberEmail>
                   <MemberMenu>
                     <MemberMenuButton>{member.role}</MemberMenuButton>
-                    {member.role != "owner" &&
-                      (member.user != user._id ? (
+                    {loggedMember.role == "owner" && (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          flexDirection: "row",
+                        }}
+                        className="remove"
+                      >
                         <MemberMenuButton
-                          className="remove"
+                          onClick={() => resentInviteClick(member.email)}
+                        >
+                          Resent
+                        </MemberMenuButton>
+                        <MemberMenuButton
                           onClick={() => setRemoveMember(member)}
                         >
-                          Remove
+                          Cancel
                         </MemberMenuButton>
-                      ) : (
-                        <MemberMenuButton
-                          className="remove"
-                          onClick={() => setRemoveMember(member)}
-                        >
-                          Leave Board
-                        </MemberMenuButton>
-                      ))}
+                      </div>
+                    )}
                   </MemberMenu>
                 </MemberInfoContainer>
               </MemberSectionContainer>

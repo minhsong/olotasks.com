@@ -25,6 +25,7 @@ import EditAttachmentPopover from "../Popovers/Attachment/EditAttachmentPopover"
 import moment from "moment";
 import AddAttachmentPopover from "../Popovers/Attachment/AddAttachmentPopover";
 import { DocumentScanner, VideoLibrary } from "@mui/icons-material";
+import { isEmpty } from "lodash-es";
 
 const Attachments = (props) => {
   const card = useSelector((state) => state.card);
@@ -45,6 +46,9 @@ const Attachments = (props) => {
 
   const AttachmentFileIcon = (attachment) => {
     const { fileType, thumbnail } = attachment;
+    if (!isEmpty(thumbnail)) {
+      return <Thumbnail src={thumbnail} />;
+    }
     switch (fileType) {
       case "image":
         return thumbnail ? (
@@ -65,7 +69,7 @@ const Attachments = (props) => {
       <Container>
         <AttachmentIcon fontSize="small" />
         <RightWrapper>
-          <Title>Attachments</Title>
+          <Title>Attachments({card.attachments?.length})</Title>
           {card.attachments?.map((attachment) => {
             const validateLink = () => {};
             validateLink();

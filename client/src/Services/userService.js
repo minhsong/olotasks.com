@@ -153,3 +153,7 @@ export const requestResetPassword = async (data) => {
 export const resetPassword = async (data) => {
   return axios.post(baseUrl + "reset-password", data);
 };
+
+export const completeInvite = async (data) => {
+  return axios.post(baseUrl + "complete-invite", data);
+};

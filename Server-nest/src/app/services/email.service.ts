@@ -29,7 +29,7 @@ export class EmailService {
 
     try {
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('Email sent: %s', info.messageId);
+      console.log('Email sent: %s', info.messageId, mailOptions.to);
       return info;
     } catch (error) {
       console.error('Error sending email: ', error);

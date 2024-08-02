@@ -12,9 +12,10 @@ import {
 } from '../models/schemas/notification.schema';
 import { RedisModule } from '../redis/redis.module';
 import { Board, BoardSchema } from '../models/schemas/board.schema';
+import { EmailService } from '../services/email.service';
 
 @Module({
-  providers: [UserService, NotificationService],
+  providers: [UserService, NotificationService, EmailService],
   controllers: [UserController, NotificationController],
   exports: [UserService],
   imports: [

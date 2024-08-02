@@ -193,6 +193,34 @@ export const boardMemberAdd = async (boardId, members, dispatch) => {
   }
 };
 
+export const boardAddMemberByEmails = async (boardId, emails, dispatch) => {
+  try {
+    const result = await axios.post(
+      `${boardRoute}/${boardId}/add-member-by-emails`,
+      {
+        emails,
+      }
+    );
+    await dispatch(updateMembers(result.data));
+    dispatch(
+      openAlert({
+        message: "Members are added to this board successfully",
+        severity: "success",
+      })
+    );
+    return result.data;
+  } catch (error) {
+    dispatch(
+      openAlert({
+        message: error?.response?.data?.errMessage
+          ? error.response.data.errMessage
+          : error.message,
+        severity: "error",
+      })
+    );
+  }
+};
+
 export const boardAddMemberByEmail = async (boardId, email, dispatch) => {
   try {
     const result = await axios.post(
@@ -224,4 +252,10 @@ export const boardMemberDelete = async (boardId, memberId) => {
   return await axios.delete(
     `${boardRoute}/${boardId}/remove-member/${memberId}`
   );
+};
+
+export const boardMemberResendInvite = async (boardId, email) => {
+  return await axios.post(`${boardRoute}/${boardId}/resend-invite`, {
+    email,
+  });
 };

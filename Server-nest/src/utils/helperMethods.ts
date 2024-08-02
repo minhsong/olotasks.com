@@ -61,6 +61,7 @@ export const getThumbnailFromMeta = (metadata) => {
     if (metadata.image) return metadata.image;
     if (metadata['og:image']) return metadata['og:image'];
     if (metadata['twitter:image']) return metadata['twitter:image'];
+    if (metadata.faviconUrl) return metadata.faviconUrl;
     if (metadata.favicons && metadata.favicons.length > 0) {
       const favs = metadata.favicons
         .map((fav) => {

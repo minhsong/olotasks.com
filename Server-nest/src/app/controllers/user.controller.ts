@@ -26,6 +26,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly redisService: RedisService,
+    private readonly emailService: EmailService,
   ) {}
 
   @Post('register')
@@ -125,7 +126,6 @@ export class UserController {
     }
 
     const token = await jwtSign({ email: user.email, id: user._id }, {}, '1h');
-    const emailService = new EmailService();
     const link = `${process.env.CLIENT_URL}/reset-password/${token}`;
     const mailOptions = {
       from: process.env.EMAIL_FROM_ADDRESS,
@@ -135,7 +135,7 @@ export class UserController {
       html: `<p>Please click the link to reset your password: <a href="${link}">${link}</a></p><p>Link expires in 1 hour</p>`,
     };
     try {
-      await emailService.sendEmail(
+      await this.emailService.sendEmail(
         email,
         mailOptions.subject,
         mailOptions.text,
@@ -166,5 +166,51 @@ export class UserController {
       await hashPassword(password),
     );
     return { message: 'Password updated!' };
+  }
+  @Post('complete-invite')
+  async loadInvitingUser(
+    @Body() body: UserRegisterDto & { token: string },
+    @Res() res: any,
+  ) {
+    const { token, email, name, password, surname } = body;
+    const user = await jwtDecode(token);
+    if (!user) {
+      throw Error('Invalid token!');
+    }
+    if (user.email !== email) {
+      throw Error('Invalid email!');
+    }
+
+    const invitedUser = await this.userService.getUserWithMail(user.email);
+    if (!invitedUser) {
+      throw Error('User not found!');
+    }
+
+    if (invitedUser.status !== 'inviting') {
+      return res.status(200).send({
+        message: 'User login successful!',
+        user: {
+          ...userPrivate(invitedUser),
+          token: await jwtSign({
+            id: invitedUser._id,
+            email: invitedUser.email,
+          }),
+        },
+      });
+    } else {
+      const result = await this.userService.updateUser(invitedUser._id, {
+        name,
+        surname,
+        password: await hashPassword(password),
+        status: 'active',
+      });
+      return res.status(200).send({
+        message: 'User login successful!',
+        token: await jwtSign({
+          id: result._id,
+          email: result.email,
+        }),
+      });
+    }
   }
 }
