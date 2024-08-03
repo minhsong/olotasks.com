@@ -395,7 +395,10 @@ export class CardService {
         color: member.color,
       });
       card.members = uniqBy(card.members, 'user');
-      await card.save();
+      await this.cardModel.updateOne(
+        { _id: card._id },
+        { members: card.members },
+      );
 
       this.activityModel.create({
         board: boardId,
