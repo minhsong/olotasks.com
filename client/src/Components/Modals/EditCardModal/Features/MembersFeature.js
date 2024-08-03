@@ -4,6 +4,7 @@ import MembersPopover from "../Popovers/Members/MembersPopover";
 import BasePopover from "../../../ReUsableComponents/BasePopover";
 import { Title, RowContainer, AddAvatar } from "./styled";
 import { Avatar } from "@mui/material";
+import AvatarIcon from "../../../AvatarIcon";
 const MembersFeature = (props) => {
   const card = useSelector((state) => state.card);
   const [memberPopover, setMemberPopover] = React.useState(null);
@@ -12,20 +13,7 @@ const MembersFeature = (props) => {
       <Title>Members</Title>
       <RowContainer>
         {card.members.map((member, index) => {
-          return (
-            <Avatar
-              key={index}
-              sx={{
-                width: 32,
-                height: 32,
-                bgcolor: member.color,
-                fontSize: "0.875rem",
-                fontWeight: "800",
-              }}
-            >
-              {member.name[0].toUpperCase()}
-            </Avatar>
-          );
+          return <AvatarIcon id={member.user} {...member} />;
         })}
         <AddAvatar onClick={(event) => setMemberPopover(event.currentTarget)}>
           +

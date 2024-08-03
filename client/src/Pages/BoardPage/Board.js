@@ -17,6 +17,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import EditCard from "../../Components/Modals/EditCardModal/EditCard";
 import { useWebSocket } from "../../Components/Websocket/WebSocketContext";
 import { isEmpty } from "lodash-es";
+import ConfirmModal from "../../Components/ConfirmModal";
 
 const Board = (props) => {
   /* props.match.params.id */
@@ -99,7 +100,15 @@ const Board = (props) => {
     return (
       <>
         <Navbar />
-        <style.Container isImage={false} color="blue"></style.Container>
+        <style.Container isImage={false} color="blue">
+          <ConfirmModal
+            open
+            title="Board Not Found!"
+            closeHandle={() => {
+              navigate("/boards");
+            }}
+          />
+        </style.Container>
       </>
     );
 

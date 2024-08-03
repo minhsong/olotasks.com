@@ -10,13 +10,13 @@ import Logout from "@mui/icons-material/Logout";
 import { useDispatch, useSelector } from "react-redux";
 import { reset } from "../Redux/Slices/boardsSlice";
 import { userLogout } from "../Services/userService";
+import AvatarIcon from "./AvatarIcon";
 
 export default function ProfileBox() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const dispatch = useDispatch();
   const open = Boolean(anchorEl);
-  const name = useSelector((state) => state.user.userInfo.name);
-  const color = useSelector((state) => state.user.userInfo.color);
+  const user = useSelector((state) => state.user.userInfo);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -28,17 +28,15 @@ export default function ProfileBox() {
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
         <Tooltip title="Logout">
           <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
-            <Avatar
+            <AvatarIcon
+              {...user}
               sx={{
                 width: 32,
                 height: 32,
-                bgcolor: color,
                 fontSize: "0.875rem",
                 fontWeight: "800",
               }}
-            >
-              {name && name[0]}
-            </Avatar>
+            />
           </IconButton>
         </Tooltip>
       </Box>

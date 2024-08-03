@@ -157,6 +157,7 @@ export class Card extends Document {
       {
         user: { type: Types.ObjectId, ref: 'User' },
         name: { type: String },
+        surename: { type: String },
         color: { type: String },
       },
     ],
@@ -165,6 +166,7 @@ export class Card extends Document {
   members: {
     user: Types.ObjectId;
     name: string;
+    surename: string;
     color: string;
   }[];
 

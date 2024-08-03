@@ -38,6 +38,27 @@ export const TimeRow = styled.div`
   padding: 0.5rem 0;
 `;
 
+export const TimeSum = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.5rem 0;
+`;
+
+export const TimeSumContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(9, 30, 66, 0.13);
+  > div:nth-child(n + 2) {
+    border-left: 1px solid rgba(9, 30, 66, 0.13);
+    padding-left: 1rem;
+  }
+`;
+
 export const ModelContainer = styled.div`
   display: flex;
   flex-direction: column;

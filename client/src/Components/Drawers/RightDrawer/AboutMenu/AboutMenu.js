@@ -19,6 +19,7 @@ import DescriptionIcon from "@mui/icons-material/TextSnippetOutlined";
 import { boardDescriptionUpdate } from "../../../../Services/boardService";
 import { Avatar } from "@mui/material";
 import BottomButtonGroup from "../../../BottomButtonGroup/BottomButtonGroup";
+import AvatarIcon from "../../../AvatarIcon";
 const AboutMenu = () => {
   const textAreaRef = useRef();
   const hiddenTextRef = useRef();
@@ -68,21 +69,12 @@ const AboutMenu = () => {
           .map((member) => {
             return (
               <MemberSectionContainer key={member.email}>
-                <Avatar
-                  sx={{
-                    width: "3rem",
-                    height: "3rem",
-                    bgcolor: member.color,
-                    fontWeight: "800",
-                  }}
-                >
-                  {member.name[0].toUpperCase()}
-                </Avatar>
+                <AvatarIcon id={member.user} {...member} />
                 <MemberInfoContainer>
                   <MemberName>{`${member.name.replace(
                     /^./,
                     member.name[0].toUpperCase()
-                  )} ${member.surname.toUpperCase()}`}</MemberName>
+                  )} ${member.surename.toUpperCase()}`}</MemberName>
                   <MemberEmail>{member.email}</MemberEmail>
                 </MemberInfoContainer>
               </MemberSectionContainer>

@@ -35,12 +35,12 @@ export class UserController {
     @Req() req: any,
     @Res() res: Response,
   ) {
-    const { name, surname, email, password } = body;
+    const { name, surename, email, password } = body;
 
     const result = await this.userService
       .register({
         name,
-        surname,
+        surename,
         email,
         password: await hashPassword(password),
       })
@@ -172,7 +172,7 @@ export class UserController {
     @Body() body: UserRegisterDto & { token: string },
     @Res() res: any,
   ) {
-    const { token, email, name, password, surname } = body;
+    const { token, email, name, password, surename } = body;
     const user = await jwtDecode(token);
     if (!user) {
       throw Error('Invalid token!');
@@ -200,7 +200,7 @@ export class UserController {
     } else {
       const result = await this.userService.updateUser(invitedUser._id, {
         name,
-        surname,
+        surename,
         password: await hashPassword(password),
         status: 'active',
       });

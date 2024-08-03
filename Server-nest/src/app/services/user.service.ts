@@ -31,7 +31,7 @@ export class UserService {
       if (userExist.status === 'inviting') {
         return await this.updateUser(userExist._id, {
           name: user.name,
-          surname: user.surname,
+          surename: user.surename,
           password: user.password,
           status: 'invited',
         });
@@ -117,7 +117,7 @@ export class UserService {
       email,
       color: createRandomHexColor(),
       name: email.split('@')[0],
-      surname: '',
+      surename: '',
       password: await hashPassword(generateRandomString(6)),
       status: 'inviting',
     });
@@ -162,7 +162,7 @@ export class UserService {
           if (member.user.toString() === updatedUser._id.toString()) {
             member.status = 'active';
             member.name = updatedUser.name;
-            member.surname = updatedUser.surname;
+            member.surename = updatedUser.surename;
           }
         });
         await board.save();

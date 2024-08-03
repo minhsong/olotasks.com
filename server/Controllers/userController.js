@@ -3,8 +3,8 @@ const userService = require("../Services/userService");
 const auth = require("../Middlewares/auth");
 
 const register = async (req, res) => {
-  const { name, surname, email, password } = req.body;
-  if (!(name && surname && email && password))
+  const { name, surename, email, password } = req.body;
+  if (!(name && surename && email && password))
     return res
       .status("400")
       .send({ errMessage: "Please fill all required areas!" });
@@ -64,7 +64,7 @@ const getUserWithMail = async (req, res) => {
 
     const dataTransferObject = {
       name: result.name,
-      surname: result.surname,
+      surename: result.surename,
       color: result.color,
       email: result.email,
     };

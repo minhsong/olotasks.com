@@ -29,6 +29,7 @@ import { Avatar } from "@mui/material";
 import { secondsToTimeString } from "../../Utils/estimateTimeHelper";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import AvatarIcon from "../AvatarIcon";
 
 const Card = (props) => {
   const [openModal, setOpenModal] = useState(false);
@@ -210,8 +211,10 @@ const Card = (props) => {
                       {card.members &&
                         card.members.map((member, i) => {
                           return (
-                            <Avatar
+                            <AvatarIcon
                               key={i}
+                              id={member.user}
+                              {...member}
                               sx={{
                                 width: 20,
                                 height: 20,
@@ -219,14 +222,7 @@ const Card = (props) => {
                                 fontSize: "0.6rem",
                                 fontWeight: "600",
                               }}
-                            >
-                              {member.name
-                                .split(/\s+/)
-                                .map((s) => s.trim())
-                                .filter((s) => !!s)
-                                .map((s) => s[0].toUpperCase().toUpperCase())
-                                .splice(0, 2)}
-                            </Avatar>
+                            />
                           );
                         })}
                     </MembersWrapper>

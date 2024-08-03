@@ -46,7 +46,7 @@ export class BoardService {
       allMembers.push({
         user: user.id,
         name: user.name,
-        surname: user.surname,
+        surename: user.surename,
         email: user.email,
         color: user.color,
         role: 'owner',
@@ -65,7 +65,7 @@ export class BoardService {
           allMembers.push({
             user: newMember.id,
             name: newMember.name,
-            surname: newMember.surname,
+            surename: newMember.surename,
             email: newMember.email,
             color: newMember.color,
             role: 'member',
@@ -134,10 +134,17 @@ export class BoardService {
     }
   }
 
-  async getBoardByShortId(shortId): Promise<Board> {
+  async getBoardByShortId(shortId, user): Promise<Board> {
     try {
       // Get board by id
-      const board = await this.boardModel.findOne({ shortId });
+      console.log({
+        shortId,
+        members: { $elemMatch: { user: new ObjectId(user) } },
+      });
+      const board = await this.boardModel.findOne({
+        shortId,
+        members: { $elemMatch: { user: new ObjectId(user) } },
+      });
       return board;
     } catch (error) {
       throw new Error(error);
@@ -240,7 +247,7 @@ export class BoardService {
           board.members.push({
             user: newMember._id,
             name: newMember.name,
-            surname: newMember.surname,
+            surename: newMember.surename,
             email: newMember.email,
             color: newMember.color,
             role: 'member',
@@ -344,7 +351,7 @@ export class BoardService {
       board.activity.push({
         user: user.id,
         name: user.name,
-        action: `removed user '${member.name}' from this board`,
+        action: `removed user '${member?.name}' from this board`,
         color: user.color,
       });
 

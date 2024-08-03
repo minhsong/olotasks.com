@@ -24,7 +24,7 @@ const create = async (req, callback) => {
     allMembers.push({
       user: user.id,
       name: user.name,
-      surname: user.surname,
+      surename: user.surename,
       email: user.email,
       color: user.color,
       role: "owner",
@@ -40,7 +40,7 @@ const create = async (req, callback) => {
         allMembers.push({
           user: newMember._id,
           name: newMember.name,
-          surname: newMember.surname,
+          surename: newMember.surename,
           email: newMember.email,
           color: newMember.color,
           role: "member",
@@ -209,7 +209,7 @@ const addMember = async (id, members, user, callback) => {
         board.members.push({
           user: newMember._id,
           name: newMember.name,
-          surname: newMember.surname,
+          surename: newMember.surename,
           email: newMember.email,
           color: newMember.color,
           role: "member",

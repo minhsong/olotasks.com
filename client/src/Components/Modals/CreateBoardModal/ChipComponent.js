@@ -13,12 +13,12 @@ const useStyles = makeStyles({
 });
 
 const ChipComponent = (props) => {
-  const { name, surname, email, callback } = props;
+  const { name, surename, email, callback } = props;
   const classes = useStyles();
   return (
     <Tooltip
       TransitionComponent={Zoom}
-      title={`${name} ${surname}`}
+      title={`${name} ${surename}`}
       size="small"
       placement="top"
       arrow

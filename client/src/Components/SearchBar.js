@@ -100,7 +100,7 @@ const SearchBar = (props) => {
         data={uniqBy(board?.members, "user").map((member) => ({
           ...member,
           id: member.user,
-          display: `${member.name} ${member.surname}`,
+          display: `${member.name} ${member.surename}`,
         }))}
       />
     </Container>

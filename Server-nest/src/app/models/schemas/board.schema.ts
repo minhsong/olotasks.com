@@ -12,7 +12,7 @@ export class BoardMember {
   name: string;
 
   @Prop()
-  surname: string;
+  surename: string;
 
   @Prop({ required: true })
   email: string;

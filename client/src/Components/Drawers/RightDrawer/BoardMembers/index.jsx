@@ -26,6 +26,7 @@ import {
 } from "../../../../Services/boardService";
 import { openAlert } from "../../../../Redux/Slices/alertSlice";
 import { updateMembers } from "../../../../Redux/Slices/boardSlice";
+import AvatarIcon from "../../../AvatarIcon";
 
 const BoardMembers = () => {
   const [invitePopover, setInvitePopover] = useState(null);
@@ -98,25 +99,16 @@ const BoardMembers = () => {
           .map((member) => {
             return (
               <MemberSectionContainer key={member.email}>
-                <Avatar
-                  sx={{
-                    width: "30px",
-                    height: "30px",
-                    bgcolor: member.color,
-                    fontWeight: "800",
-                  }}
-                >
-                  {member.name[0].toUpperCase()}
-                </Avatar>
+                <AvatarIcon id={member.user} {...member} />
                 <MemberInfoContainer>
                   <MemberName>{`${member.name.replace(
                     /^./,
                     member.name[0].toUpperCase()
-                  )} ${member.surname.toUpperCase()}`}</MemberName>
+                  )} ${member.surename.toUpperCase()}`}</MemberName>
                   <MemberEmail>{member.email}</MemberEmail>
                   <MemberMenu>
                     <MemberMenuButton>{member.role}</MemberMenuButton>
-                    {loggedMember.role == "owner" &&
+                    {["owner", "admin"].includes(loggedMember.role) &&
                       member.user != loggedMember.user && (
                         <MemberMenuButton
                           className="remove"
@@ -152,21 +144,12 @@ const BoardMembers = () => {
           .map((member) => {
             return (
               <MemberSectionContainer key={member.email}>
-                <Avatar
-                  sx={{
-                    width: "30px",
-                    height: "30px",
-                    bgcolor: member.color,
-                    fontWeight: "800",
-                  }}
-                >
-                  {member.name[0].toUpperCase()}
-                </Avatar>
+                <AvatarIcon id={member.user} {...member} />
                 <MemberInfoContainer>
                   <MemberName>{`${member.name.replace(
                     /^./,
                     member.name[0].toUpperCase()
-                  )} ${member.surname.toUpperCase()}`}</MemberName>
+                  )} ${member.surename.toUpperCase()}`}</MemberName>
                   <MemberEmail>{member.email}</MemberEmail>
                   <MemberMenu>
                     <MemberMenuButton>{member.role}</MemberMenuButton>

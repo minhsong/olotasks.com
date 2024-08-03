@@ -35,12 +35,16 @@ const ConfirmModal = ({
           {children}
         </Box>
         <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-          <Button onClick={closeHandle} sx={{ mr: 2 }}>
-            Cancel
-          </Button>
-          <Button onClick={confirmHandle} variant="contained" color="primary">
-            Confirm
-          </Button>
+          {closeHandle && (
+            <Button onClick={closeHandle} sx={{ mr: 2 }}>
+              Cancel
+            </Button>
+          )}
+          {confirmHandle && (
+            <Button onClick={confirmHandle} variant="contained" color="primary">
+              Confirm
+            </Button>
+          )}
         </Box>
       </Box>
     </Modal>
@@ -50,8 +54,8 @@ const ConfirmModal = ({
 ConfirmModal.propTypes = {
   title: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
-  confirmHandle: PropTypes.func.isRequired,
-  closeHandle: PropTypes.func.isRequired,
+  confirmHandle: PropTypes.func,
+  closeHandle: PropTypes.func,
   open: PropTypes.bool.isRequired,
 };
 

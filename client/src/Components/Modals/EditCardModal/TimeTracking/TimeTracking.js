@@ -1,7 +1,15 @@
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar } from "@mui/material";
-import { TimeRow, TimeTable, Title, TitleWrapper, Container } from "./Styled";
+import {
+  TimeRow,
+  TimeTable,
+  Title,
+  TitleWrapper,
+  Container,
+  TimeSum,
+  TimeSumContainer,
+} from "./Styled";
 import Button from "../../../ReUsableComponents/Button";
 import { Timer } from "@mui/icons-material";
 import TimeTrackingButton from "../../../ReUsableComponents/TimeTrackingButton";
@@ -20,6 +28,7 @@ import {
 } from "../../../../Services/cardService";
 import UserTimeTrackingModel from "./UserTimeTrackingModel";
 import TaskComment from "./TaskCommen";
+import AvatarIcon from "../../../AvatarIcon";
 
 const TimeTracking = () => {
   const dispatch = useDispatch();
@@ -87,19 +96,9 @@ const TimeTracking = () => {
         .filter((u) => s.user == u.user)
         .reduce((acc, time) => acc + time.loggedTime, 0);
       return (
-        <TimeRow key={s.user}>
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            <Avatar
-              sx={{
-                width: 28,
-                height: 28,
-                bgcolor: s.color,
-                fontSize: "0.875rem",
-                fontWeight: "800",
-              }}
-            >
-              {user.userInfo?.name && user.userInfo?.name[0].toUpperCase()}
-            </Avatar>
+        <TimeSum>
+          <div key={s.user} style={{ display: "flex", flexDirection: "row" }}>
+            <AvatarIcon id={s.user} {...s} />
             <div
               style={{
                 display: "flex",
@@ -107,13 +106,13 @@ const TimeTracking = () => {
                 marginLeft: "0.5em",
               }}
             >
-              <span style={{ fontWeight: "bold" }}>{user.userInfo.name}</span>
+              <span style={{ fontWeight: "bold" }}>{s.userName}</span>
               <span style={{ fontSize: "0.75em", color: "#5e6c84" }}>
                 {secondsToTimeString(time)}
               </span>
             </div>
           </div>
-        </TimeRow>
+        </TimeSum>
       );
     });
   };
@@ -128,17 +127,7 @@ const TimeTracking = () => {
     return (
       <TimeRow key={user.userInfo._id}>
         <div style={{ display: "flex", flexDirection: "row" }}>
-          <Avatar
-            sx={{
-              width: 28,
-              height: 28,
-              bgcolor: user.userInfo.color,
-              fontSize: "0.875rem",
-              fontWeight: "800",
-            }}
-          >
-            {user.userInfo?.name && user.userInfo?.name[0].toUpperCase()}
-          </Avatar>
+          <AvatarIcon {...user.userInfo} />
           <div
             style={{
               display: "flex",
@@ -252,7 +241,7 @@ const TimeTracking = () => {
           </div>
         </div>
         <TimeTable>
-          {TimeRows()}
+          <TimeSumContainer> {TimeRows()}</TimeSumContainer>
           {loggedUserTimeRow()}
         </TimeTable>
       </Container>

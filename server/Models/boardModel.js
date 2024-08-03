@@ -73,7 +73,7 @@ export class boardSchema {
         name: {
           type: String,
         },
-        surname: {
+        surename: {
           type: String,
         },
         email: {

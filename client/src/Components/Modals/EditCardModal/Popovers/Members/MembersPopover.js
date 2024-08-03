@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { memberAdd, memberDelete } from "../../../../../Services/cardService";
 import { Avatar } from "@mui/material";
 import { uniqBy } from "lodash-es";
+import AvatarIcon from "../../../../AvatarIcon";
 
 const Container = styled.div`
   width: 100%;
@@ -101,17 +102,7 @@ const MemberComponent = (props) => {
   };
   return (
     <MemberWrapper onClick={handleClick}>
-      <Avatar
-        sx={{
-          width: 28,
-          height: 28,
-          bgcolor: props.color,
-          fontSize: "0.875rem",
-          fontWeight: "800",
-        }}
-      >
-        {props.name[0].toUpperCase()}
-      </Avatar>
+      <AvatarIcon id={props.user} {...props} />
       <MemberName>{props.name}</MemberName>
       {isMember && (
         <IconWrapper>

@@ -30,7 +30,7 @@ import { Error } from "../ResetPassword/Styled";
 
 const schema = yup.object().shape({
   name: yup.string().required("Name is required"),
-  surname: yup.string().required("Surname is required"),
+  surename: yup.string().required("Surename is required"),
   email: yup.string().email().required("Email is required"),
   password: yup
     .string()
@@ -114,11 +114,11 @@ const Invitied = () => {
               {errors.name && <Error>{errors.name.message}</Error>}
               <Input
                 type="text"
-                placeholder="Enter surname"
+                placeholder="Enter surename"
                 required
-                {...register("surname")}
+                {...register("surename")}
               />
-              {errors.surname && <Error>{errors.surname.message}</Error>}
+              {errors.surename && <Error>{errors.surename.message}</Error>}
               <Input
                 type="email"
                 placeholder="Enter email"

@@ -35,6 +35,7 @@ import {
 } from "./styled";
 import TimeTracking from "./TimeTracking/TimeTracking";
 import { isEmpty } from "lodash-es";
+import ConfirmModal from "../../ConfirmModal";
 
 export default function EditCard(props) {
   const { cardId, boardId } = props.ids;
@@ -73,6 +74,16 @@ export default function EditCard(props) {
       await uploadAttachment(cId, thisCard.owner, bId, files, dispatch);
     }
   };
+
+  if (isEmpty(thisCard.cardId)) {
+    return (
+      <ConfirmModal
+        open
+        title="Card not found"
+        closeHandle={() => props.callback()}
+      />
+    );
+  }
 
   return (
     <div style={{ position: "relative" }}>

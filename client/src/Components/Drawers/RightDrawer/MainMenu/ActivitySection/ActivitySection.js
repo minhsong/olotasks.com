@@ -18,6 +18,7 @@ import {
 import moment from "moment";
 import { activityUpdate } from "../../../../../Services/boardService";
 import CardLoadingSvg from "../../../../../Images/cardLoading.svg";
+import AvatarIcon from "../../../../AvatarIcon";
 
 const ActivitySection = () => {
   const board = useSelector((state) => state.board);
@@ -34,17 +35,7 @@ const ActivitySection = () => {
   const Comment = (props) => {
     return (
       <ActionContainer>
-        <Avatar
-          sx={{
-            width: 32,
-            height: 32,
-            bgcolor: props.color,
-            fontSize: "0.875rem",
-            fontWeight: "800",
-          }}
-        >
-          {props.name[0].toUpperCase()}
-        </Avatar>
+        <AvatarIcon id={props._id} name={props.name} color={props.color} />
         <ActionWrapper>
           <CommentTitle>
             <Text>
@@ -62,17 +53,7 @@ const ActivitySection = () => {
   const Action = (props) => {
     return (
       <ActionContainer>
-        <Avatar
-          sx={{
-            width: 32,
-            height: 32,
-            bgcolor: props.color,
-            fontSize: "0.875rem",
-            fontWeight: "800",
-          }}
-        >
-          {props.name[0].toUpperCase()}
-        </Avatar>
+        <AvatarIcon id={props._id} name={props.name} color={props.color} />
         <ActionWrapper>
           <Text>
             <b style={{ fontSize: "0.875rem" }}>{props.name}</b> {props.action}

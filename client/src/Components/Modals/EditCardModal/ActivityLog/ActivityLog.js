@@ -13,6 +13,7 @@ import {
 import { loadCardActivities } from "../../../../Services/cardService";
 import CardLoadingSvg from "../../../../Images/cardLoading.svg";
 import { LoadingScreen } from "../styled";
+import AvatarIcon from "../../../AvatarIcon";
 
 const ActivityLog = () => {
   const card = useSelector((state) => state.card);
@@ -41,17 +42,11 @@ const ActivityLog = () => {
           return (
             <Container key={index}>
               <LeftContainer>
-                <Avatar
-                  sx={{
-                    width: 28,
-                    height: 28,
-                    bgcolor: activity.color,
-                    fontSize: "0.875rem",
-                    fontWeight: "800",
-                  }}
-                >
-                  {activity.userName[0].toUpperCase()}
-                </Avatar>
+                <AvatarIcon
+                  id={activity.user}
+                  name={activity.userName}
+                  color={activity.color}
+                />
               </LeftContainer>
               <RightContainer>
                 <LogWrapper>

@@ -20,6 +20,7 @@ import moment from "moment";
 import CardLoadingSvg from "../../../Images/cardLoading.svg";
 import { useParams } from "react-router-dom";
 import { markAllAsRead } from "../../../Services/notificationService";
+import AvatarIcon from "../../AvatarIcon";
 
 const ActivitySection = () => {
   const [notifications, isLoading] = useSelector((state) => [
@@ -37,17 +38,7 @@ const ActivitySection = () => {
       <ActionContainer
         to={`/b/${props.board.id}-${props.board.name}/${props.card.id}-${props.card.name}`}
       >
-        <Avatar
-          sx={{
-            width: 32,
-            height: 32,
-            bgcolor: props.sender.color,
-            fontSize: "0.875rem",
-            fontWeight: "800",
-          }}
-        >
-          {props.sender.name[0].toUpperCase()}
-        </Avatar>
+        <AvatarIcon id={props.sender.user} {...props.sender} />
         <ActionWrapper>
           <Text>
             <b style={{ fontSize: "0.875rem" }}>{props.sender.name}</b>{" "}
@@ -68,17 +59,8 @@ const ActivitySection = () => {
       <ActionContainer
         to={`/b/${props.board.id}-${props.board.name}/${props.card.id}-${props.card.name}`}
       >
-        <Avatar
-          sx={{
-            width: 32,
-            height: 32,
-            bgcolor: props.color,
-            fontSize: "0.875rem",
-            fontWeight: "800",
-          }}
-        >
-          {props.sender.name[0].toUpperCase()}
-        </Avatar>
+        <AvatarIcon id={props.sender.user} {...props.sender} />
+
         <ActionWrapper>
           <Text>
             <b style={{ fontSize: "0.875rem" }}>{props.sender.name}</b>{" "}

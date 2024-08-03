@@ -22,6 +22,7 @@ import { Avatar } from "@mui/material";
 import moment from "moment";
 import BottomButtonGroup from "../../../BottomButtonGroup/BottomButtonGroup.js";
 import QuillEditor from "../../../QuillEditor/index.jsx";
+import AvatarIcon from "../../../AvatarIcon.jsx";
 
 const Comment = (props) => {
   const board = useSelector((state) => state.board);
@@ -52,17 +53,7 @@ const Comment = (props) => {
     <>
       <Container>
         <LeftContainer>
-          <Avatar
-            sx={{
-              width: 28,
-              height: 28,
-              bgcolor: props.color,
-              fontSize: "0.875rem",
-              fontWeight: "800",
-            }}
-          >
-            {props.sender.name[0].toUpperCase()}
-          </Avatar>
+          <AvatarIcon id={props.sender.user} {...props.sender} />
         </LeftContainer>
         <RightContainer>
           <div

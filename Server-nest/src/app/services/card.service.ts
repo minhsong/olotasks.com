@@ -248,7 +248,7 @@ export class CardService {
       // Add comment
       card.comments.push({
         sender: {
-          user: user.id,
+          user: user._id,
           name: user.name,
           color: user.color,
         },
@@ -392,6 +392,7 @@ export class CardService {
       card.members.unshift({
         user: member._id,
         name: member.name,
+        surename: member.surename,
         color: member.color,
       });
       card.members = uniqBy(card.members, 'user');
@@ -1245,7 +1246,7 @@ export class CardService {
       card.timeTracking.userTimeTracking.push({
         user: user._id,
         loggedTime: time,
-        userName: `${user.name} ${user.surname}`,
+        userName: `${user.name} ${user.surename}`,
         date: new Date(date),
         comment: comment,
       });

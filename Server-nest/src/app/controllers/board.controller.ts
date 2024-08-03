@@ -64,7 +64,10 @@ export class BoardController {
     @Request() req: any,
   ) {
     const loggedInUser = req.user as User;
-    const board = await this.boardService.getBoardByShortId(boardId);
+    const board = await this.boardService.getBoardByShortId(
+      boardId,
+      loggedInUser._id,
+    );
     if (!board) {
       return res
         .status(HttpStatus.BAD_REQUEST)
@@ -148,7 +151,10 @@ export class BoardController {
     @Request() req: any,
   ) {
     const loggedInUser = req.user as User;
-    const board = await this.boardService.getBoardByShortId(boardId);
+    const board = await this.boardService.getBoardByShortId(
+      boardId,
+      loggedInUser._id,
+    );
     if (!board) {
       return res
         .status(HttpStatus.BAD_REQUEST)
@@ -300,11 +306,14 @@ export class BoardController {
   }
 
   @Get(':id')
-  getById(@Param('id') id: string) {
-    return this.boardService.getBoardByShortId(id);
+  @Roles([])
+  getById(@Param('id') id: string, @Request() req) {
+    const user = req.user as User;
+    return this.boardService.getBoardByShortId(id, user._id);
   }
 
   @Get(':id/activity')
+  @Roles([])
   getActivityById(@Param('id') id: string) {
     return this.boardService.getActivityById(id);
   }

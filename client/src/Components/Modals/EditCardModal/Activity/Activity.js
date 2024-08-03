@@ -18,6 +18,7 @@ import { comment } from "../../../../Services/cardService";
 import { Avatar } from "@mui/material";
 import { CommentEditorContainer } from "../Comment/styled";
 import QuillEditor from "../../../QuillEditor";
+import AvatarIcon from "../../../AvatarIcon";
 
 const Activity = () => {
   const dispatch = useDispatch();
@@ -62,17 +63,7 @@ const Activity = () => {
       <Container>
         <LeftContainer>
           <MessageIcon fontSize="small" />
-          <Avatar
-            sx={{
-              width: 28,
-              height: 28,
-              bgcolor: user.userInfo.color,
-              fontSize: "0.875rem",
-              fontWeight: "800",
-            }}
-          >
-            {user.userInfo?.name && user.userInfo?.name[0].toUpperCase()}
-          </Avatar>
+          <AvatarIcon {...user.userInfo} />
         </LeftContainer>
         <RightContainer>
           <TitleWrapper>

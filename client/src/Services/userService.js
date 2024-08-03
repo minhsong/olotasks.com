@@ -17,7 +17,7 @@ import setBearer from "../Utils/setBearer";
 const baseUrl = process.env.REACT_APP_API_URL + "/user/";
 
 export const register = async (
-  { name, surname, email, password, repassword },
+  { name, surename, email, password, repassword },
   dispatch
 ) => {
   dispatch(registrationStart());
@@ -32,7 +32,7 @@ export const register = async (
     try {
       const res = await axios.post(`${baseUrl}register`, {
         name,
-        surname,
+        surename,
         email,
         password,
       });
