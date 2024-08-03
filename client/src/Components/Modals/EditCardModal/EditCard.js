@@ -75,7 +75,7 @@ export default function EditCard(props) {
     }
   };
 
-  if (isEmpty(thisCard.cardId)) {
+  if (!thisCard.pending && isEmpty(thisCard.cardId)) {
     return (
       <ConfirmModal
         open
