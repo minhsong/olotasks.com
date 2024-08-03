@@ -413,7 +413,7 @@ export class CardService {
 
       return { ...jsonCard, boardTitle: board.title };
     } catch (error) {
-      throw new Error('Something went wrong');
+      throw new Error(error);
     }
   }
 

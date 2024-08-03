@@ -247,7 +247,7 @@ export class BoardService {
             status: inviting ? 'inviting' : 'active',
           });
 
-          board.members = uniqBy(board.members, 'user');
+          board.members = uniqBy(board.members, 'email');
 
           // Add to board activity
           board.activity.push({
@@ -274,21 +274,21 @@ export class BoardService {
       //go through all boards and get all lists
 
       boards.forEach(async (board) => {
-        await this.cardModel.updateMany(
-          {
-            owner: { $in: board.lists },
-          },
-          { board: board._id },
-        );
+        // await this.cardModel.updateMany(
+        //   {
+        //     owner: { $in: board.lists },
+        //   },
+        //   { board: board._id },
+        // );
 
-        await this.cardModel.updateMany(
-          {
-            owner: { $in: board.lists.map((s) => s.toString()) },
-          },
-          { board: board._id },
-        );
-        board.shortId = generateRandomString();
-
+        // await this.cardModel.updateMany(
+        //   {
+        //     owner: { $in: board.lists.map((s) => s.toString()) },
+        //   },
+        //   { board: board._id },
+        // );
+        // board.shortId = generateRandomString();
+        board.members = uniqBy(board.members, 'email');
         board.save();
       });
 

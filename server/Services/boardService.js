@@ -214,7 +214,7 @@ const addMember = async (id, members, user, callback) => {
           color: newMember.color,
           role: "member",
         });
-        board.members = uniqBy(board.members, "user");
+        board.members = uniqBy(board.members, "email");
         //Add to board activity
         board.activity.push({
           user: user.id,
