@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 export default function AvatarIcon({ id, name, surename, color, sx = {} }) {
   const boardMembers = useSelector((state) => state.board.members);
 
-  const member = boardMembers.find((m) => m.user === id);
+  const member = boardMembers?.find((m) => m.user === id);
   const fullName = `${upperFirst(member?.name || name)} ${upperFirst(
     member?.surename || surename
   )}`.trim();
