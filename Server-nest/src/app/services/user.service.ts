@@ -124,13 +124,15 @@ export class UserService {
   }
 
   async updateCacheUser(userIds): Promise<any> {
-    if (userIds) {
-      userIds.map(async (userId) => {
-        this.getUser(userId).then((user) => {
-          this.redisService.SetUserData(user);
+    try {
+      if (userIds) {
+        userIds.map(async (userId) => {
+          this.getUser(userId).then((user) => {
+            this.redisService.SetUserData(user);
+          });
         });
-      });
-    }
+      }
+    } catch (error) {}
   }
 
   async updatePassword(email, password): Promise<any> {

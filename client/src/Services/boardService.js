@@ -252,6 +252,10 @@ export const boardMemberDelete = async (boardId, memberId) => {
   return await axios.delete(`${boardRoute}/${boardId}/member/${memberId}`);
 };
 
+export const boardMemberLeave = async (boardId) => {
+  return await axios.delete(`${boardRoute}/${boardId}/member/leave`);
+};
+
 export const boardMemberResendInvite = async (boardId, email) => {
   return await axios.post(`${boardRoute}/${boardId}/member/resend-invite`, {
     email,

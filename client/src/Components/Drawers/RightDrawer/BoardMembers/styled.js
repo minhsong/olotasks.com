@@ -68,8 +68,8 @@ export const MemberInfoContainer = styled.div`
 
 export const MemberName = styled.div`
   width: 100%;
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: 0.8rem;
+  font-weight: 700;
   word-wrap: break-word;
   color: #172b4d;
 `;

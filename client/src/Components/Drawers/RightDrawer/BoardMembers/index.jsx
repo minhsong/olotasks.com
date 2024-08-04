@@ -28,11 +28,10 @@ import { openAlert } from "../../../../Redux/Slices/alertSlice";
 import { updateMembers } from "../../../../Redux/Slices/boardSlice";
 import AvatarIcon from "../../../AvatarIcon";
 import ChangeMemberRole from "../../../Modals/EditCardModal/Popovers/ChangeMemberRole/ChangeMemberRole";
+import MemberItem from "./MemberItem";
 
 const BoardMembers = () => {
   const [invitePopover, setInvitePopover] = useState(null);
-  const [rolePopover, setRolePopover] = useState(null);
-  const [roleMember, setRoleMember] = useState(null);
   const [removeMember, setRemoveMember] = useState(null);
   const [board, user] = useSelector((state) => [
     state.board,
@@ -40,30 +39,6 @@ const BoardMembers = () => {
   ]);
 
   const dispatch = useDispatch();
-
-  const handleRemoveMember = () => {
-    boardMemberDelete(board.shortId, removeMember.user)
-      .then((res) => {
-        setRemoveMember(null);
-        dispatch(updateMembers(res.data));
-        dispatch(
-          openAlert({
-            message: "Member removed successfully",
-            severity: "success",
-          })
-        );
-      })
-      .catch((error) => {
-        dispatch(
-          openAlert({
-            message: error?.response?.data?.errMessage
-              ? error.response.data.errMessage
-              : error.message,
-            severity: "error",
-          })
-        );
-      });
-  };
 
   const resentInviteClick = (email) => {
     boardMemberResendInvite(board.shortId, email).then((res) => {
@@ -74,11 +49,6 @@ const BoardMembers = () => {
         })
       );
     });
-  };
-
-  const changeRoleClick = (member, e) => {
-    setRolePopover(e.currentTarget);
-    setRoleMember(member);
   };
 
   const loggedMember = board.members.find((m) => m.user == user._id);
@@ -92,14 +62,6 @@ const BoardMembers = () => {
 
   return (
     <Container>
-      {removeMember && (
-        <ConfirmModal
-          open={true}
-          closeHandle={() => setRemoveMember(null)}
-          confirmHandle={handleRemoveMember}
-          title="Are you sure to remove member?"
-        />
-      )}
       <SectionContainer>
         {["owner", "admin"].includes(loggedMember.role) && (
           <SectionHeaderContainer>
@@ -111,51 +73,9 @@ const BoardMembers = () => {
             </InviteButton>
           </SectionHeaderContainer>
         )}
-        {activeMembers.map((member) => {
-          return (
-            <MemberSectionContainer key={member.email}>
-              <AvatarIcon id={member.user} {...member} />
-              <MemberInfoContainer>
-                <MemberName>{`${member.name.replace(
-                  /^./,
-                  member.name[0].toUpperCase()
-                )} ${member.surename.toUpperCase()}`}</MemberName>
-                <MemberEmail>{member.email}</MemberEmail>
-                <MemberMenu>
-                  <MemberMenuButton
-                    clickable={
-                      ["owner"].includes(loggedMember.role) &&
-                      member.user != loggedMember.user
-                    }
-                    onClick={(event) => changeRoleClick(member, event)}
-                  >
-                    {member.role}
-                  </MemberMenuButton>
-                  {["owner", "admin"].includes(loggedMember.role) &&
-                    member.user != loggedMember.user && (
-                      <MemberMenuButton
-                        clickable
-                        className="remove"
-                        onClick={() => setRemoveMember(member)}
-                      >
-                        Remove
-                      </MemberMenuButton>
-                    )}
-                  {loggedMember.role != "owner" &&
-                    member.user == loggedMember.user && (
-                      <MemberMenuButton
-                        clickable
-                        className="remove"
-                        onClick={() => setRemoveMember(member)}
-                      >
-                        Leave Board
-                      </MemberMenuButton>
-                    )}
-                </MemberMenu>
-              </MemberInfoContainer>
-            </MemberSectionContainer>
-          );
-        })}
+        {activeMembers.map((member) => (
+          <MemberItem key={member.email} member={member} />
+        ))}
       </SectionContainer>
       <SectionContainer>
         <SectionHeaderContainer>
@@ -204,33 +124,13 @@ const BoardMembers = () => {
           <BasePopover
             anchorElement={invitePopover}
             closeCallback={() => {
-              setRolePopover(null);
+              setInvitePopover(null);
             }}
             title="Invite Members"
             contents={
               <InviteMembers
                 closeCallback={() => {
-                  setRolePopover(null);
-                }}
-              />
-            }
-          />
-        )}
-
-        {rolePopover && (
-          <BasePopover
-            anchorElement={rolePopover}
-            closeCallback={() => {
-              setRolePopover(null);
-              setRoleMember(null);
-            }}
-            title={`Change role of ${roleMember.name}`}
-            contents={
-              <ChangeMemberRole
-                member={roleMember}
-                closeCallback={() => {
-                  setRolePopover(null);
-                  setRoleMember(null);
+                  setInvitePopover(null);
                 }}
               />
             }

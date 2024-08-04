@@ -85,7 +85,7 @@ export class BoardController {
       const unregistedEmails = emails.filter(
         (email) => !registedEmails.includes(email),
       );
-      this.boardService.addMember(boardId, users, loggedInUser);
+      await this.boardService.addMember(boardId, users, loggedInUser);
       // send invite email to unregisted emails
       users.forEach((user) => {
         if (user.status === 'inviting') {
@@ -113,6 +113,12 @@ export class BoardController {
           );
         }
       });
+
+      this.userService.updateCacheUser(
+        users
+          .filter((s) => s.status != 'inviting')
+          .map((s) => s._id.toString()),
+      );
 
       // create invite account for unregisted emails
       await Promise.all(
@@ -340,6 +346,16 @@ export class BoardController {
     return await this.boardService.getAll(user);
   }
 
+  @Delete(':id/member/leave')
+  @Roles([])
+  async leaveBoard(@Param('id') id: string, @Request() req) {
+    const user = req.user as User;
+    return await this.boardService.leaveBoard(id, user).then((result) => {
+      this.userService.updateCacheUser([user._id.toString()]);
+      return result;
+    });
+  }
+
   @Delete(':id/member/:memberId')
   @Roles([])
   async removeMember(
@@ -348,14 +364,12 @@ export class BoardController {
     @Request() req,
   ) {
     const user = req.user as User;
-    return await this.boardService.removeMember(id, memberId, user);
-  }
-
-  @Delete(':id/member/leave')
-  @Roles([])
-  async leaveBoard(@Param('id') id: string, @Request() req) {
-    const user = req.user as User;
-    return await this.boardService.leaveBoard(id, user);
+    return await this.boardService
+      .removeMember(id, memberId, user)
+      .then((result) => {
+        this.userService.updateCacheUser([memberId]);
+        return result;
+      });
   }
 
   @Put(':id/member/change-role')

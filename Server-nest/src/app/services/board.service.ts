@@ -11,13 +11,14 @@ import { uniqBy } from 'lodash';
 import { Card, CardDocument } from '../models/schemas/card.schema';
 import { generateRandomString } from 'src/utils/helperMethods';
 import { List, ListDocument } from '../models/schemas/list.shema';
+import { UserService } from './user.service';
 
 @Injectable()
 export class BoardService {
   constructor(
     @InjectModel(Board.name) private readonly boardModel: Model<BoardDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    @InjectModel(Card.name) private readonly cardModel: Model<CardDocument>,
+    private readonly userService: UserService,
   ) {}
 
   async create(data: CreateBoardDto, loggedUser: User): Promise<Board> {
