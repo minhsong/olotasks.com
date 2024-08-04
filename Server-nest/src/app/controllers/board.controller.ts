@@ -81,22 +81,37 @@ export class BoardController {
     if (['owner', 'admin'].includes(loggedBoardMember.role)) {
       const { emails } = req.body;
       const users = await this.userService.getUsersByEmails(emails);
-      const registedEmails = users
-        .filter((s) => s.status != 'inviting')
-        .map((s) => s.email);
+      const registedEmails = users.map((s) => s.email);
       const unregistedEmails = emails.filter(
         (email) => !registedEmails.includes(email),
       );
       this.boardService.addMember(boardId, users, loggedInUser);
       // send invite email to unregisted emails
       users.forEach((user) => {
-        this.mailService.sendEmail(
-          user.email,
-          '[Olotasks]Invite to join board',
-          `You have been invited to join a board ${board.title}`,
-          `You have been invited to join a Olotasks board ${board.title} by ${loggedInUser.name}. Please click the link to join <br/>
+        if (user.status === 'inviting') {
+          const token = jwtSign(
+            { email: user.email, id: user._id },
+            {},
+            '360d',
+          );
+          this.mailService.sendEmail(
+            user.email,
+            '[Olotasks]Invite to join board',
+            `You have been invited to join a board ${board.title}`,
+            `<p>You have been invited to join a Olotasks board <a target="_blank" href="${process.env.CLIENT_URL}/b/${board.shortId}-${board.title}">${board.title}</a> by ${loggedInUser.name}.</p>
+             <p>Please click the link to join <a target="_blank" href="${process.env.CLIENT_URL}/invited?email=${user.email}&token=${token}">Join</a></p>
+             <p>Or copy and paste the link below to your browser</p>
+             <p>${process.env.CLIENT_URL}/invited?email=${user.email}&token=${token}</p>`,
+          );
+        } else {
+          this.mailService.sendEmail(
+            user.email,
+            '[Olotasks]Invite to join board',
+            `You have been invited to join a board ${board.title}`,
+            `You have been invited to join a Olotasks board ${board.title} by ${loggedInUser.name}. Please click the link to join <br/>
            ${process.env.CLIENT_URL}/b/${board.shortId}-${board.title}`,
-        );
+          );
+        }
       });
 
       // create invite account for unregisted emails
@@ -143,7 +158,7 @@ export class BoardController {
     }
   }
 
-  @Post(':boardId/resend-invite')
+  @Post(':boardId/member/resend-invite')
   @Roles([])
   async resentInvite(
     @Param('boardId') boardId: string,
@@ -325,7 +340,7 @@ export class BoardController {
     return await this.boardService.getAll(user);
   }
 
-  @Delete(':id/remove-member/:memberId')
+  @Delete(':id/member/:memberId')
   @Roles([])
   async removeMember(
     @Param('id') id: string,
@@ -341,5 +356,21 @@ export class BoardController {
   async leaveBoard(@Param('id') id: string, @Request() req) {
     const user = req.user as User;
     return await this.boardService.leaveBoard(id, user);
+  }
+
+  @Put(':id/member/change-role')
+  @Roles([])
+  async changeRole(
+    @Param('id') id: string,
+    @Body() body: { memberId: string; role: string },
+    @Request() req,
+  ) {
+    const user = req.user as User;
+    return await this.boardService.changeRole(
+      id,
+      body.memberId,
+      body.role,
+      user,
+    );
   }
 }

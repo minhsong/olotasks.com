@@ -202,7 +202,7 @@ export class UserController {
         name,
         surename,
         password: await hashPassword(password),
-        status: 'active',
+        status: 'invited',
       });
       return res.status(200).send({
         message: 'User login successful!',

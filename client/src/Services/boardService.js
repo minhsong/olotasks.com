@@ -249,13 +249,18 @@ export const boardAddMemberByEmail = async (boardId, email, dispatch) => {
 };
 
 export const boardMemberDelete = async (boardId, memberId) => {
-  return await axios.delete(
-    `${boardRoute}/${boardId}/remove-member/${memberId}`
-  );
+  return await axios.delete(`${boardRoute}/${boardId}/member/${memberId}`);
 };
 
 export const boardMemberResendInvite = async (boardId, email) => {
-  return await axios.post(`${boardRoute}/${boardId}/resend-invite`, {
+  return await axios.post(`${boardRoute}/${boardId}/member/resend-invite`, {
     email,
+  });
+};
+
+export const boardMemberChangeRole = async (boardId, memberId, role) => {
+  return await axios.put(`${boardRoute}/${boardId}/member/change-role`, {
+    memberId,
+    role,
   });
 };

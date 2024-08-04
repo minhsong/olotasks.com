@@ -137,10 +137,6 @@ export class BoardService {
   async getBoardByShortId(shortId, user): Promise<Board> {
     try {
       // Get board by id
-      console.log({
-        shortId,
-        members: { $elemMatch: { user: new ObjectId(user) } },
-      });
       const board = await this.boardModel.findOne({
         shortId,
         members: { $elemMatch: { user: new ObjectId(user) } },
@@ -230,16 +226,25 @@ export class BoardService {
       const board = await this.boardModel.findOne({ shortId: id });
 
       // Validate whether params.id is in the user's boards or not
+      const loggedBoardMember = user.boards.filter(
+        (board) => board.toString() === board._id.toString(),
+      );
       const validate = user.boards.filter(
         (board) => board.toString() === board._id.toString(),
       );
-      if (!validate)
+      if (
+        !validate ||
+        !loggedBoardMember ||
+        ['owner', 'admin'].includes(loggedBoardMember.role)
+      )
         throw new Error(
           'You can not add member to this board, you are not a member or owner!',
         );
       // Set variables
       await Promise.all(
         members.map(async (member) => {
+          if (!member) return;
+
           const newMember = await this.userModel.findById(member._id);
           newMember.boards.push(board._id as any);
           newMember.boards = uniqBy(newMember.boards, 'toString');
@@ -404,6 +409,46 @@ export class BoardService {
       // Save changes
       await board.save();
 
+      return board.members;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async changeRole(boardId, memberId, role, user: User): Promise<any> {
+    try {
+      // Get board by id
+      const board = await this.boardModel.findOne({ shortId: boardId });
+      const loggedBoardMember = board.members.find(
+        (member) => member.user.toString() === user._id.toString(),
+      );
+
+      if (!loggedBoardMember || loggedBoardMember.role !== 'owner')
+        throw new Error('You can not change role of this member!');
+
+      const member = board.members.find(
+        (member) => member.user.toString() === memberId,
+      );
+
+      if (!member) throw new Error('Member not found!');
+
+      board.members = board.members.map((member) => {
+        if (member.user.toString() === memberId) {
+          member.role = role;
+        }
+        return member;
+      });
+
+      // Add to board activity
+      board.activity.push({
+        user: user.id,
+        name: user.name,
+        action: `${user.name} changed role of ${member.name} to ${role}`,
+        color: user.color,
+      });
+
+      // Save changes
+      await board.save();
       return board.members;
     } catch (error) {
       throw new Error(error);

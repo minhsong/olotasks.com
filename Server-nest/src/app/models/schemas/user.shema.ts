@@ -29,7 +29,7 @@ export class User extends Document {
 
   @Prop({
     enum: ['inviting', 'invited', 'registered'],
-    default: 'inviting',
+    default: 'registered',
   })
   status: 'inviting' | 'invited' | 'registered';
 }

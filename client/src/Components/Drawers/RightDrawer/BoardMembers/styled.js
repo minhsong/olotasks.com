@@ -144,8 +144,12 @@ export const MemberMenu = styled.div`
 export const MemberMenuButton = styled.div`
   font-size: 0.875rem;
   color: #5e6c84;
-  cursor: pointer;
-  &:hover {
+
+  ${(props) =>
+    props.clickable &&
+    `
+     cursor: pointer;
+    &:hover {
     text-decoration: underline;
-  }
+  }`};
 `;
