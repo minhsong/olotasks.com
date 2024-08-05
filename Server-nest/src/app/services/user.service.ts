@@ -10,6 +10,7 @@ import { User, UserDocument } from '../models/schemas/user.shema';
 import { comparePasswords, hashPassword } from 'src/utils/jwthelper';
 import { Board, BoardDocument } from '../models/schemas/board.schema';
 import { RedisService } from '../redis/redis.service';
+import {} from 'lodash';
 
 @Injectable()
 export class UserService {
@@ -20,7 +21,10 @@ export class UserService {
   ) {}
 
   async register(user) {
-    const userExist = await this.userModel.findOne({ email: user.email });
+    user.email = user.email.toLowerCase();
+    const userExist = await this.userModel.findOne({
+      email: user.email,
+    });
     if (!userExist) {
       return this.userModel.create({
         ...user,
@@ -43,7 +47,7 @@ export class UserService {
 
   async login(email, password): Promise<any> {
     try {
-      const user = await this.userModel.findOne({ email });
+      const user = await this.userModel.findOne({ email: email.toLowerCase() });
       if (!user) {
         return null;
       }
@@ -92,7 +96,7 @@ export class UserService {
 
   async getUserWithMail(email): Promise<any> {
     try {
-      let user = await this.userModel.findOne({ email });
+      let user = await this.userModel.findOne({ email: email.toLowerCase() });
       if (!user) {
         return null;
       }
@@ -105,7 +109,9 @@ export class UserService {
 
   async getUsersByEmails(emails): Promise<User[]> {
     try {
-      const users = await this.userModel.find({ email: { $in: emails } });
+      const users = await this.userModel.find({
+        email: { $in: emails.filter((s) => !!s).map((s) => s.toLowerCase()) },
+      });
       return users;
     } catch (error) {
       throw new Error(error);
@@ -114,7 +120,7 @@ export class UserService {
 
   async createUserWithEmail(email): Promise<User> {
     return await this.userModel.create({
-      email,
+      email: email.toLowerCase(),
       color: createRandomHexColor(),
       name: email.split('@')[0],
       surename: '',
@@ -137,7 +143,7 @@ export class UserService {
 
   async updatePassword(email, password): Promise<any> {
     try {
-      const user = await this.userModel.findOne({ email });
+      const user = await this.userModel.findOne({ email: email.toLowerCase() });
       if (!user) {
         return null;
       }
@@ -150,6 +156,7 @@ export class UserService {
   }
 
   async updateUser(id, user): Promise<any> {
+    user.email = user.email.toLowerCase();
     try {
       const updatedUser = await this.userModel.findByIdAndUpdate(id, user, {
         new: true,
