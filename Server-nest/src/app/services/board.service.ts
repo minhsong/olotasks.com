@@ -247,9 +247,9 @@ export class BoardService {
           if (!member) return;
 
           const newMember = await this.userModel.findById(member._id);
-          newMember.boards.push(board._id as any);
-          newMember.boards = uniqBy(newMember.boards, 'toString');
+          newMember.boards.push(board._id as ObjectId);
           await newMember.save();
+
           board.members.push({
             user: newMember._id,
             name: newMember.name,

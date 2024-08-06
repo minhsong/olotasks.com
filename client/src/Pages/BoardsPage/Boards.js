@@ -6,6 +6,7 @@ import Navbar from "../../Components/Navbar";
 import { Container, Wrapper, Title, Board, AddBoard } from "./Styled";
 import CreateBoard from "../../Components/Modals/CreateBoardModal/CreateBoard";
 import { useNavigate } from "react-router";
+import { boardLink } from "../../Utils/linkHelper";
 
 const Boards = () => {
   const dispatch = useDispatch();
@@ -28,7 +29,7 @@ const Boards = () => {
 
   const handleClick = (e) => {
     const board = boardsData.find((board) => board.shortId === e.target.id);
-    navigate(`/b/${e.target.id}-${board.title}`);
+    navigate(boardLink(e.target.id, board.title));
   };
 
   useEffect(() => {

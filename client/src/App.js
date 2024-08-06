@@ -8,6 +8,7 @@ import Boards from "./Pages/BoardsPage/Boards";
 import { loadUser } from "./Services/userService";
 import Store from "./Redux/Store";
 import Board from "./Pages/BoardPage/Board";
+import Report from "./Pages/BoardReport";
 import ProtectedArea from "./Utils/ProtectedArea";
 import { WebSocketProvider } from "./Components/Websocket/WebSocketContext";
 import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
@@ -41,10 +42,18 @@ const App = () => {
           />
           <Route
             exact
-            path="/b/:id/:cardId*"
+            path="/b/:id/:cardId"
             element={
               <ProtectedArea>
                 <Board />
+              </ProtectedArea>
+            }
+          />
+          <Route
+            path="/r/:id/*"
+            element={
+              <ProtectedArea>
+                <Report />
               </ProtectedArea>
             }
           />

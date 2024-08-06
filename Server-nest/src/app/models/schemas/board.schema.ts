@@ -80,7 +80,7 @@ export class Board {
   @Prop({ type: [BoardActivitySchema], default: [] })
   activity: BoardActivity[];
 
-  @Prop([BoardMemberSchema])
+  @Prop({ type: [BoardMemberSchema], default: [], _id: false })
   members: BoardMember[];
 
   @Prop([{ type: Types.ObjectId, ref: 'List' }])

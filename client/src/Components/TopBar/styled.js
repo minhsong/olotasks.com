@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { xs } from "../../BreakPoints";
+import { Link } from "react-router-dom";
 
 export const TopBar = styled.div`
   height: 52px;
@@ -102,4 +103,28 @@ export const BoardNameInput = styled.input`
   ${xs({
     maxWidth: "8rem",
   })}
+`;
+
+export const Button = styled(Link)`
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.25);
+  border: none;
+  color: white;
+  height: 2rem;
+  gap: 0.3rem;
+  padding: 0rem 0.7rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: 250ms ease;
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  ${(props) =>
+    props.active &&
+    `
+	background-color: green;
+	font-weight: 700;
+	shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+	`}
 `;

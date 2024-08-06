@@ -8,12 +8,12 @@ import DateIcon from "@mui/icons-material/ScheduleOutlined";
 import AttachmentIcon from "@mui/icons-material/AttachFileOutlined";
 import CoverIcon from "@mui/icons-material/TableChartOutlined";
 import BasePopover from "../../../ReUsableComponents/BasePopover";
-import MembersPopover from "../Popovers/Members/MembersPopover";
 import LabelsPopover from "../Popovers/Labels/LabelsPopover";
 import ChecklistPopover from "../Popovers/Checklist/ChecklistPopover";
 import DatePopover from "../Popovers/Date/DatePopover";
 import AddAttachmentPopover from "../Popovers/Attachment/AddAttachmentPopover";
 import CoverPopover from "../Popovers/Cover/CoverPopover";
+import Members from "../Popovers/Members";
 
 const AddToCard = () => {
   const [memberPopover, setMemberPopover] = React.useState(null);
@@ -24,6 +24,7 @@ const AddToCard = () => {
   const [coverPopover, setCoverPopover] = React.useState(null);
   const [labelsBackArrow, setLabelsBackArrow] = React.useState(false);
   const [labelsTitle, setLabelsTitle] = React.useState("Labels");
+
   return (
     <Container>
       <Title>Add to card</Title>
@@ -40,7 +41,7 @@ const AddToCard = () => {
             setMemberPopover(null);
           }}
           title="Members"
-          contents={<MembersPopover />}
+          contents={<Members />}
         />
       )}
 

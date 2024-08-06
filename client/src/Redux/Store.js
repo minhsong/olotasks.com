@@ -6,6 +6,8 @@ import boardReducer from "./Slices/boardSlice";
 import listReducer from "./Slices/listSlice";
 import cardReducer from "./Slices/cardSlice";
 import notificationReducer from "./Slices/notificationSlice";
+import reportReducer from "./Slices/reportSlice";
+
 const reducer = {
   user: userReducer,
   alert: alertReducer,
@@ -13,6 +15,7 @@ const reducer = {
   list: listReducer,
   card: cardReducer,
   notification: notificationReducer,
+  report: reportReducer,
 };
 const Store =
   process.env.NODE_ENV == "development"

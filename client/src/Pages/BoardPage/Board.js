@@ -25,7 +25,7 @@ const Board = (props) => {
   const navigate = useNavigate();
   const { ws } = useWebSocket();
   let { id, cardId } = useParams();
-  const { backgroundImageLink, isImage, loading, title } = useSelector(
+  const { backgroundImageLink, isImage, loading, title, shortId } = useSelector(
     (state) => state.board
   );
   const user = useSelector((state) => state.user);
@@ -38,6 +38,9 @@ const Board = (props) => {
   });
 
   useEffect(() => {
+    // prevent loading board again when data is loaded
+    if (!isEmpty(title) && !loading && boardId == shortId) return;
+
     getBoard(boardId, dispatch);
     getLists(boardId, dispatch);
   }, [id, dispatch, boardId]);
@@ -121,7 +124,7 @@ const Board = (props) => {
           isImage ? backgroundImageLink.split("?")[0] : backgroundImageLink
         }
       >
-        <TopBar />
+        <TopBar activeMenu={"b"} />
         {loadingListService && <LoadingScreen />}
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable

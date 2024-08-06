@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { getBoards } from "../Services/boardsService";
 import CardLoadingSvg from "../Images/cardLoading.svg";
+import { boardLink } from "../Utils/linkHelper";
 
 const BootstrapButton = styled(Button)({
   boxShadow: "none",
@@ -103,7 +104,7 @@ export default function DropdownMenu(props) {
                   key={item._id}
                   onClick={() => {
                     setAnchorEl(null);
-                    navigate("/b/" + item.shortId + "-" + item.title);
+                    navigate(boardLink(item.shortId, item.title));
                   }}
                 >
                   <Span>{item.title}</Span>

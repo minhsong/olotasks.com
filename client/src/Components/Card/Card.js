@@ -30,6 +30,7 @@ import { secondsToTimeString } from "../../Utils/estimateTimeHelper";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import AvatarIcon from "../AvatarIcon";
+import { cardLink } from "../../Utils/linkHelper";
 
 const Card = (props) => {
   const [openModal, setOpenModal] = useState(false);
@@ -46,9 +47,7 @@ const Card = (props) => {
   });
 
   const handleOpenClose = () => {
-    navigate(
-      `/b/${props.boardId}-${board.title}/${props.info._id}-${card.title}`
-    );
+    navigate(cardLink(props.boardId, board.title, props.info._id, card.title));
     // setOpenModal((current) => !current);
   };
 

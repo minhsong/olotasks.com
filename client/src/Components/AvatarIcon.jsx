@@ -21,6 +21,7 @@ export default function AvatarIcon({ id, name, surename, color, sx = {} }) {
       <Avatar
         sx={merge(
           {
+            display: "inline-flex",
             width: "28px",
             height: "28px",
             bgcolor: member ? member.color : color,

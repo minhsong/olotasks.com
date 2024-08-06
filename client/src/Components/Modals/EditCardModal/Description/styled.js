@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import HTMLEditor from "../../../ReUsableComponents/HTMLEditor";
 
 export const Container = styled.div`
   display: flex;

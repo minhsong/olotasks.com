@@ -9,7 +9,6 @@ import {
 import DescriptionIcon from "@mui/icons-material/TextSnippetOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { descriptionUpdate } from "../../../../Services/cardService";
-import HTMLEditor from "../../../ReUsableComponents/HTMLEditor.js";
 import BottomButtonGroup from "../../../BottomButtonGroup/BottomButtonGroup.js";
 import QuillEditor from "../../../QuillEditor/index.jsx";
 const Description = () => {

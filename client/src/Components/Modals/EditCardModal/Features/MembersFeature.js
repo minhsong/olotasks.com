@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import MembersPopover from "../Popovers/Members/MembersPopover";
+import MembersPopover from "../../../Popovers/MembersPopover";
 import BasePopover from "../../../ReUsableComponents/BasePopover";
 import { Title, RowContainer, AddAvatar } from "./styled";
 import { Avatar } from "@mui/material";
