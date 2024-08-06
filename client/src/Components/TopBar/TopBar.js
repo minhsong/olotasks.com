@@ -5,6 +5,7 @@ import * as common from "../../Pages/BoardPage/CommonStyled";
 import { useDispatch, useSelector } from "react-redux";
 import { boardTitleUpdate } from "../../Services/boardsService";
 import RightDrawer from "../Drawers/RightDrawer/RightDrawer";
+import { boardLink, boardReportLink } from "../../Utils/linkHelper";
 
 const TopBar = ({ activeMenu }) => {
   const board = useSelector((state) => state.board);
@@ -30,14 +31,14 @@ const TopBar = ({ activeMenu }) => {
         <style.Button
           color={activeMenu !== "b" && "clasic"}
           active={activeMenu == "b"}
-          to={`/b/${board.shortId}-${board.title}`}
+          to={boardLink(board.shortId, board.title)}
         >
           TASKS
         </style.Button>
         <style.Button
           color={activeMenu !== "r" && "clasic"}
           active={activeMenu == "r"}
-          to={`/r/${board.shortId}-${board.title}`}
+          to={boardReportLink(board.shortId, board.title)}
         >
           REPORT
         </style.Button>

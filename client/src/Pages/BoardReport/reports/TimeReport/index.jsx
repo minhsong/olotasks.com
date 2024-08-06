@@ -81,7 +81,6 @@ export default function TimeReport() {
               return true;
             }
           });
-          console.log(listCards);
           cards.push(
             ...listCards.map((s) => ({ ...s, listTitle: list.title }))
           );
@@ -95,7 +94,7 @@ export default function TimeReport() {
 
   useEffect(() => {
     filterData();
-  }, [report.filter]);
+  }, [report.filter, allLists]);
 
   const viewDetailClick = (user) => {
     if (detailView === user) {
@@ -123,7 +122,11 @@ export default function TimeReport() {
               {data.map((user) => (
                 <>
                   <TableRow
+                    hover={user.cards.length > 0}
                     key={user.user}
+                    sx={{
+                      cursor: user.cards.length > 0 ? "pointer" : "default",
+                    }}
                     onClick={() => viewDetailClick(user.user)}
                   >
                     <TableCell>
@@ -142,19 +145,19 @@ export default function TimeReport() {
                         <TableContainer>
                           <Table size="small" aria-label="sticky table">
                             <TableHead>
-                              <TableRow>
+                              <TableRow style={{ background: "#ccc" }}>
                                 <TableCell></TableCell>
                                 <TableCell>Task</TableCell>
                                 <TableCell>Column</TableCell>
-                                <TableCell>member time</TableCell>
-                                <TableCell>task time</TableCell>
+                                <TableCell>Member time</TableCell>
+                                <TableCell>Task time</TableCell>
                                 <TableCell>Estimated</TableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              {user.cards.map((card) => (
+                              {user.cards.map((card, i) => (
                                 <TableRow key={card._id}>
-                                  <TableCell></TableCell>
+                                  <TableCell>{i + 1}</TableCell>
                                   <TableCell>
                                     <CardTitleLink
                                       target="_blank"

@@ -72,4 +72,5 @@ export const RightWrapper = styled.div`
 
 export const RightContent = styled.div`
   padding: 1rem;
+  overflow-y: auto;
 `;

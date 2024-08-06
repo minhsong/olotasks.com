@@ -21,6 +21,7 @@ import CardLoadingSvg from "../../../Images/cardLoading.svg";
 import { useParams } from "react-router-dom";
 import { markAllAsRead } from "../../../Services/notificationService";
 import AvatarIcon from "../../AvatarIcon";
+import { cardLink } from "../../../Utils/linkHelper";
 
 const ActivitySection = () => {
   const [notifications, isLoading] = useSelector((state) => [
@@ -57,7 +58,12 @@ const ActivitySection = () => {
   const Action = (props) => {
     return (
       <ActionContainer
-        to={`/b/${props.board.id}-${props.board.name}/${props.card.id}-${props.card.name}`}
+        to={cardLink(
+          props.board.id,
+          props.board.name,
+          props.card.id,
+          props.card.name
+        )}
       >
         <AvatarIcon id={props.sender.user} {...props.sender} />
 
