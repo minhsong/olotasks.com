@@ -55,7 +55,7 @@ export default ({ actionMenu, filterPanel }) => {
       <TopLeftWrapper>{actionMenu}</TopLeftWrapper>
       <TopRightWrapper>
         <Title>
-          <FilterAlt fontSize="small" /> Fillter:
+          <FilterAlt fontSize="small" /> Filter:
         </Title>
         <Button
           color={columnsWatch.length > 0 ? "success" : "default"}

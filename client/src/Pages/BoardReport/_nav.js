@@ -1,6 +1,7 @@
 import Timer from "@mui/icons-material/Timer";
 import Report from "@mui/icons-material/Report";
 import Dash from "@mui/icons-material/Dashboard";
+import CalendarToday from "@mui/icons-material/CalendarToday";
 
 export default [
   // {
@@ -17,5 +18,10 @@ export default [
     name: "Deadline Report",
     to: "deadline",
     icon: <Report />,
+  },
+  {
+    name: "Calendar view",
+    to: "calendar-view",
+    icon: <CalendarToday />,
   },
 ];

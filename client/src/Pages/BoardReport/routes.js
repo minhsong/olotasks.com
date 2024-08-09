@@ -1,6 +1,7 @@
 import Dashboard from "./reports/Dashboard";
 import TimeReport from "./reports/TimeReport";
 import Deadline from "./reports/Deadline";
+import CalendarView from "./reports/CalendarView";
 
 export default [
   {
@@ -26,5 +27,11 @@ export default [
     name: "Deadline",
     exact: true,
     element: <Deadline />,
+  },
+  {
+    path: "calendar-view",
+    name: "Calendar view",
+    exact: true,
+    element: <CalendarView />,
   },
 ];

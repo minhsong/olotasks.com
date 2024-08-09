@@ -49,7 +49,11 @@ export default function TimeReport() {
         .map((list) => {
           const listCards = list.cards.filter((card) => {
             // validate labels
-            if (!isEmpty(labels) && !labels.includes(card._id)) {
+            const cardLabels = (card.labels || []).map((s) => s._id);
+            if (
+              !isEmpty(labels) &&
+              !labels.some((label) => cardLabels.includes(label))
+            ) {
               return false;
             }
             // validate user has logged time
@@ -57,8 +61,12 @@ export default function TimeReport() {
               if (log.user === member.user) {
                 // validate date range
                 if (
-                  new Date(log.date) >= new Date(dateRange.startDate) &&
-                  new Date(log.date) <= new Date(dateRange.endDate)
+                  new Date(log.date) >=
+                    dayjs(new Date(dateRange.startDate))
+                      .startOf("date")
+                      .toDate() &&
+                  new Date(log.date) <=
+                    dayjs(new Date(dateRange.endDate)).endOf("date").toDate()
                 ) {
                   return true;
                 } else {
@@ -181,7 +189,7 @@ export default function TimeReport() {
                   </TableRow>
                   {detailViews.includes(user.user) && user.cards.length > 0 && (
                     <TableRow>
-                      <TableCell colSpan={5}>
+                      <TableCell colSpan={4 + filterDatesList().length}>
                         <TableContainer>
                           <Table size="small" aria-label="sticky table">
                             <TableHead>
@@ -189,9 +197,15 @@ export default function TimeReport() {
                                 <TableCell></TableCell>
                                 <TableCell>Task</TableCell>
                                 <TableCell>Column</TableCell>
-                                <TableCell>Member time</TableCell>
-                                <TableCell>Task time</TableCell>
-                                <TableCell>Estimated</TableCell>
+                                {filterDatesList().map((date) => (
+                                  <TableCell key={date.getTime()}>
+                                    {dayjs(date).format("DD/MM")}
+                                  </TableCell>
+                                ))}
+                                <TableCell>Total</TableCell>
+
+                                {/* <TableCell>Task time</TableCell>
+                                <TableCell>Estimated</TableCell> */}
                               </TableRow>
                             </TableHead>
                             <TableBody>
@@ -212,6 +226,36 @@ export default function TimeReport() {
                                     </CardTitleLink>
                                   </TableCell>
                                   <TableCell>{card.listTitle}</TableCell>
+                                  {filterDatesList().map((date) => {
+                                    const dateLogs =
+                                      card.timeTracking.userTimeTracking.filter(
+                                        (log) => {
+                                          if (
+                                            log.user === user.user &&
+                                            new Date(
+                                              log.date
+                                            ).toDateString() ===
+                                              date.toDateString()
+                                          ) {
+                                            return true;
+                                          } else {
+                                            return false;
+                                          }
+                                        }
+                                      );
+                                    const dateLoggedTime = dateLogs.reduce(
+                                      (a, b) => a + b.loggedTime,
+                                      0
+                                    );
+                                    return (
+                                      <TableCell key={date.toDateString()}>
+                                        {secondsToTimeString(
+                                          dateLoggedTime,
+                                          "h"
+                                        )}
+                                      </TableCell>
+                                    );
+                                  })}
                                   <TableCell>
                                     {secondsToTimeString(
                                       card.timeTracking.userTimeTracking
@@ -220,7 +264,7 @@ export default function TimeReport() {
                                       "h"
                                     )}
                                   </TableCell>
-                                  <TableCell>
+                                  {/* <TableCell>
                                     {card.timeTracking?.spentTime
                                       ? secondsToTimeString(
                                           card.timeTracking.spentTime,
@@ -235,7 +279,7 @@ export default function TimeReport() {
                                           "h"
                                         )
                                       : "-"}
-                                  </TableCell>
+                                  </TableCell> */}
                                 </TableRow>
                               ))}
                             </TableBody>

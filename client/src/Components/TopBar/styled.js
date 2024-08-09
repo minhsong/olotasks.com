@@ -32,6 +32,7 @@ export const RightWrapper = styled.div`
   display: flex;
   flex: 1;
   height: 100%;
+  gap: 1rem;
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;

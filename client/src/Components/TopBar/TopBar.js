@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { boardTitleUpdate } from "../../Services/boardsService";
 import RightDrawer from "../Drawers/RightDrawer/RightDrawer";
 import { boardLink, boardReportLink } from "../../Utils/linkHelper";
+import Button from "../ReUsableComponents/Button";
+import { FilterAlt } from "@mui/icons-material";
 
 const TopBar = ({ activeMenu }) => {
   const board = useSelector((state) => state.board);
@@ -45,6 +47,11 @@ const TopBar = ({ activeMenu }) => {
       </style.LeftWrapper>
 
       <style.RightWrapper>
+        {activeMenu == "b" && (
+          <Button color={"default"}>
+            <FilterAlt fontSize="small" /> Filter
+          </Button>
+        )}
         <common.Button
           onClick={() => {
             setShowDrawer(true);
