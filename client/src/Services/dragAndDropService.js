@@ -4,6 +4,7 @@ import {
   updateListDragDrop,
 } from "../Redux/Slices/listSlice";
 import { openAlert } from "../Redux/Slices/alertSlice";
+import { updateListId } from "../Redux/Slices/cardSlice";
 
 const baseUrl = process.env.REACT_APP_API_URL + "/list";
 
@@ -49,7 +50,7 @@ export const updateCardOrder = async (props, dispatch) => {
     });
   }
   await dispatch(updateCardDragDrop(tempList));
-
+  dispatch(updateListId(props.destinationId));
   // Server side requests
 
   submitCall = submitCall.then(() =>

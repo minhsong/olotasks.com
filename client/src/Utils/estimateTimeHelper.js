@@ -27,9 +27,25 @@ export const timeStringToSeconds = (input) => {
   return seconds;
 };
 
-export const secondsToTimeString = (seconds) => {
+export const secondsToTimeString = (seconds, unit) => {
   if (typeof seconds !== "number" || seconds < 0) {
     return null;
+  }
+
+  if (unit === "s") {
+    return seconds + "s";
+  }
+
+  if (unit === "m") {
+    return Math.floor(seconds / 60) + "m";
+  }
+  let duration = [];
+  if (unit === "h") {
+    const hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
+    if (hours > 0) duration.push(`${hours}h`);
+    if (seconds > 0) duration.push(`${Math.floor(seconds / 60)}m`);
+    return duration.join(" ");
   }
 
   const days = Math.floor(seconds / 86400);
@@ -38,8 +54,6 @@ export const secondsToTimeString = (seconds) => {
   seconds %= 3600;
   const minutes = Math.floor(seconds / 60);
   seconds %= 60;
-
-  let duration = [];
 
   if (days > 0) duration.push(`${days}d`);
   if (hours > 0) duration.push(`${hours}h`);

@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
+import dayjs from "dayjs";
 
 const initialState = {
   filter: {
     dateRange: {
-      startDate: new Date(),
-      endDate: new Date(),
+      startDate: dayjs(new Date()).startOf("date").toDate(),
+      endDate: dayjs(new Date()).endOf("date").toDate(),
     },
     labels: [],
     members: [],
@@ -22,9 +23,21 @@ const reportSlice = createSlice({
     setLoadingListService(state, action) {
       state.loadingListService = action.payload;
     },
+    resetFilter(state) {
+      state.filter = {
+        dateRange: {
+          startDate: dayjs(new Date()).startOf("date").toDate(),
+          endDate: dayjs(new Date()).endOf("date").toDate(),
+        },
+        labels: [],
+        members: [],
+        columns: [],
+      };
+    },
   },
 });
 
-export const { setFilter, setLoadingListService } = reportSlice.actions;
+export const { setFilter, setLoadingListService, resetFilter } =
+  reportSlice.actions;
 
 export default reportSlice.reducer;

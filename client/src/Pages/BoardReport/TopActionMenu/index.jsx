@@ -12,7 +12,7 @@ import { CalendarMonth, FilterAlt, ViewColumn } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import DateRangePicker from "../../../Components/DateRangePicker";
 import { differenceInDays } from "date-fns";
-import { setFilter } from "../../../Redux/Slices/reportSlice";
+import { resetFilter, setFilter } from "../../../Redux/Slices/reportSlice";
 import BaseSelectItems from "../../../Components/Popovers/BaseSelectItems";
 
 export default ({ actionMenu, filterPanel }) => {
@@ -47,17 +47,7 @@ export default ({ actionMenu, filterPanel }) => {
 
   const resetDefaultHandle = () => {
     reset();
-    dispatch(
-      setFilter({
-        dateRange: {
-          startDate: new Date(),
-          endDate: new Date(),
-        },
-        labels: [],
-        members: [],
-        columns: [],
-      })
-    );
+    dispatch(resetFilter());
   };
 
   return (

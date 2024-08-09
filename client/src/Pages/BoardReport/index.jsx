@@ -27,6 +27,7 @@ import _nav from "./_nav";
 import routes from "./routes";
 import Button from "../../Components/ReUsableComponents/Button";
 import TopActionMenu from "./TopActionMenu";
+import { resetFilter } from "../../Redux/Slices/reportSlice";
 
 export default (props) => {
   /* props.match.params.id */
@@ -50,6 +51,7 @@ export default (props) => {
     if (!isEmpty(title) && !loading && boardId == shortId) return;
     getBoard(boardId, dispatch);
     getLists(boardId, dispatch);
+    dispatch(resetFilter());
   }, [id, dispatch, boardId]);
 
   useEffect(() => {

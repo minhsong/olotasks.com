@@ -60,6 +60,11 @@ const cardsSlice = createSlice({
       state.timeTracking = action.payload.timeTracking;
       state.comments = action.payload.comments;
     },
+
+    updateListId: (state, action) => {
+      state.listId = action.payload;
+      state.owner = action.payload;
+    },
     setCardActivities: (state, action) => {
       state.activities = action.payload;
     },
@@ -318,5 +323,6 @@ export const {
   updateSpentTime,
   updateTimeTracking,
   setCardActivities,
+  updateListId,
 } = cardsSlice.actions;
 export default cardsSlice.reducer;
